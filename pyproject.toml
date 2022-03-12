@@ -1,0 +1,63 @@
+[project]
+description = "Data definitions for CPPython"
+name = "cppython-core"
+
+license-expression = "MIT"
+
+authors = [
+  {name = "Synodic Software", email = "contact@synodic.software"},
+]
+readme = "README.md"
+
+dynamic = ["version"]
+
+requires-python = ">=3.10"
+
+dependencies = [
+  "pydantic>=1.9",
+]
+
+[project.license-files]
+paths = ["LICENSE.md"]
+
+[project.urls]
+homepage = "https://github.com/Synodic-Software/CPPython-Core"
+repository = "https://github.com/Synodic-Software/CPPython-Core"
+
+[tool.pdm]
+version = {use_scm = true}
+
+[tool.pdm.dev-dependencies]
+lint = [
+  "black>=22.1.0",
+  "pylint>=2.12.2",
+  "isort>=5.10.1",
+]
+test = [
+  "pytest-cov>=3.0.0",
+  "pytest-mock>=3.7.0",
+  "tomlkit>=0.10.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests",
+]
+
+[tool.black]
+line-length = 120
+preview = true
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint.messages_control]
+disable = "C0330, C0326"
+extension-pkg-whitelist = "pydantic"
+
+[tool.pylint.format]
+max-line-length = "120"
+
+[build-system]
+build-backend = "pdm.pep517.api"
+requires = ["pdm-pep517"]
