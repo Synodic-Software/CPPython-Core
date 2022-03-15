@@ -4,10 +4,9 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from pathlib import Path
 from typing import Optional, Type, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pydantic.fields import Field
 
 
@@ -23,14 +22,27 @@ class TargetEnum(Enum):
 
 class PEP621(BaseModel):
     """
-    PEP 621 conforming data
-        The entirety of PEP 621 is not relevant for interface plugins
+    CPPython relevant PEP 621 conforming data
         Schema: https://www.python.org/dev/peps/pep-0621/
     """
 
-    name: str
-    version: str
-    description: str = ""
+    dynamic: list[str] = Field(default=[], description="https://peps.python.org/pep-0621/#dynamic")
+    name: str = Field(description="https://peps.python.org/pep-0621/#name")
+    version: Optional[str] = Field(default=None, description="https://peps.python.org/pep-0621/#version")
+    description: str = Field(default="", description="https://peps.python.org/pep-0621/#description")
+
+    @validator("version")
+    def validate_version(value, values):  # pylint: disable=E0213
+        """
+        TODO
+        """
+
+        if "version" in values["dynamic"]:
+            assert value is None
+        else:
+            assert value is not None
+
+        return value
 
 
 class CPPythonData(BaseModel):
@@ -41,7 +53,6 @@ class CPPythonData(BaseModel):
     generator: str
     target: TargetEnum
     dependencies: dict[str, str] = {}
-    install_path: Path = Field(alias="install-path")
 
 
 class ToolData(BaseModel):
