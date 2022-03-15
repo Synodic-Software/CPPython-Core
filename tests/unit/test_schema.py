@@ -26,7 +26,6 @@ class TestSchema:
         [tool.cppython]\n
         generator = "test_generator"\n
         target = "executable"\n
-        install-path = ""\n
         """
 
         document = parse(data)

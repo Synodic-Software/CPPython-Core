@@ -34,6 +34,7 @@ lint = [
   "isort>=5.10.1",
 ]
 test = [
+  "pytest>=7.1.0",
   "pytest-cov>=3.0.0",
   "pytest-mock>=3.7.0",
   "tomlkit>=0.10.0",
