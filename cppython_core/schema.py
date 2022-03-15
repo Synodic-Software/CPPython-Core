@@ -57,7 +57,7 @@ class CPPythonData(BaseModel):
 
 class ToolData(BaseModel):
     """
-    TODO
+    Tool entry
     """
 
     cppython: Optional[CPPythonData]
