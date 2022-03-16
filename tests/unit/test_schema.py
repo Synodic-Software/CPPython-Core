@@ -30,6 +30,7 @@ class TestSchema:
 
         document = parse(data)
         pyproject = PyProject(**document)
+        assert pyproject.tool is not None
         assert pyproject.tool.cppython is not None
 
     def test_empty_cppython(self):
@@ -48,4 +49,5 @@ class TestSchema:
 
         document = parse(data)
         pyproject = PyProject(**document)
+        assert pyproject.tool is not None
         assert pyproject.tool.cppython is None
