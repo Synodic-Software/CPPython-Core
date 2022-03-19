@@ -50,7 +50,6 @@ class CPPythonData(BaseModel):
     Data required by the tool
     """
 
-    generator: str
     target: TargetEnum
     dependencies: dict[str, str] = {}
 
