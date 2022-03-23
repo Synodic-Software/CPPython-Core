@@ -136,14 +136,6 @@ class Interface:
     """
 
     @abstractmethod
-    def read_generator_data(self, generator_data_type: Type[GeneratorDataType]) -> GeneratorDataType:
-        """
-        Dynamic pyproject.toml data that is determined by the generator plugin requested by [tool.cppython.generator]
-            The Schema defined by 'generator_data_type' must be filled by the [tool.cppython.{generator_value}] slot.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     def write_pyproject(self) -> None:
         """
         Called when CPPython requires the interface to write out pyproject.toml changes
