@@ -156,7 +156,7 @@ class Generator(Plugin, API):
     """
 
     @abstractmethod
-    def __init__(self, pyproject: PyProject, generator_data: GeneratorData) -> None:
+    def __init__(self, pyproject: PyProject) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
         """
