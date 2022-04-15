@@ -4,6 +4,7 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 
 from abc import ABC, abstractmethod
 from enum import Enum
+from pathlib import Path
 from typing import Optional, Type, TypeVar
 
 from pydantic import BaseModel, validator
@@ -185,21 +186,21 @@ class Generator(Plugin, API):
         raise NotImplementedError()
 
     @abstractmethod
-    def generator_downloaded(self) -> bool:
+    def generator_downloaded(self, path: Path) -> bool:
         """
         Returns whether the generator needs to be downloaded
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def download_generator(self) -> None:
+    def download_generator(self, path: Path) -> None:
         """
         Installs the external tooling required by the generator
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def update_generator(self) -> None:
+    def update_generator(self, path: Path) -> None:
         """
         Update the tooling required by the generator
         """
