@@ -229,7 +229,7 @@ summary = "Module for decorators, wrappers and monkey patching."
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:6a3d3320ac233d1975c385f62e4a8565772f1860512cdf61206812aad0b8c519"
+content_hash = "sha256:e643838c1bcf286cbbd320d3879a7c56e3dd15b7c26f084b48a4d44c421c13c9"
 
 [metadata.files]
 "astroid 2.11.2" = [
