@@ -4,6 +4,7 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 
 from abc import ABC, abstractmethod
 from enum import Enum
+from os import name as system_name
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -46,6 +47,11 @@ class PEP621(BaseModel):
         return value
 
 
+def _default_install_location() -> Path:
+
+    return Path.home() / ".cppython"
+
+
 class CPPythonData(BaseModel):
     """
     Data required by the tool
@@ -53,6 +59,7 @@ class CPPythonData(BaseModel):
 
     target: TargetEnum
     dependencies: dict[str, str] = {}
+    install_path: Path = Field(alias="install-path", default_factory=_default_install_location)
 
 
 class ToolData(BaseModel):
