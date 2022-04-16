@@ -4,11 +4,10 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from os import name as system_name
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Extra, validator
 from pydantic.fields import Field
 
 
@@ -25,6 +24,7 @@ class TargetEnum(Enum):
 class PEP621(BaseModel):
     """
     CPPython relevant PEP 621 conforming data
+    Because only the partial schema is used, we ignore 'extra' attributes
         Schema: https://www.python.org/dev/peps/pep-0621/
     """
 
@@ -52,7 +52,7 @@ def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
 
-class CPPythonData(BaseModel):
+class CPPythonData(BaseModel, extra=Extra.forbid):
     """
     Data required by the tool
     """
@@ -65,6 +65,7 @@ class CPPythonData(BaseModel):
 class ToolData(BaseModel):
     """
     Tool entry
+    This schema is not under our control. Ignore 'extra' attributes
     """
 
     cppython: Optional[CPPythonData]
@@ -73,6 +74,7 @@ class ToolData(BaseModel):
 class PyProject(BaseModel):
     """
     pyproject.toml schema
+    This schema is not under our control. Ignore 'extra' attributes
     """
 
     project: PEP621
@@ -129,7 +131,7 @@ class Plugin(ABC):
         raise NotImplementedError()
 
 
-class GeneratorData(BaseModel):
+class GeneratorData(BaseModel, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
