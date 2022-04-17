@@ -3,7 +3,9 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 """
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from enum import Enum
+from logging import Logger
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -131,6 +133,15 @@ class Plugin(ABC):
         raise NotImplementedError()
 
 
+@dataclass
+class GeneratorConfiguration:
+    """
+    Base class for the configuration data that is set by the project for the generator
+    """
+
+    logger: Logger
+
+
 class GeneratorData(BaseModel, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
@@ -166,7 +177,7 @@ class Generator(Plugin, API):
     """
 
     @abstractmethod
-    def __init__(self, pyproject: PyProject) -> None:
+    def __init__(self, configuration: GeneratorConfiguration, pyproject: PyProject) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
         """

@@ -24,7 +24,6 @@ class TestSchema:
         description = "A test document"\n
 
         [tool.cppython]\n
-        generator = "test_generator"\n
         target = "executable"\n
         """
 
