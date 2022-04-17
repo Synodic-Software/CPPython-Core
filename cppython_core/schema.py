@@ -212,6 +212,22 @@ class Generator(Plugin, API):
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
         """
+        self._configuration = configuration
+        self._pyproject = pyproject
+
+    @property
+    def configuration(self):
+        """
+        TODO
+        """
+        return self._configuration
+
+    @property
+    def pyproject(self):
+        """
+        TODO
+        """
+        return self._pyproject
 
     @staticmethod
     def plugin_group() -> str:
