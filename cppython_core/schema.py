@@ -195,9 +195,9 @@ class Interface:
         raise NotImplementedError()
 
     @abstractmethod
-    def print(self, string: str) -> None:
+    def register_logger(self, logger: Logger) -> None:
         """
-        Prints the given string into the Interface IO
+        TODO
         """
         raise NotImplementedError()
 
