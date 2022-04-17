@@ -2,9 +2,11 @@
 TODO
 """
 
+from _pytest.python_api import raises
+from pytest import raises
 from tomlkit import parse
 
-from cppython_core.schema import PyProject
+from cppython_core.schema import PEP508, PyProject
 
 
 class TestSchema:
@@ -24,7 +26,6 @@ class TestSchema:
         description = "A test document"\n
 
         [tool.cppython]\n
-        generator = "test_generator"\n
         target = "executable"\n
         """
 
@@ -51,3 +52,15 @@ class TestSchema:
         pyproject = PyProject(**document)
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is None
+
+    def test_508(self):
+        """
+        TODO
+        """
+
+        requirement = PEP508('requests [security,tests] >= 2.8.1, == 2.8.* ; python_version < "2.7"')
+
+        assert requirement.name == "requests"
+
+        with raises(ValueError):
+            PEP508("this is not conforming")

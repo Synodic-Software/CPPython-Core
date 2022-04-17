@@ -3,10 +3,13 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 """
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from enum import Enum
+from logging import Logger
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
+from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, validator
 from pydantic.fields import Field
 
@@ -52,13 +55,43 @@ def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
 
+class PEP508(Requirement):
+    """
+    PEP 508 conforming string
+    """
+
+    @classmethod
+    def __get_validators__(cls):
+        """
+        TODO
+        """
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, value):
+        """
+        TODO
+        """
+        if not isinstance(value, str):
+            raise TypeError("string required")
+
+        # TODO: Manage Requirement specifics
+
+        try:
+            definition = Requirement(value)
+        except InvalidRequirement as invalid:
+            raise ValueError from invalid
+
+        return definition
+
+
 class CPPythonData(BaseModel, extra=Extra.forbid):
     """
     Data required by the tool
     """
 
     target: TargetEnum
-    dependencies: dict[str, str] = {}
+    dependencies: list[PEP508] = []
     install_path: Path = Field(alias="install-path", default_factory=_default_install_location)
 
 
@@ -131,6 +164,15 @@ class Plugin(ABC):
         raise NotImplementedError()
 
 
+@dataclass
+class GeneratorConfiguration:
+    """
+    Base class for the configuration data that is set by the project for the generator
+    """
+
+    logger: Logger
+
+
 class GeneratorData(BaseModel, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
@@ -166,7 +208,7 @@ class Generator(Plugin, API):
     """
 
     @abstractmethod
-    def __init__(self, pyproject: PyProject) -> None:
+    def __init__(self, configuration: GeneratorConfiguration, pyproject: PyProject) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
         """
