@@ -9,6 +9,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
+from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, validator
 from pydantic.fields import Field
 
@@ -54,13 +55,43 @@ def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
 
+class PEP508(Requirement):
+    """
+    PEP 508 conforming string
+    """
+
+    @classmethod
+    def __get_validators__(cls):
+        """
+        TODO
+        """
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, value):
+        """
+        TODO
+        """
+        if not isinstance(value, str):
+            raise TypeError("string required")
+
+        # TODO: Manage Requirement specifics
+
+        try:
+            definition = Requirement(value)
+        except InvalidRequirement as invalid:
+            raise ValueError from invalid
+
+        return definition
+
+
 class CPPythonData(BaseModel, extra=Extra.forbid):
     """
     Data required by the tool
     """
 
     target: TargetEnum
-    dependencies: dict[str, str] = {}
+    dependencies: list[PEP508] = []
     install_path: Path = Field(alias="install-path", default_factory=_default_install_location)
 
 
