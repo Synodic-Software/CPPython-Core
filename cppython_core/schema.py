@@ -157,6 +157,13 @@ class Plugin(ABC):
 
     @staticmethod
     @abstractmethod
+    def name() -> str:
+        """
+        The name of the plugin, canonicalized
+        """
+        raise NotImplementedError()
+
+    @staticmethod
     def plugin_group() -> str:
         """
         The plugin group name as used by 'setuptools'
@@ -182,10 +189,25 @@ class GeneratorData(BaseModel, extra=Extra.forbid):
 GeneratorDataType = TypeVar("GeneratorDataType", bound=GeneratorData)
 
 
-class Interface:
+class Interface(Plugin):
     """
     Abstract type to be inherited by CPPython interfaces
     """
+
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        """
+        The name of the plugin, canonicalized
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def plugin_group() -> str:
+        """
+        The plugin group name as used by 'setuptools'
+        """
+        return "interface"
 
     @abstractmethod
     def write_pyproject(self) -> None:
@@ -234,7 +256,7 @@ class Generator(Plugin, API):
         """
         The plugin group name as used by 'setuptools'
         """
-        return "generator_plugins"
+        return "generator"
 
     @staticmethod
     @abstractmethod
