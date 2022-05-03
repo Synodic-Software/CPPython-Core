@@ -2,10 +2,10 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from logging import Logger
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -170,14 +170,18 @@ class Plugin(ABC):
         """
         raise NotImplementedError()
 
+    def get_logger(self) -> logging.Logger:
+        """
+        TODO
+        """
+        return logging.getLogger(f"cppython.{self.plugin_group()}.{self.name()}")
+
 
 @dataclass
 class GeneratorConfiguration:
     """
     Base class for the configuration data that is set by the project for the generator
     """
-
-    logger: Logger
 
 
 class GeneratorData(BaseModel, extra=Extra.forbid):
@@ -213,13 +217,6 @@ class Interface(Plugin):
     def write_pyproject(self) -> None:
         """
         Called when CPPython requires the interface to write out pyproject.toml changes
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def register_logger(self, logger: Logger) -> None:
-        """
-        TODO
         """
         raise NotImplementedError()
 
