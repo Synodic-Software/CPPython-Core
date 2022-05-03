@@ -190,7 +190,7 @@ class GeneratorData(BaseModel, extra=Extra.forbid):
     """
 
 
-GeneratorDataType = TypeVar("GeneratorDataType", bound=GeneratorData)
+GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
 
 
 class Interface(Plugin):
