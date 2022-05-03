@@ -190,9 +190,6 @@ class GeneratorData(BaseModel, extra=Extra.forbid):
     """
 
 
-GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
-
-
 class Interface(Plugin):
     """
     Abstract type to be inherited by CPPython interfaces
@@ -291,3 +288,9 @@ class Generator(Plugin, API):
         Update the tooling required by the generator
         """
         raise NotImplementedError()
+
+
+GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
+PluginT = TypeVar("PluginT", bound=Plugin)
+InterfaceT = TypeVar("InterfaceT", bound=Interface)
+GeneratorT = TypeVar("GeneratorT", bound=Generator)
