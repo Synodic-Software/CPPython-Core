@@ -178,6 +178,13 @@ class Plugin(ABC):
 
 
 @dataclass
+class InterfaceConfiguration:
+    """
+    Base class for the configuration data that is passed to the interface
+    """
+
+
+@dataclass
 class GeneratorConfiguration:
     """
     Base class for the configuration data that is set by the project for the generator
@@ -194,6 +201,23 @@ class Interface(Plugin):
     """
     Abstract type to be inherited by CPPython interfaces
     """
+
+    @abstractmethod
+    def __init__(self, configuration: InterfaceConfiguration) -> None:
+        """
+        TODO
+        """
+        self._configuration = configuration
+
+        # Register the logger handler
+        self.register_logger_handler()
+
+    @property
+    def configuration(self) -> InterfaceConfiguration:
+        """
+        TODO
+        """
+        return self._configuration
 
     @staticmethod
     @abstractmethod
@@ -217,6 +241,13 @@ class Interface(Plugin):
         """
         raise NotImplementedError()
 
+    def register_logger_handler(self) -> None:
+        """
+        Entry point for the registration of log handlers. Can be overridden if a default stream handler isn't desired.
+        """
+        console_handler = logging.StreamHandler()
+        self.get_logger().addHandler(console_handler)
+
 
 class Generator(Plugin, API):
     """
@@ -232,14 +263,14 @@ class Generator(Plugin, API):
         self._pyproject = pyproject
 
     @property
-    def configuration(self):
+    def configuration(self) -> GeneratorConfiguration:
         """
         TODO
         """
         return self._configuration
 
     @property
-    def pyproject(self):
+    def pyproject(self) -> PyProject:
         """
         TODO
         """
