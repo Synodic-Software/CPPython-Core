@@ -6,6 +6,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+from mimetypes import init
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -155,6 +156,14 @@ class Plugin(ABC):
     Abstract plugin type
     """
 
+    @abstractmethod
+    def __init__(self) -> None:
+
+        # Register the logger handler
+        self.register_logger_handler()
+
+        super().__init__()
+
     @staticmethod
     @abstractmethod
     def name() -> str:
@@ -164,6 +173,7 @@ class Plugin(ABC):
         raise NotImplementedError()
 
     @staticmethod
+    @abstractmethod
     def plugin_group() -> str:
         """
         The plugin group name as used by 'setuptools'
@@ -174,7 +184,14 @@ class Plugin(ABC):
         """
         TODO
         """
-        return logging.getLogger(f"cppython.{self.plugin_group()}.{self.name()}")
+        return logging.getLogger("cppython")
+
+    def register_logger_handler(self) -> None:
+        """
+        Entry point for the registration of log handlers. Can be overridden if a default stream handler isn't desired.
+        """
+        console_handler = logging.StreamHandler()
+        self.get_logger().addHandler(console_handler)
 
 
 @dataclass
@@ -209,8 +226,7 @@ class Interface(Plugin):
         """
         self._configuration = configuration
 
-        # Register the logger handler
-        self.register_logger_handler()
+        super().__init__()
 
     @property
     def configuration(self) -> InterfaceConfiguration:
@@ -241,13 +257,6 @@ class Interface(Plugin):
         """
         raise NotImplementedError()
 
-    def register_logger_handler(self) -> None:
-        """
-        Entry point for the registration of log handlers. Can be overridden if a default stream handler isn't desired.
-        """
-        console_handler = logging.StreamHandler()
-        self.get_logger().addHandler(console_handler)
-
 
 class Generator(Plugin, API):
     """
@@ -261,6 +270,8 @@ class Generator(Plugin, API):
         """
         self._configuration = configuration
         self._pyproject = pyproject
+
+        super().__init__()
 
     @property
     def configuration(self) -> GeneratorConfiguration:
