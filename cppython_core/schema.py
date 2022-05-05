@@ -2,11 +2,9 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from mimetypes import init
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -158,10 +156,6 @@ class Plugin(ABC):
 
     @abstractmethod
     def __init__(self) -> None:
-
-        # Register the logger handler
-        self.register_logger_handler()
-
         super().__init__()
 
     @staticmethod
@@ -179,19 +173,6 @@ class Plugin(ABC):
         The plugin group name as used by 'setuptools'
         """
         raise NotImplementedError()
-
-    def get_logger(self) -> logging.Logger:
-        """
-        TODO
-        """
-        return logging.getLogger("cppython")
-
-    def register_logger_handler(self) -> None:
-        """
-        Entry point for the registration of log handlers. Can be overridden if a default stream handler isn't desired.
-        """
-        console_handler = logging.StreamHandler()
-        self.get_logger().addHandler(console_handler)
 
 
 @dataclass
