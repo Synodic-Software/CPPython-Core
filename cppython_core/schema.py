@@ -5,6 +5,7 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+from logging import Logger, getLogger
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -173,6 +174,13 @@ class Plugin(ABC):
         The plugin group name as used by 'setuptools'
         """
         raise NotImplementedError()
+
+    @property
+    def logger(self) -> Logger:
+        """
+        Returns the plugin specific sub-logger
+        """
+        return getLogger(f"cppython.{self.plugin_group()}.{self.name()}")
 
 
 @dataclass
