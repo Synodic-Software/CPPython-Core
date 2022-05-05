@@ -64,3 +64,8 @@ class TestSchema:
 
         with raises(ValueError):
             PEP508("this is not conforming")
+
+    def test_root_log(self, caplog):
+        """
+        TODO
+        """

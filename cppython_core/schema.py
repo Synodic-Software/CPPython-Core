@@ -2,7 +2,6 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -155,6 +154,10 @@ class Plugin(ABC):
     Abstract plugin type
     """
 
+    @abstractmethod
+    def __init__(self) -> None:
+        super().__init__()
+
     @staticmethod
     @abstractmethod
     def name() -> str:
@@ -164,17 +167,12 @@ class Plugin(ABC):
         raise NotImplementedError()
 
     @staticmethod
+    @abstractmethod
     def plugin_group() -> str:
         """
         The plugin group name as used by 'setuptools'
         """
         raise NotImplementedError()
-
-    def get_logger(self) -> logging.Logger:
-        """
-        TODO
-        """
-        return logging.getLogger(f"cppython.{self.plugin_group()}.{self.name()}")
 
 
 @dataclass
@@ -209,8 +207,7 @@ class Interface(Plugin):
         """
         self._configuration = configuration
 
-        # Register the logger handler
-        self.register_logger_handler()
+        super().__init__()
 
     @property
     def configuration(self) -> InterfaceConfiguration:
@@ -241,13 +238,6 @@ class Interface(Plugin):
         """
         raise NotImplementedError()
 
-    def register_logger_handler(self) -> None:
-        """
-        Entry point for the registration of log handlers. Can be overridden if a default stream handler isn't desired.
-        """
-        console_handler = logging.StreamHandler()
-        self.get_logger().addHandler(console_handler)
-
 
 class Generator(Plugin, API):
     """
@@ -261,6 +251,8 @@ class Generator(Plugin, API):
         """
         self._configuration = configuration
         self._pyproject = pyproject
+
+        super().__init__()
 
     @property
     def configuration(self) -> GeneratorConfiguration:
