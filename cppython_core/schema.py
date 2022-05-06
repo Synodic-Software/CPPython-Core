@@ -169,18 +169,23 @@ class Plugin(ABC):
 
     @staticmethod
     @abstractmethod
-    def plugin_group() -> str:
+    def group() -> str:
         """
         The plugin group name as used by 'setuptools'
         """
         raise NotImplementedError()
 
+    @classmethod
     @property
-    def logger(self) -> Logger:
+    def logger(cls) -> Logger:
         """
         Returns the plugin specific sub-logger
         """
-        return getLogger(f"cppython.{self.plugin_group()}.{self.name()}")
+
+        if not hasattr(cls, "_logger"):
+            cls._logger = getLogger(f"cppython.{cls.group()}.{cls.name()}")
+
+        return cls._logger
 
 
 @dataclass
@@ -233,7 +238,7 @@ class Interface(Plugin):
         raise NotImplementedError()
 
     @staticmethod
-    def plugin_group() -> str:
+    def group() -> str:
         """
         The plugin group name as used by 'setuptools'
         """
@@ -277,7 +282,7 @@ class Generator(Plugin, API):
         return self._pyproject
 
     @staticmethod
-    def plugin_group() -> str:
+    def group() -> str:
         """
         The plugin group name as used by 'setuptools'
         """
