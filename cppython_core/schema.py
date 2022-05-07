@@ -92,7 +92,8 @@ class CPPythonData(BaseModel, extra=Extra.forbid):
 
     target: TargetEnum
     dependencies: list[PEP508] = []
-    install_path: Path = Field(alias="install-path", default_factory=_default_install_location)
+    install_path: Path = Field(_default_install_location(), alias="install-path")
+    tool_path: Path = Field(Path("tool/cppython"), alias="tool-path")
 
 
 class ToolData(BaseModel):
