@@ -10,8 +10,7 @@ from pathlib import Path
 from typing import Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
-from pydantic import BaseModel, Extra, validator
-from pydantic.fields import Field
+from pydantic import BaseModel, Extra, Field, validator
 
 
 class TargetEnum(Enum):
@@ -113,42 +112,6 @@ class PyProject(BaseModel):
 
     project: PEP621
     tool: Optional[ToolData]
-
-
-class API(ABC):
-    """
-    API
-    """
-
-    @abstractmethod
-    def install(self) -> None:
-        """
-        Called when dependencies need to be installed from a lock file.
-
-        Raises:
-            NotImplementedError: [description]
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def update(self) -> None:
-        """
-        Called when dependencies need to be updated and written to the lock file.
-
-        Raises:
-            NotImplementedError: [description]
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def build(self) -> None:
-        """
-        Called when the C++ target needs to be produced.
-
-        Raises:
-            NotImplementedError: [description]
-        """
-        raise NotImplementedError()
 
 
 class Plugin(ABC):
@@ -253,7 +216,7 @@ class Interface(Plugin):
         raise NotImplementedError()
 
 
-class Generator(Plugin, API):
+class Generator(Plugin):
     """
     Abstract type to be inherited by CPPython Generator plugins
     """
@@ -323,6 +286,24 @@ class Generator(Plugin, API):
     def update_generator(self, path: Path) -> None:
         """
         Update the tooling required by the generator
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def install(self) -> Path:
+        """
+        Called when dependencies need to be installed from a lock file.
+
+        @returns - A Path to the CMake Toolchain file
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def update(self) -> Path:
+        """
+        Called when dependencies need to be updated and written to the lock file.
+
+        @returns - A Path to the CMake Toolchain file
         """
         raise NotImplementedError()
 
