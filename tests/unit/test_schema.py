@@ -6,7 +6,7 @@ from _pytest.python_api import raises
 from pytest import raises
 from tomlkit import parse
 
-from cppython_core.schema import PEP508, PyProject
+from cppython_core.schema import PEP508, CPPythonData, PyProject, TargetEnum
 
 
 class TestSchema:
@@ -64,3 +64,9 @@ class TestSchema:
 
         with raises(ValueError):
             PEP508("this is not conforming")
+
+    def test_cppython_data(self):
+        """
+        TODO
+        """
+        CPPythonData(target=TargetEnum.EXE)
