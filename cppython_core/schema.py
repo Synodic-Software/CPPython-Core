@@ -313,3 +313,5 @@ GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
 PluginT = TypeVar("PluginT", bound=Plugin)
 InterfaceT = TypeVar("InterfaceT", bound=Interface)
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
+
+PyProjectT = TypeVar("PyProjectT", bound=PyProject)
