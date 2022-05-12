@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Optional, Type, TypeVar
+from typing import Any, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -36,7 +36,7 @@ class PEP621(BaseModel):
     description: str = Field(default="", description="https://peps.python.org/pep-0621/#description")
 
     @validator("version")
-    def validate_version(value, values):  # pylint: disable=E0213
+    def validate_version(value, values: dict[str, Any]):  # pylint: disable=E0213
         """
         TODO
         """
@@ -67,7 +67,7 @@ class PEP508(Requirement):
         yield cls.validate
 
     @classmethod
-    def validate(cls, value):
+    def validate(cls, value: "PEP508"):
         """
         TODO
         """
