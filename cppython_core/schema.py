@@ -315,3 +315,5 @@ InterfaceT = TypeVar("InterfaceT", bound=Interface)
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
 
 PyProjectT = TypeVar("PyProjectT", bound=PyProject)
+ToolDataT = TypeVar("ToolDataT", bound=ToolData)
+CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
