@@ -223,12 +223,18 @@ class Generator(Plugin):
     """
 
     @abstractmethod
-    def __init__(self, configuration: GeneratorConfiguration, pyproject: PyProject) -> None:
+    def __init__(
+        self,
+        configuration: GeneratorConfiguration,
+        project: PEP621,
+        cppython: CPPythonData,
+    ) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
         """
         self._configuration = configuration
-        self._pyproject = pyproject
+        self._project = project
+        self._cppython = cppython
 
         super().__init__()
 
@@ -240,11 +246,18 @@ class Generator(Plugin):
         return self._configuration
 
     @property
-    def pyproject(self) -> PyProject:
+    def project(self) -> PEP621:
         """
         TODO
         """
-        return self._pyproject
+        return self._project
+
+    @property
+    def cppython(self) -> CPPythonData:
+        """
+        TODO
+        """
+        return self._cppython
 
     @staticmethod
     def group() -> str:
