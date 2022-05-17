@@ -23,3 +23,5 @@ def subprocess_call(arguments: list[str | Path], suppress: bool = False):
 
         if not suppress:
             cppython_logger.error(f"The process failed with: {error.stdout}")
+
+        raise error

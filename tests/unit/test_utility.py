@@ -3,10 +3,12 @@ TODO
 """
 
 import logging
+import subprocess
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
 
+import pytest
 from pytest import LogCaptureFixture
 
 from cppython_core.schema import Plugin
@@ -52,7 +54,7 @@ class TestUtility:
             logger.info("test")
             assert caplog.records[0].message == "test"
 
-    def test_subprocess(self, caplog: LogCaptureFixture):
+    def test_subprocess_output(self, caplog: LogCaptureFixture):
         """
         Test subprocess_call
         """
@@ -70,9 +72,9 @@ class TestUtility:
             subprocess_call([python, "-c", "import sys; print('Test Error', file = sys.stderr)"])
             assert "Test Error" in caplog.text
 
-    def test_suppression(self, caplog: LogCaptureFixture):
+    def test_subprocess_suppression(self, caplog: LogCaptureFixture):
         """
-        Test subprocess_call
+        Test subprocess_call supression flag
         """
 
         console_logger = StreamHandler()
@@ -83,3 +85,13 @@ class TestUtility:
         with caplog.at_level(logging.INFO):
             subprocess_call([python, "-c", "import sys; print('Test Out', file = sys.stdout)"], suppress=True)
             assert len(caplog.text) == 0
+
+    def test_subprocess_exception(self):
+        """
+        Test subprocess_call exception output
+        """
+
+        python = Path(executable)
+
+        with pytest.raises(subprocess.CalledProcessError):
+            subprocess_call([python, "-c", "import sys; sys.exit('My error message')"])
