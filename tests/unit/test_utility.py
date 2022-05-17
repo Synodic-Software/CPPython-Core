@@ -69,3 +69,17 @@ class TestUtility:
         with caplog.at_level(logging.INFO):
             subprocess_call([python, "-c", "import sys; print('Test Error', file = sys.stderr)"])
             assert "Test Error" in caplog.text
+
+    def test_suppression(self, caplog: LogCaptureFixture):
+        """
+        Test subprocess_call
+        """
+
+        console_logger = StreamHandler()
+        cppython_logger.addHandler(console_logger)
+
+        python = Path(executable)
+
+        with caplog.at_level(logging.INFO):
+            subprocess_call([python, "-c", "import sys; print('Test Out', file = sys.stdout)"], suppress=True)
+            assert len(caplog.text) == 0
