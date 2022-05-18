@@ -19,7 +19,7 @@ def subprocess_call(arguments: list[str | Path], suppress: bool = False, **kwarg
         if not suppress:
             with process.stdout as pipe:
                 for line in iter(pipe.readline, ""):
-                    cppython_logger.info(line)
+                    cppython_logger.info(line.strip())
 
         exitcode = process.wait()
 
