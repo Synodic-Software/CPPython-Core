@@ -1,14 +1,14 @@
 """
 Core Utilities
 """
+import logging
 import subprocess
-from logging import getLogger
 from pathlib import Path
 
-cppython_logger = getLogger("cppython")
+cppython_logger = logging.getLogger("cppython")
 
 
-def subprocess_call(arguments: list[str | Path], suppress: bool = False, **kwargs):
+def subprocess_call(arguments: list[str | Path], log_level: int = logging.WARNING, suppress: bool = False, **kwargs):
     """
     Executes a subprocess call with logger and utility attachments. Captures STDOUT and STDERR
     """
@@ -19,7 +19,7 @@ def subprocess_call(arguments: list[str | Path], suppress: bool = False, **kwarg
         if not suppress:
             with process.stdout as pipe:
                 for line in iter(pipe.readline, ""):
-                    cppython_logger.info(line.rstrip())
+                    cppython_logger.log(log_level, line.rstrip())
 
         exitcode = process.wait()
 
