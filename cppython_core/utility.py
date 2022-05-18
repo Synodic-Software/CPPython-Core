@@ -14,12 +14,17 @@ def subprocess_call(arguments: list[str | Path], suppress: bool = False, **kwarg
     """
 
     try:
-        process = subprocess.run(
-            arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=True, text=True, **kwargs
-        )
+        process = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
 
         if not suppress:
-            cppython_logger.info(process.stdout)
+            with process.stdout as pipe:
+                for line in iter(pipe.readline, ""):
+                    cppython_logger.info(line)
+
+        exitcode = process.wait()
+
+        if exitcode != 0:
+            raise subprocess.CalledProcessError(exitcode, arguments)
 
     except subprocess.CalledProcessError as error:
 
