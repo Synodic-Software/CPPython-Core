@@ -329,6 +329,7 @@ GeneratorT = TypeVar("GeneratorT", bound=Generator)
 
 PyProjectT = TypeVar("PyProjectT", bound=PyProject)
 ToolDataT = TypeVar("ToolDataT", bound=ToolData)
+ProjectDataT = TypeVar("ProjectDataT", bound=PEP621)
 CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
