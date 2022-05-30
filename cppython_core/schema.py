@@ -228,6 +228,7 @@ class Generator(Plugin):
         configuration: GeneratorConfiguration,
         project: PEP621,
         cppython: CPPythonData,
+        generator: GeneratorData,
     ) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
@@ -235,6 +236,7 @@ class Generator(Plugin):
         self._configuration = configuration
         self._project = project
         self._cppython = cppython
+        self._generator = generator
 
         super().__init__()
 
@@ -258,6 +260,13 @@ class Generator(Plugin):
         TODO
         """
         return self._cppython
+
+    @property
+    def generator(self) -> GeneratorData:
+        """
+        TODO
+        """
+        return self._generator
 
     @staticmethod
     def group() -> str:
