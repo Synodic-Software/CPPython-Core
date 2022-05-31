@@ -3,7 +3,6 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
@@ -153,18 +152,18 @@ class Plugin(ABC):
         return cls._logger
 
 
-@dataclass
-class InterfaceConfiguration:
+class InterfaceConfiguration(BaseModel):
     """
     Base class for the configuration data that is passed to the interface
     """
 
 
-@dataclass
-class GeneratorConfiguration:
+class GeneratorConfiguration(BaseModel):
     """
     Base class for the configuration data that is set by the project for the generator
     """
+
+    root_path: Path = Field(description="The path where the pyproject.toml lives")
 
 
 class GeneratorData(BaseModel, extra=Extra.forbid):
