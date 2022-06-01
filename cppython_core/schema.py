@@ -6,10 +6,12 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Optional, Type, TypeVar
+from typing import Any, Generic, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
+
+ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
 class TargetEnum(Enum):
@@ -46,6 +48,9 @@ class PEP621(BaseModel):
             assert value is not None
 
         return value
+
+
+ProjectDataT = TypeVar("ProjectDataT", bound=PEP621)
 
 
 def _default_install_location() -> Path:
@@ -95,6 +100,9 @@ class CPPythonData(BaseModel, extra=Extra.forbid):
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
 
+CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
+
+
 class ToolData(BaseModel):
     """
     Tool entry
@@ -102,6 +110,9 @@ class ToolData(BaseModel):
     """
 
     cppython: Optional[CPPythonData]
+
+
+ToolDataT = TypeVar("ToolDataT", bound=ToolData)
 
 
 class PyProject(BaseModel):
@@ -112,6 +123,9 @@ class PyProject(BaseModel):
 
     project: PEP621
     tool: Optional[ToolData]
+
+
+PyProjectT = TypeVar("PyProjectT", bound=PyProject)
 
 
 class Plugin(ABC):
@@ -152,6 +166,9 @@ class Plugin(ABC):
         return cls._logger
 
 
+PluginT = TypeVar("PluginT", bound=Plugin)
+
+
 class InterfaceConfiguration(BaseModel):
     """
     Base class for the configuration data that is passed to the interface
@@ -170,6 +187,9 @@ class GeneratorData(BaseModel, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
+
+
+GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
 
 
 class Interface(Plugin):
@@ -216,7 +236,10 @@ class Interface(Plugin):
         raise NotImplementedError()
 
 
-class Generator(Plugin):
+InterfaceT = TypeVar("InterfaceT", bound=Interface)
+
+
+class Generator(Plugin, Generic[GeneratorDataT]):
     """
     Abstract type to be inherited by CPPython Generator plugins
     """
@@ -227,7 +250,7 @@ class Generator(Plugin):
         configuration: GeneratorConfiguration,
         project: PEP621,
         cppython: CPPythonData,
-        generator: GeneratorData,
+        generator: GeneratorDataT,
     ) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
@@ -261,7 +284,7 @@ class Generator(Plugin):
         return self._cppython
 
     @property
-    def generator(self) -> GeneratorData:
+    def generator(self) -> GeneratorDataT:
         """
         TODO
         """
@@ -284,7 +307,7 @@ class Generator(Plugin):
 
     @staticmethod
     @abstractmethod
-    def data_type() -> Type[GeneratorData]:
+    def data_type() -> Type[GeneratorDataT]:
         """
         Returns the pydantic type to cast the generator configuration data to
         """
@@ -330,14 +353,4 @@ class Generator(Plugin):
         raise NotImplementedError()
 
 
-GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
-PluginT = TypeVar("PluginT", bound=Plugin)
-InterfaceT = TypeVar("InterfaceT", bound=Interface)
-GeneratorT = TypeVar("GeneratorT", bound=Generator)
-
-PyProjectT = TypeVar("PyProjectT", bound=PyProject)
-ToolDataT = TypeVar("ToolDataT", bound=ToolData)
-ProjectDataT = TypeVar("ProjectDataT", bound=PEP621)
-CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
-
-ModelT = TypeVar("ModelT", bound=BaseModel)
+GeneratorT = TypeVar("GeneratorT", bound=Generator[GeneratorData])
