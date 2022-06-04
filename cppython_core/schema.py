@@ -88,6 +88,46 @@ class PEP508(Requirement):
         return definition
 
 
+class Preset(BaseModel):
+    """
+    Partial Preset specification
+    """
+
+    name: str
+    hidden: Optional[bool]
+    inherits: Optional[list[str] | str]
+    displayName: Optional[str]
+    description: Optional[str]
+
+    @validator("inherits")
+    def validate_str(cls, values: dict[str, Any]):  # pylint: disable=E0213
+        """
+        Conform to list
+        """
+        if isinstance(values, str):
+            return [values]
+
+        return values
+
+
+class ConfigurePreset(Preset):
+    """
+    Partial Configure Preset specification
+    """
+
+    toolchainFile: Optional[str]
+
+    @validator("toolchainFile")
+    def validate_path(cls, value: Optional[str]):  # pylint: disable=E0213
+        """
+        TODO
+        """
+        if value is not None:
+            return Path(value).as_posix()
+
+        return None
+
+
 class CPPythonData(BaseModel, extra=Extra.forbid):
     """
     Data required by the tool
@@ -335,20 +375,25 @@ class Generator(Plugin, Generic[GeneratorDataT]):
         raise NotImplementedError()
 
     @abstractmethod
-    def install(self) -> Path:
+    def install(self) -> None:
         """
         Called when dependencies need to be installed from a lock file.
-
-        @returns - A Path to the CMake Toolchain file
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def update(self) -> Path:
+    def update(self) -> None:
+        """
+        Called when dependencies need to be updated and written to the lock file.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def generate_cmake_config(self) -> ConfigurePreset:
         """
         Called when dependencies need to be updated and written to the lock file.
 
-        @returns - A Path to the CMake Toolchain file
+        @returns - A CMake configure preset
         """
         raise NotImplementedError()
 
