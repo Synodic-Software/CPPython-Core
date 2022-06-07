@@ -92,11 +92,11 @@ class Preset(BaseModel):
     """
 
     name: str
-    hidden: Optional[bool]
-    inherits: Optional[list[str] | str]
-    displayName: Optional[str]
-    description: Optional[str]
-    cacheVariables: Optional[dict[str, None | bool | str | dict[str, str | bool]]]
+    hidden: Optional[bool] = Field(default=None)
+    inherits: Optional[list[str] | str] = Field(default=None)
+    displayName: Optional[str] = Field(default=None)
+    description: Optional[str] = Field(default=None)
+    cacheVariables: Optional[dict[str, None | bool | str | dict[str, str | bool]]] = Field(default=None)
 
     @validator("inherits")
     def validate_str(cls, values: Optional[list[str] | str]):  # pylint: disable=E0213
@@ -114,7 +114,7 @@ class ConfigurePreset(Preset):
     Partial Configure Preset specification
     """
 
-    toolchainFile: Optional[str]
+    toolchainFile: Optional[str] = Field(default=None)
 
     @validator("toolchainFile")
     def validate_path(cls, value: Optional[str]):  # pylint: disable=E0213
@@ -133,7 +133,7 @@ class CPPythonData(BaseModel, extra=Extra.forbid):
     """
 
     target: TargetEnum
-    dependencies: list[PEP508] = []
+    dependencies: list[PEP508] = Field(default=[])
     install_path: Path = Field(default=_default_install_location(), alias="install-path")
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
     build_path: Path = Field(default=Path("build"), alias="build-path")
@@ -148,7 +148,7 @@ class ToolData(BaseModel):
     This schema is not under our control. Ignore 'extra' attributes
     """
 
-    cppython: Optional[CPPythonData]
+    cppython: Optional[CPPythonData] = Field(default=None)
 
 
 ToolDataT = TypeVar("ToolDataT", bound=ToolData)
@@ -161,7 +161,7 @@ class PyProject(BaseModel):
     """
 
     project: PEP621
-    tool: Optional[ToolData]
+    tool: Optional[ToolData] = Field(default=None)
 
 
 PyProjectT = TypeVar("PyProjectT", bound=PyProject)
