@@ -78,8 +78,6 @@ class PEP508(Requirement):
         if not isinstance(value, str):
             raise TypeError("string required")
 
-        # TODO: Manage Requirement specifics
-
         try:
             definition = Requirement(value)
         except InvalidRequirement as invalid:
