@@ -98,9 +98,10 @@ class Preset(BaseModel):
     inherits: Optional[list[str] | str]
     displayName: Optional[str]
     description: Optional[str]
+    cacheVariables: Optional[dict[str, None | bool | str | dict[str, str | bool]]]
 
     @validator("inherits")
-    def validate_str(cls, values: dict[str, Any]):  # pylint: disable=E0213
+    def validate_str(cls, values: Optional[list[str] | str]):  # pylint: disable=E0213
         """
         Conform to list
         """
