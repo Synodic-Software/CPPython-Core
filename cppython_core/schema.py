@@ -11,7 +11,21 @@ from typing import Any, Generic, Optional, Type, TypeVar
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
 
-ModelT = TypeVar("ModelT", bound=BaseModel)
+
+class CPPythonModel(BaseModel):
+    """
+    The base model to use for all CPPython models
+    """
+
+    class Config:
+        """
+        Pydantic built-in configuration
+        """
+
+        validate_assignment = True
+
+
+ModelT = TypeVar("ModelT", bound=CPPythonModel)
 
 
 class TargetEnum(Enum):
@@ -24,7 +38,7 @@ class TargetEnum(Enum):
     SHARED = "shared"
 
 
-class PEP621(BaseModel):
+class PEP621(CPPythonModel):
     """
     CPPython relevant PEP 621 conforming data
     Because only the partial schema is used, we ignore 'extra' attributes
@@ -86,7 +100,7 @@ class PEP508(Requirement):
         return definition
 
 
-class Preset(BaseModel):
+class Preset(CPPythonModel):
     """
     Partial Preset specification
     """
@@ -127,7 +141,7 @@ class ConfigurePreset(Preset):
         return None
 
 
-class CPPythonData(BaseModel, extra=Extra.forbid):
+class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """
     Data required by the tool
     """
@@ -142,7 +156,7 @@ class CPPythonData(BaseModel, extra=Extra.forbid):
 CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
 
 
-class ToolData(BaseModel):
+class ToolData(CPPythonModel):
     """
     Tool entry
     This schema is not under our control. Ignore 'extra' attributes
@@ -154,7 +168,7 @@ class ToolData(BaseModel):
 ToolDataT = TypeVar("ToolDataT", bound=ToolData)
 
 
-class PyProject(BaseModel):
+class PyProject(CPPythonModel):
     """
     pyproject.toml schema
     This schema is not under our control. Ignore 'extra' attributes
@@ -208,13 +222,13 @@ class Plugin(ABC):
 PluginT = TypeVar("PluginT", bound=Plugin)
 
 
-class InterfaceConfiguration(BaseModel):
+class InterfaceConfiguration(CPPythonModel, extra=Extra.forbid):
     """
     Base class for the configuration data that is passed to the interface
     """
 
 
-class GeneratorConfiguration(BaseModel):
+class GeneratorConfiguration(CPPythonModel, extra=Extra.forbid):
     """
     Base class for the configuration data that is set by the project for the generator
     """
@@ -222,7 +236,7 @@ class GeneratorConfiguration(BaseModel):
     root_path: Path = Field(description="The path where the pyproject.toml lives")
 
 
-class GeneratorData(BaseModel, extra=Extra.forbid):
+class GeneratorData(CPPythonModel, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
