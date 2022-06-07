@@ -17,6 +17,7 @@ def subprocess_call(arguments: list[str | Path], log_level: int = logging.WARNIN
         process = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
 
         if not suppress:
+            assert process.stdout is not None
             with process.stdout as pipe:
                 for line in iter(pipe.readline, ""):
                     cppython_logger.log(log_level, line.rstrip())
