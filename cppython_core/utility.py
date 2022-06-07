@@ -10,7 +10,7 @@ cppython_logger = logging.getLogger("cppython")
 
 
 def subprocess_call(
-    arguments: list[str | Path], log_level: int = logging.WARNING, suppress: bool = False, **kwargs: dict[str, Any]
+    arguments: list[str | Path], log_level: int = logging.WARNING, suppress: bool = False, **kwargs: Any
 ):
     """
     Executes a subprocess call with logger and utility attachments. Captures STDOUT and STDERR
