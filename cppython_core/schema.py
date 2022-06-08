@@ -411,4 +411,5 @@ class Generator(Plugin, Generic[GeneratorDataT]):
         raise NotImplementedError()
 
 
-GeneratorT = TypeVar("GeneratorT", bound=Generator[GeneratorData])
+# Generator[GeneratorDataT] is not allowed. 'Any' will resolve to GeneratorDataT when implemented
+GeneratorT = TypeVar("GeneratorT", bound=Generator[Any])
