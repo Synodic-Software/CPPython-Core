@@ -22,6 +22,7 @@ class CPPythonModel(BaseModel):
         Pydantic built-in configuration
         """
 
+        allow_population_by_field_name = True
         validate_assignment = True
 
 
