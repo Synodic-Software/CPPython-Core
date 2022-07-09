@@ -2,17 +2,22 @@
 TODO
 """
 
-from _pytest.python_api import raises
-from pytest import raises
+import pytest
 from tomlkit import parse
 
-from cppython_core.schema import PEP508, CPPythonData, PyProject, TargetEnum
+from cppython_core.schema import PEP508, CPPythonData, PyProject
 
 
 class TestSchema:
     """
     TODO
     """
+
+    def test_cppython_data(self):
+        """
+        Ensures that the CPPython config data can be defaulted
+        """
+        CPPythonData()
 
     def test_cppython_table(self):
         """
@@ -62,11 +67,5 @@ class TestSchema:
 
         assert requirement.name == "requests"
 
-        with raises(ValueError):
+        with pytest.raises(ValueError):
             PEP508("this is not conforming")
-
-    def test_cppython_data(self):
-        """
-        TODO
-        """
-        CPPythonData(target=TargetEnum.EXE)

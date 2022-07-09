@@ -22,7 +22,9 @@ class CPPythonModel(BaseModel):
         Pydantic built-in configuration
         """
 
-        allow_population_by_field_name = True
+        # Currently, there is no need for programmatically defined data outside tests.
+        # Tests will validate via default values and then assignment.
+        allow_population_by_field_name = False
         validate_assignment = True
 
 
@@ -147,7 +149,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     Data required by the tool
     """
 
-    target: TargetEnum
+    target: TargetEnum = Field(default=TargetEnum.EXE)
     dependencies: list[PEP508] = Field(default=[])
     install_path: Path = Field(default=_default_install_location(), alias="install-path")
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
