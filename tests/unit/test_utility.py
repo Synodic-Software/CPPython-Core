@@ -74,7 +74,7 @@ class TestUtility:
 
     def test_subprocess_suppression(self, caplog: LogCaptureFixture):
         """
-        Test subprocess_call supression flag
+        Test subprocess_call suppression flag
         """
 
         console_logger = StreamHandler()
