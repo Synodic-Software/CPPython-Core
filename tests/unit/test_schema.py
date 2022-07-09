@@ -34,7 +34,7 @@ class TestSchema:
         target = "executable"\n
         """
 
-        document = parse(data)
+        document = parse(data).value
         pyproject = PyProject(**document)
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is not None
@@ -53,7 +53,7 @@ class TestSchema:
         [tool.test]\n
         """
 
-        document = parse(data)
+        document = parse(data).value
         pyproject = PyProject(**document)
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is None
