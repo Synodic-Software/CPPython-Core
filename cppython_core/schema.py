@@ -169,9 +169,6 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
             self.build_path = base_path / self.build_path
 
 
-CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
-
-
 class ToolData(CPPythonModel):
     """
     Tool entry
