@@ -2,6 +2,8 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from logging import Logger, getLogger
@@ -10,6 +12,7 @@ from typing import Any, Generic, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
+from pydantic.types import FilePath
 
 
 class CPPythonModel(BaseModel):
@@ -41,6 +44,34 @@ class TargetEnum(Enum):
     SHARED = "shared"
 
 
+class ProjectConfiguration(CPPythonModel):
+    """
+    Project-wide configuration
+    """
+
+    pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
+    version: str = Field(description="The version number a 'dynamic' project version will resolve to")
+    verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
+
+    @validator("verbosity")
+    def min_max(cls, value: int):  # pylint: disable=E0213
+        """
+        Clamps the input value to an acceptable range
+        """
+        return min(max(value, 0), 2)
+
+    @validator("pyproject_file")
+    def pyproject_name(cls, value: FilePath):  # pylint: disable=E0213
+        """
+        Verify the name of the file
+        """
+
+        if value.name != "pyproject.toml":
+            raise ValueError('The given file is not named "pyproject.toml"')
+
+        return value
+
+
 class PEP621(CPPythonModel):
     """
     CPPython relevant PEP 621 conforming data
@@ -66,8 +97,18 @@ class PEP621(CPPythonModel):
 
         return value
 
+    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621:
+        """
+        Creates a deep copy and resolves dynamic attributes on the copy
+        TODO: Replace return with Self - python 3.11 - removing __future__ annotations
+        """
 
-ProjectDataT = TypeVar("ProjectDataT", bound=PEP621)
+        modified = self.copy(deep=True)
+
+        # Update the dynamic version
+        modified.version = project_configuration.version
+
+        return modified
 
 
 def _default_install_location() -> Path:
@@ -155,24 +196,27 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
-    def resolve_paths(self, base_path: Path) -> None:
+    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonData:
         """
-        Resolves relative paths
+        Creates a deep copy and resolves dynamic attributes on the copy
+        TODO: Replace return with Self - python 3.11 - removing __future__ annotations
         """
 
-        base_path = base_path.absolute()
+        modified = self.copy(deep=True)
 
-        if not self.install_path.is_absolute():
-            self.install_path = base_path / self.install_path
+        root_directory = project_configuration.pyproject_file.parent.absolute()
 
-        if not self.tool_path.is_absolute():
-            self.tool_path = base_path / self.tool_path
+        # Add the project location to all relative paths
+        if not modified.install_path.is_absolute():
+            modified.install_path = root_directory / modified.install_path
 
-        if not self.build_path.is_absolute():
-            self.build_path = base_path / self.build_path
+        if not modified.tool_path.is_absolute():
+            modified.tool_path = root_directory / modified.tool_path
 
+        if not modified.build_path.is_absolute():
+            modified.build_path = root_directory / modified.build_path
 
-CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
+        return modified
 
 
 class ToolData(CPPythonModel):
