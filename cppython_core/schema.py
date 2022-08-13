@@ -67,9 +67,6 @@ class PEP621(CPPythonModel):
         return value
 
 
-ProjectDataT = TypeVar("ProjectDataT", bound=PEP621)
-
-
 def _default_install_location() -> Path:
 
     return Path.home() / ".cppython"
