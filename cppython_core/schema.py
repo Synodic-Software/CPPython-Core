@@ -299,20 +299,22 @@ class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     root_path: Path = Field(description="The path where the pyproject.toml lives")
 
 
+# Remove required quotes once 'GeneratorData::resolve' uses the Self type
+GeneratorDataT = TypeVar("GeneratorDataT", bound="GeneratorData")
+
+
 class GeneratorData(CPPythonModel, ABC, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
 
     @abstractmethod
-    def resolve_paths(self, base_path: Path) -> None:
+    def resolve(self: GeneratorDataT, project_configuration: ProjectConfiguration) -> GeneratorDataT:
         """
         Resolves relative paths
+        TODO - Replace with Self type
         """
         raise NotImplementedError()
-
-
-GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
 
 
 class Interface(Plugin):
