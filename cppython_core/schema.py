@@ -155,6 +155,22 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
+    def resolve_paths(self, base_path: Path) -> None:
+        """
+        Resolves relative paths
+        """
+
+        base_path = base_path.absolute()
+
+        if not self.install_path.is_absolute():
+            self.install_path = base_path / self.install_path
+
+        if not self.tool_path.is_absolute():
+            self.tool_path = base_path / self.tool_path
+
+        if not self.build_path.is_absolute():
+            self.build_path = base_path / self.build_path
+
 
 CPPythonDataT = TypeVar("CPPythonDataT", bound=CPPythonData)
 
@@ -231,7 +247,7 @@ class InterfaceConfiguration(CPPythonModel, extra=Extra.forbid):
     """
 
 
-class GeneratorConfiguration(CPPythonModel, extra=Extra.forbid):
+class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     """
     Base class for the configuration data that is set by the project for the generator
     """
@@ -239,10 +255,17 @@ class GeneratorConfiguration(CPPythonModel, extra=Extra.forbid):
     root_path: Path = Field(description="The path where the pyproject.toml lives")
 
 
-class GeneratorData(CPPythonModel, extra=Extra.forbid):
+class GeneratorData(CPPythonModel, ABC, extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
+
+    @abstractmethod
+    def resolve_paths(self, base_path: Path) -> None:
+        """
+        Resolves relative paths
+        """
+        raise NotImplementedError()
 
 
 GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData)
