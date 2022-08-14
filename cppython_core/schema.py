@@ -12,7 +12,7 @@ from typing import Any, Generic, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
-from pydantic.types import FilePath
+from pydantic.types import DirectoryPath, FilePath
 
 
 class CPPythonModel(BaseModel):
@@ -206,7 +206,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 
         root_directory = project_configuration.pyproject_file.parent.absolute()
 
-        # Add the project location to all relative paths
+        # Add the base path to all relative paths
         if not modified.install_path.is_absolute():
             modified.install_path = root_directory / modified.install_path
 
@@ -296,7 +296,7 @@ class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     Base class for the configuration data that is set by the project for the generator
     """
 
-    root_path: Path = Field(description="The path where the pyproject.toml lives")
+    root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
 # Remove required quotes once 'GeneratorData::resolve' uses the Self type
