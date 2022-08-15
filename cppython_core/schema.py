@@ -401,7 +401,7 @@ class Interface(Plugin):
 InterfaceT = TypeVar("InterfaceT", bound=Interface)
 
 
-class Generator(Plugin, Generic[GeneratorDataT]):
+class Generator(Plugin, Generic[GeneratorDataResolvedT]):
     """
     Abstract type to be inherited by CPPython Generator plugins
     """
@@ -412,7 +412,7 @@ class Generator(Plugin, Generic[GeneratorDataT]):
         configuration: GeneratorConfiguration,
         project: PEP621Resolved,
         cppython: CPPythonDataResolved,
-        generator: GeneratorDataT,
+        generator: GeneratorDataResolvedT,
     ) -> None:
         """
         Allows CPPython to pass the relevant data to constructed Generator plugin
@@ -446,7 +446,7 @@ class Generator(Plugin, Generic[GeneratorDataT]):
         return self._cppython
 
     @property
-    def generator(self) -> GeneratorDataT:
+    def generator(self) -> GeneratorDataResolvedT:
         """
         Returns the GeneratorData object set at initialization
         """
@@ -469,7 +469,7 @@ class Generator(Plugin, Generic[GeneratorDataT]):
 
     @staticmethod
     @abstractmethod
-    def data_type() -> Type[GeneratorDataT]:
+    def data_type() -> Type[GeneratorDataResolvedT]:
         """
         Returns the pydantic type to cast the generator configuration data to
         """
