@@ -410,8 +410,8 @@ class Generator(Plugin, Generic[GeneratorDataT]):
     def __init__(
         self,
         configuration: GeneratorConfiguration,
-        project: PEP621,
-        cppython: CPPythonData,
+        project: PEP621Resolved,
+        cppython: CPPythonDataResolved,
         generator: GeneratorDataT,
     ) -> None:
         """
@@ -432,16 +432,16 @@ class Generator(Plugin, Generic[GeneratorDataT]):
         return self._configuration
 
     @property
-    def project(self) -> PEP621:
+    def project(self) -> PEP621Resolved:
         """
-        Returns the PEP621 object set at initialization
+        Returns the PEP621Resolved object set at initialization
         """
         return self._project
 
     @property
-    def cppython(self) -> CPPythonData:
+    def cppython(self) -> CPPythonDataResolved:
         """
-        Returns the CPPythonData object set at initialization
+        Returns the CPPythonDataResolved object set at initialization
         """
         return self._cppython
 
