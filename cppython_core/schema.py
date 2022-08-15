@@ -245,6 +245,11 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         if not modified.build_path.is_absolute():
             modified.build_path = root_directory / modified.build_path
 
+        # Create directories if they do not exist
+        modified.install_path.mkdir(parents=True, exist_ok=True)
+        modified.tool_path.mkdir(parents=True, exist_ok=True)
+        modified.build_path.mkdir(parents=True, exist_ok=True)
+
         return CPPythonDataResolved(**modified.dict())
 
 
