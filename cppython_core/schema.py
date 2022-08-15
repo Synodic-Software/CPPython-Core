@@ -2,8 +2,6 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from enum import Enum
 from logging import Logger, getLogger
@@ -72,6 +70,16 @@ class ProjectConfiguration(CPPythonModel):
         return value
 
 
+class PEP621Resolved(CPPythonModel):
+    """
+    Resolved PEP621
+    """
+
+    name: str
+    version: str
+    description: str
+
+
 class PEP621(CPPythonModel):
     """
     CPPython relevant PEP 621 conforming data
@@ -97,10 +105,9 @@ class PEP621(CPPythonModel):
 
         return value
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621:
+    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621Resolved:
         """
-        Creates a deep copy and resolves dynamic attributes on the copy
-        TODO: Replace return with Self - python 3.11 - removing __future__ annotations
+        Creates a copy and resolves dynamic attributes
         """
 
         modified = self.copy(deep=True)
@@ -108,7 +115,7 @@ class PEP621(CPPythonModel):
         # Update the dynamic version
         modified.version = project_configuration.version
 
-        return modified
+        return PEP621Resolved(**modified.dict())
 
 
 def _default_install_location() -> Path:
@@ -185,6 +192,18 @@ class ConfigurePreset(Preset):
         return None
 
 
+class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
+    """
+    Resolved CPPythonData
+    """
+
+    target: TargetEnum
+    dependencies: list[PEP508]
+    install_path: DirectoryPath
+    tool_path: DirectoryPath
+    build_path: DirectoryPath
+
+
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """
     Data required by the tool
@@ -196,10 +215,9 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonData:
+    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonDataResolved:
         """
-        Creates a deep copy and resolves dynamic attributes on the copy
-        TODO: Replace return with Self - python 3.11 - removing __future__ annotations
+        Creates a copy and resolves dynamic attributes
         """
 
         modified = self.copy(deep=True)
@@ -216,7 +234,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         if not modified.build_path.is_absolute():
             modified.build_path = root_directory / modified.build_path
 
-        return modified
+        return CPPythonDataResolved(**modified.dict())
 
 
 class ToolData(CPPythonModel):
