@@ -2,8 +2,6 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from enum import Enum
 from logging import Logger, getLogger
@@ -12,7 +10,7 @@ from typing import Any, Generic, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
-from pydantic.types import FilePath
+from pydantic.types import DirectoryPath, FilePath
 
 
 class CPPythonModel(BaseModel):
@@ -72,6 +70,16 @@ class ProjectConfiguration(CPPythonModel):
         return value
 
 
+class PEP621Resolved(CPPythonModel):
+    """
+    Resolved PEP621
+    """
+
+    name: str
+    version: str
+    description: str
+
+
 class PEP621(CPPythonModel):
     """
     CPPython relevant PEP 621 conforming data
@@ -87,7 +95,7 @@ class PEP621(CPPythonModel):
     @validator("version")
     def validate_version(value, values: dict[str, Any]):  # pylint: disable=E0213
         """
-        TODO
+        Validates that version is present or that the name is present in the dynamic field
         """
 
         if "version" in values["dynamic"]:
@@ -97,10 +105,9 @@ class PEP621(CPPythonModel):
 
         return value
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621:
+    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621Resolved:
         """
-        Creates a deep copy and resolves dynamic attributes on the copy
-        TODO: Replace return with Self - python 3.11 - removing __future__ annotations
+        Creates a copy and resolves dynamic attributes
         """
 
         modified = self.copy(deep=True)
@@ -108,7 +115,7 @@ class PEP621(CPPythonModel):
         # Update the dynamic version
         modified.version = project_configuration.version
 
-        return modified
+        return PEP621Resolved(**modified.dict())
 
 
 def _default_install_location() -> Path:
@@ -124,14 +131,15 @@ class PEP508(Requirement):
     @classmethod
     def __get_validators__(cls):
         """
-        TODO
+        Returns the set of validators defined for this type so pydantic can use them internally
         """
         yield cls.validate
 
     @classmethod
     def validate(cls, value: "PEP508"):
         """
-        TODO
+        Enforce type that this class can be
+        TODO - Use the Self type python 3.11
         """
         if not isinstance(value, str):
             raise TypeError("string required")
@@ -177,10 +185,32 @@ class ConfigurePreset(Preset):
     @validator("toolchainFile")
     def validate_path(cls, value: Optional[str]):  # pylint: disable=E0213
         """
-        TODO
+        Enforce the posix form of the path as that is what CMake understands
         """
         if value is not None:
             return Path(value).as_posix()
+
+        return None
+
+
+class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
+    """
+    Resolved CPPythonData
+    """
+
+    target: TargetEnum
+    dependencies: list[PEP508]
+    install_path: DirectoryPath
+    tool_path: DirectoryPath
+    build_path: DirectoryPath
+
+    @validator("install_path", "tool_path", "build_path")
+    def validate_absolute_path(cls, value: DirectoryPath):  # pylint: disable=E0213
+        """
+        Enforce the value is an absolute path
+        """
+        if not value.is_absolute():
+            raise ValueError("Absolute path required")
 
         return None
 
@@ -196,17 +226,16 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonData:
+    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonDataResolved:
         """
-        Creates a deep copy and resolves dynamic attributes on the copy
-        TODO: Replace return with Self - python 3.11 - removing __future__ annotations
+        Creates a copy and resolves dynamic attributes
         """
 
         modified = self.copy(deep=True)
 
         root_directory = project_configuration.pyproject_file.parent.absolute()
 
-        # Add the project location to all relative paths
+        # Add the base path to all relative paths
         if not modified.install_path.is_absolute():
             modified.install_path = root_directory / modified.install_path
 
@@ -216,7 +245,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         if not modified.build_path.is_absolute():
             modified.build_path = root_directory / modified.build_path
 
-        return modified
+        return CPPythonDataResolved(**modified.dict())
 
 
 class ToolData(CPPythonModel):
@@ -296,25 +325,33 @@ class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     Base class for the configuration data that is set by the project for the generator
     """
 
-    root_path: Path = Field(description="The path where the pyproject.toml lives")
+    root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-# Remove required quotes once 'GeneratorData::resolve' uses the Self type
-GeneratorDataT = TypeVar("GeneratorDataT", bound="GeneratorData")
+class GeneratorDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
+    """
+    Base class for the configuration data that will be resolved from 'GeneratorData'
+    """
 
 
-class GeneratorData(CPPythonModel, ABC, extra=Extra.forbid):
+GeneratorDataResolvedT = TypeVar("GeneratorDataResolvedT", bound=GeneratorDataResolved)
+
+
+class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
 
     @abstractmethod
-    def resolve(self: GeneratorDataT, project_configuration: ProjectConfiguration) -> GeneratorDataT:
+    def resolve(self, project_configuration: ProjectConfiguration) -> GeneratorDataResolvedT:
         """
-        Resolves relative paths
-        TODO - Replace with Self type
+        Creates a copy and resolves dynamic attributes
         """
         raise NotImplementedError()
+
+
+# GeneratorDataT[GeneratorDataResolvedT] is not allowed. 'Any' will resolve to GeneratorDataResolvedT when implemented
+GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
 
 
 class Interface(Plugin):
@@ -325,7 +362,7 @@ class Interface(Plugin):
     @abstractmethod
     def __init__(self, configuration: InterfaceConfiguration) -> None:
         """
-        TODO
+        Initializes the class properties and calls the base plugin class
         """
         self._configuration = configuration
 
@@ -334,7 +371,7 @@ class Interface(Plugin):
     @property
     def configuration(self) -> InterfaceConfiguration:
         """
-        TODO
+        Returns the InterfaceConfiguration object set at initialization
         """
         return self._configuration
 
@@ -390,28 +427,28 @@ class Generator(Plugin, Generic[GeneratorDataT]):
     @property
     def configuration(self) -> GeneratorConfiguration:
         """
-        TODO
+        Returns the GeneratorConfiguration object set at initialization
         """
         return self._configuration
 
     @property
     def project(self) -> PEP621:
         """
-        TODO
+        Returns the PEP621 object set at initialization
         """
         return self._project
 
     @property
     def cppython(self) -> CPPythonData:
         """
-        TODO
+        Returns the CPPythonData object set at initialization
         """
         return self._cppython
 
     @property
     def generator(self) -> GeneratorDataT:
         """
-        TODO
+        Returns the GeneratorData object set at initialization
         """
         return self._generator
 
