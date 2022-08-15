@@ -317,22 +317,30 @@ class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-# Remove required quotes once 'GeneratorData::resolve' uses the Self type
-GeneratorDataT = TypeVar("GeneratorDataT", bound="GeneratorData")
+class GeneratorDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
+    """
+    Base class for the configuration data that will be resolved from 'GeneratorData'
+    """
 
 
-class GeneratorData(CPPythonModel, ABC, extra=Extra.forbid):
+GeneratorDataResolvedT = TypeVar("GeneratorDataResolvedT", bound=GeneratorDataResolved)
+
+
+class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=Extra.forbid):
     """
     Base class for the configuration data that will be read by the interface and given to the generator
     """
 
     @abstractmethod
-    def resolve(self: GeneratorDataT, project_configuration: ProjectConfiguration) -> GeneratorDataT:
+    def resolve(self, project_configuration: ProjectConfiguration) -> GeneratorDataResolvedT:
         """
-        Resolves relative paths
-        TODO - Replace with Self type
+        Creates a copy and resolves dynamic attributes
         """
         raise NotImplementedError()
+
+
+# GeneratorDataT[GeneratorDataResolvedT] is not allowed. 'Any' will resolve to GeneratorDataResolvedT when implemented
+GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
 
 
 class Interface(Plugin):
