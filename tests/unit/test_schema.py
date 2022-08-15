@@ -1,5 +1,5 @@
 """
-TODO
+Test custom schema validation that cannot be verified by the Pydantic validation
 """
 
 import pytest
@@ -10,7 +10,7 @@ from cppython_core.schema import PEP508, CPPythonData, PyProject
 
 class TestSchema:
     """
-    TODO
+    Test validation
     """
 
     def test_cppython_data(self):
@@ -21,7 +21,7 @@ class TestSchema:
 
     def test_cppython_table(self):
         """
-        TODO
+        Ensures that the nesting yaml table behavior can be read properly
         """
 
         data = """
@@ -41,7 +41,7 @@ class TestSchema:
 
     def test_empty_cppython(self):
         """
-        TODO
+        Ensure that the common none condition works
         """
 
         data = """
@@ -60,7 +60,7 @@ class TestSchema:
 
     def test_508(self):
         """
-        TODO
+        Ensure correct parsing of the 'packaging' type via the PEP508 intermediate type
         """
 
         requirement = PEP508('requests [security,tests] >= 2.8.1, == 2.8.* ; python_version < "2.7"')

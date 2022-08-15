@@ -95,7 +95,7 @@ class PEP621(CPPythonModel):
     @validator("version")
     def validate_version(value, values: dict[str, Any]):  # pylint: disable=E0213
         """
-        TODO
+        Validates that version is present or that the name is present in the dynamic field
         """
 
         if "version" in values["dynamic"]:
@@ -131,14 +131,15 @@ class PEP508(Requirement):
     @classmethod
     def __get_validators__(cls):
         """
-        TODO
+        Returns the set of validators defined for this type so pydantic can use them internally
         """
         yield cls.validate
 
     @classmethod
     def validate(cls, value: "PEP508"):
         """
-        TODO
+        Enforce type that this class can be
+        TODO - Use the Self type python 3.11
         """
         if not isinstance(value, str):
             raise TypeError("string required")
@@ -184,7 +185,7 @@ class ConfigurePreset(Preset):
     @validator("toolchainFile")
     def validate_path(cls, value: Optional[str]):  # pylint: disable=E0213
         """
-        TODO
+        Enforce the posix form of the path as that is what CMake understands
         """
         if value is not None:
             return Path(value).as_posix()
@@ -351,7 +352,7 @@ class Interface(Plugin):
     @abstractmethod
     def __init__(self, configuration: InterfaceConfiguration) -> None:
         """
-        TODO
+        Initializes the class properties and calls the base plugin class
         """
         self._configuration = configuration
 
@@ -360,7 +361,7 @@ class Interface(Plugin):
     @property
     def configuration(self) -> InterfaceConfiguration:
         """
-        TODO
+        Returns the InterfaceConfiguration object set at initialization
         """
         return self._configuration
 
@@ -416,28 +417,28 @@ class Generator(Plugin, Generic[GeneratorDataT]):
     @property
     def configuration(self) -> GeneratorConfiguration:
         """
-        TODO
+        Returns the GeneratorConfiguration object set at initialization
         """
         return self._configuration
 
     @property
     def project(self) -> PEP621:
         """
-        TODO
+        Returns the PEP621 object set at initialization
         """
         return self._project
 
     @property
     def cppython(self) -> CPPythonData:
         """
-        TODO
+        Returns the CPPythonData object set at initialization
         """
         return self._cppython
 
     @property
     def generator(self) -> GeneratorDataT:
         """
-        TODO
+        Returns the GeneratorData object set at initialization
         """
         return self._generator
 

@@ -1,5 +1,5 @@
 """
-TODO
+Tests the scope of utilities
 """
 
 import logging
@@ -17,12 +17,12 @@ from cppython_core.utility import cppython_logger, subprocess_call
 
 class TestUtility:
     """
-    TODO
+    Tests the utility functionality
     """
 
     def test_root_log(self, caplog: LogCaptureFixture):
         """
-        TODO
+        Ensures that the root logger is written to by plugins
         """
 
         console_logger = StreamHandler()
@@ -30,20 +30,20 @@ class TestUtility:
 
         class MockPlugin(Plugin):
             """
-            TODO
+            A dummy plugin to verify logging metadata
             """
 
             @staticmethod
             def name() -> str:
                 """
-                TODO
+                Static name to compare in this test
                 """
                 return "mock"
 
             @staticmethod
             def group() -> str:
                 """
-                TODO
+                Static group to compare in this test
                 """
                 return "group"
 
