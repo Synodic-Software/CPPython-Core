@@ -204,6 +204,16 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
     tool_path: DirectoryPath
     build_path: DirectoryPath
 
+    @validator("install_path", "tool_path", "build_path")
+    def validate_absolute_path(cls, value: DirectoryPath):  # pylint: disable=E0213
+        """
+        Enforce the value is an absolute path
+        """
+        if not value.is_absolute():
+            raise ValueError("Absolute path required")
+
+        return None
+
 
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """
