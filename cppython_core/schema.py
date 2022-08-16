@@ -215,6 +215,9 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
         return None
 
 
+CPPythonDataResolvedT = TypeVar("CPPythonDataResolvedT", bound=CPPythonDataResolved)
+
+
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """
     Data required by the tool
@@ -226,7 +229,9 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: Path = Field(default=Path("tool"), alias="tool-path")
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonDataResolved:
+    def resolve(
+        self, resolved_type: Type[CPPythonDataResolvedT], project_configuration: ProjectConfiguration
+    ) -> CPPythonDataResolvedT:
         """
         Creates a copy and resolves dynamic attributes
         """
@@ -250,7 +255,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         modified.tool_path.mkdir(parents=True, exist_ok=True)
         modified.build_path.mkdir(parents=True, exist_ok=True)
 
-        return CPPythonDataResolved(**modified.dict())
+        return resolved_type(**modified.dict())
 
 
 class ToolData(CPPythonModel):
