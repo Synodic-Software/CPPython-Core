@@ -411,7 +411,7 @@ class Interface(Plugin):
 InterfaceT = TypeVar("InterfaceT", bound=Interface)
 
 
-class Generator(Plugin, Generic[GeneratorDataResolvedT]):
+class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
     """
     Abstract type to be inherited by CPPython Generator plugins
     """
@@ -479,9 +479,17 @@ class Generator(Plugin, Generic[GeneratorDataResolvedT]):
 
     @staticmethod
     @abstractmethod
-    def data_type() -> Type[GeneratorDataResolvedT]:
+    def data_type() -> Type[GeneratorDataT]:
         """
         Returns the pydantic type to cast the generator configuration data to
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    @abstractmethod
+    def resolved_data_type() -> Type[GeneratorDataResolvedT]:
+        """
+        Returns the pydantic type to cast the resolved generator configuration data to
         """
         raise NotImplementedError()
 
@@ -531,4 +539,4 @@ class Generator(Plugin, Generic[GeneratorDataResolvedT]):
 
 
 # Generator[GeneratorDataT] is not allowed. 'Any' will resolve to GeneratorDataT when implemented
-GeneratorT = TypeVar("GeneratorT", bound=Generator[Any])
+GeneratorT = TypeVar("GeneratorT", bound=Generator[Any, Any])
