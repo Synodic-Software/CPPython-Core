@@ -212,7 +212,7 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
         if not value.is_absolute():
             raise ValueError("Absolute path required")
 
-        return None
+        return value
 
 
 CPPythonDataResolvedT = TypeVar("CPPythonDataResolvedT", bound=CPPythonDataResolved)
