@@ -2,10 +2,19 @@
 Test custom schema validation that cannot be verified by the Pydantic validation
 """
 
+from pathlib import Path
+
 import pytest
 from tomlkit import parse
 
-from cppython_core.schema import PEP508, CPPythonData, PyProject
+from cppython_core.schema import (
+    PEP508,
+    PEP621,
+    CPPythonData,
+    CPPythonDataResolved,
+    ProjectConfiguration,
+    PyProject,
+)
 
 
 class TestSchema:
@@ -69,3 +78,31 @@ class TestSchema:
 
         with pytest.raises(ValueError):
             PEP508("this is not conforming")
+
+    def test_cppython_resolve(self):
+        """
+        Test the CPPython schema resolve function
+        """
+
+        data = CPPythonData()
+        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        resolved = data.resolve(CPPythonDataResolved, config)
+
+        class_variables = vars(resolved)
+
+        assert len(class_variables)
+        assert not None in class_variables.values()
+
+    def test_pep621_resolve(self):
+        """
+        Test the PEP621 schema resolve function
+        """
+
+        data = PEP621(name="pep621-resolve-test")
+        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        resolved = data.resolve(config)
+
+        class_variables = vars(resolved)
+
+        assert len(class_variables)
+        assert not None in class_variables.values()
