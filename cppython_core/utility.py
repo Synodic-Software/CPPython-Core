@@ -1,16 +1,18 @@
 """
 Core Utilities
 """
+
 import logging
 import subprocess
+from logging import Logger
 from pathlib import Path
 from typing import Any
 
-cppython_logger = logging.getLogger("cppython")
+from cppython_core.exceptions import ProcessError
 
 
 def subprocess_call(
-    arguments: list[str | Path], log_level: int = logging.WARNING, suppress: bool = False, **kwargs: Any
+    arguments: list[str | Path], logger: Logger, log_level: int = logging.WARNING, suppress: bool = False, **kwargs: Any
 ):
     """
     Executes a subprocess call with logger and utility attachments. Captures STDOUT and STDERR
@@ -23,16 +25,16 @@ def subprocess_call(
             assert process.stdout is not None
             with process.stdout as pipe:
                 for line in iter(pipe.readline, ""):
-                    cppython_logger.log(log_level, line.rstrip())
+                    logger.log(log_level, line.rstrip())
 
         exitcode = process.wait()
 
         if exitcode != 0:
-            raise subprocess.CalledProcessError(exitcode, arguments)
+            raise ProcessError("Called subprocess failed.")
 
-    except subprocess.CalledProcessError as error:
+    except subprocess.CalledProcessError:
+        # There was an error with the subprocess itself
 
-        if not suppress:
-            cppython_logger.error(f"The process failed with: {error.stdout}")
+        logger.error("The process failed.")
 
-        raise error
+        raise

@@ -14,8 +14,8 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-  "pydantic>=1.9.2",
-  "packaging>=21.3",
+    "pydantic>=1.10.1",
+    "packaging>=21.3",
 ]
 
 [project.license-files]
@@ -31,7 +31,7 @@ version = {use_scm = true}
 [tool.pdm.dev-dependencies]
 lint = [
   "black>=22.6.0",
-  "pylint>=2.14.5",
+  "pylint>=2.15.0",
   "isort>=5.10.1",
 ]
 test = [
