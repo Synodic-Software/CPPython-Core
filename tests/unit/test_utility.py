@@ -124,7 +124,7 @@ class TestUtility:
 
     def test_stderr_exception(self, caplog: LogCaptureFixture):
         """
-        TODO
+        Verify print and exit
         """
         python = Path(executable)
         with pytest.raises(ProcessError) as exec_info, caplog.at_level(logging.INFO):
@@ -140,7 +140,7 @@ class TestUtility:
 
     def test_stdout_exception(self, caplog: LogCaptureFixture):
         """
-        TODO
+        Verify print and exit
         """
         python = Path(executable)
         with pytest.raises(ProcessError) as exec_info, caplog.at_level(logging.INFO):
