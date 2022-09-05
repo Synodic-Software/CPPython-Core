@@ -106,7 +106,7 @@ class TestUtility:
             assert len(caplog.records) == 1
             assert "Test Exit Output" == caplog.records[0].message
 
-        assert "Called subprocess failed." in str(exec_info.value)
+        assert "Subprocess task failed" in str(exec_info.value)
 
     def test_subprocess_exception(self, caplog: LogCaptureFixture):
         """
@@ -120,7 +120,7 @@ class TestUtility:
             assert len(caplog.records) == 1
             assert "Test Exception Output" == caplog.records[0].message
 
-        assert "Called subprocess failed." in str(exec_info.value)
+        assert "Subprocess task failed" in str(exec_info.value)
 
     def test_stderr_exception(self, caplog: LogCaptureFixture):
         """
@@ -136,7 +136,7 @@ class TestUtility:
             assert "Test Out" == caplog.records[0].message
             assert "Test Exit Out" == caplog.records[1].message
 
-        assert "Called subprocess failed." in str(exec_info.value)
+        assert "Subprocess task failed" in str(exec_info.value)
 
     def test_stdout_exception(self, caplog: LogCaptureFixture):
         """
@@ -152,4 +152,4 @@ class TestUtility:
             assert "Test Error" == caplog.records[0].message
             assert "Test Exit Error" == caplog.records[1].message
 
-        assert "Called subprocess failed." in str(exec_info.value)
+        assert "Subprocess task failed" in str(exec_info.value)

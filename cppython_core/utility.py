@@ -18,23 +18,15 @@ def subprocess_call(
     Executes a subprocess call with logger and utility attachments. Captures STDOUT and STDERR
     """
 
-    try:
-        process = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
+    process = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
 
-        if not suppress:
-            assert process.stdout is not None
-            with process.stdout as pipe:
-                for line in iter(pipe.readline, ""):
-                    logger.log(log_level, line.rstrip())
+    if not suppress:
+        assert process.stdout is not None
+        with process.stdout as pipe:
+            for line in iter(pipe.readline, ""):
+                logger.log(log_level, line.rstrip())
 
-        exitcode = process.wait()
+    exitcode = process.wait()
 
-        if exitcode != 0:
-            raise ProcessError("Called subprocess failed.")
-
-    except subprocess.CalledProcessError:
-        # There was an error with the subprocess itself
-
-        logger.error("The process failed.")
-
-        raise
+    if exitcode != 0:
+        raise ProcessError("Subprocess task failed")
