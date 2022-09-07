@@ -493,22 +493,25 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
         """
         raise NotImplementedError()
 
+    @staticmethod
     @abstractmethod
-    def generator_downloaded(self, path: Path) -> bool:
+    def generator_downloaded(path: Path) -> bool:
         """
         Returns whether the generator needs to be downloaded
         """
         raise NotImplementedError()
 
+    @staticmethod
     @abstractmethod
-    def download_generator(self, path: Path) -> None:
+    def download_generator(path: Path) -> None:
         """
         Installs the external tooling required by the generator
         """
         raise NotImplementedError()
 
+    @staticmethod
     @abstractmethod
-    def update_generator(self, path: Path) -> None:
+    def update_generator(path: Path) -> None:
         """
         Update the tooling required by the generator
         """
