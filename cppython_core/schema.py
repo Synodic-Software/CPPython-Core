@@ -495,7 +495,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @classmethod
     @abstractmethod
-    def generator_downloaded(cls, path: Path) -> bool:
+    def generator_downloaded(cls, path: DirectoryPath) -> bool:
         """
         Returns whether the generator needs to be downloaded
         """
@@ -503,7 +503,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @classmethod
     @abstractmethod
-    def download_generator(cls, path: Path) -> None:
+    def download_generator(cls, path: DirectoryPath) -> None:
         """
         Installs the external tooling required by the generator
         """
@@ -511,7 +511,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @classmethod
     @abstractmethod
-    def update_generator(cls, path: Path) -> None:
+    def update_generator(cls, path: DirectoryPath) -> None:
         """
         Update the tooling required by the generator
         """
