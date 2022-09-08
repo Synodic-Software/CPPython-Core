@@ -3,7 +3,6 @@ Tests the scope of utilities
 """
 
 import logging
-import subprocess
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
