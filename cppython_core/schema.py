@@ -515,6 +515,15 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @classmethod
     @abstractmethod
+    def tooling_downloaded(cls) -> bool:
+        """
+        Returns whether the generator tooling needs to be downloaded
+        """
+
+        raise NotImplementedError()
+
+    @classmethod
+    @abstractmethod
     async def download_tooling(cls) -> None:
         """
         Installs the external tooling required by the generator
