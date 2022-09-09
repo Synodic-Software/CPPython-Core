@@ -515,7 +515,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @classmethod
     @abstractmethod
-    async def download_tooling(cls, path: Path) -> None:
+    async def download_tooling(cls) -> None:
         """
         Installs the external tooling required by the generator
         """
