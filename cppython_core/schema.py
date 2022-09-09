@@ -2,6 +2,8 @@
 Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from enum import Enum
 from logging import Logger, getLogger
@@ -213,6 +215,24 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
             raise ValueError("Absolute path required")
 
         return value
+
+    def generator_resolve(
+        self, generator_type: Type[Generator[GeneratorDataT, GeneratorDataResolvedT]]
+    ) -> CPPythonDataResolved:
+        """
+        Returns a deep copy that is modified for the given generator
+        TODO: Replace return type with Self
+        """
+
+        modified = self.copy(deep=True)
+
+        # Add generator specific paths to the base path
+        modified.install_path /= generator_type.name()
+
+        # Create directories if they do not exist
+        modified.install_path.mkdir(parents=True, exist_ok=True)
+
+        return modified
 
 
 CPPythonDataResolvedT = TypeVar("CPPythonDataResolvedT", bound=CPPythonDataResolved)
