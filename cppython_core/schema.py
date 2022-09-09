@@ -495,26 +495,11 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @classmethod
     @abstractmethod
-    def generator_downloaded(cls, path: DirectoryPath) -> bool:
-        """
-        Returns whether the generator needs to be downloaded
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    @abstractmethod
-    def download_generator(cls, path: DirectoryPath) -> None:
+    async def download_tooling(cls, path: Path) -> None:
         """
         Installs the external tooling required by the generator
         """
-        raise NotImplementedError()
 
-    @classmethod
-    @abstractmethod
-    def update_generator(cls, path: DirectoryPath) -> None:
-        """
-        Update the tooling required by the generator
-        """
         raise NotImplementedError()
 
     @abstractmethod
