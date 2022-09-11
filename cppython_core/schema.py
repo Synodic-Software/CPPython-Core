@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import Any, Callable, Generic, Iterator, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -54,14 +54,16 @@ class ProjectConfiguration(CPPythonModel):
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
     @validator("verbosity")
-    def min_max(cls, value: int):  # pylint: disable=E0213
+    @classmethod
+    def min_max(cls, value: int) -> int:
         """
         Clamps the input value to an acceptable range
         """
         return min(max(value, 0), 2)
 
     @validator("pyproject_file")
-    def pyproject_name(cls, value: FilePath):  # pylint: disable=E0213
+    @classmethod
+    def pyproject_name(cls, value: FilePath) -> FilePath:
         """
         Verify the name of the file
         """
@@ -95,7 +97,8 @@ class PEP621(CPPythonModel):
     description: str = Field(default="", description="https://peps.python.org/pep-0621/#description")
 
     @validator("version")
-    def validate_version(value, values: dict[str, Any]):  # pylint: disable=E0213
+    @classmethod
+    def validate_version(cls, value: str | None, values: dict[str, Any]) -> str | None:
         """
         Validates that version is present or that the name is present in the dynamic field
         """
@@ -131,14 +134,14 @@ class PEP508(Requirement):
     """
 
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls) -> Iterator[Callable[[Any], Any]]:
         """
         Returns the set of validators defined for this type so pydantic can use them internally
         """
         yield cls.validate
 
     @classmethod
-    def validate(cls, value: "PEP508"):
+    def validate(cls, value: "PEP508") -> Requirement:
         """
         Enforce type that this class can be
         TODO - Use the Self type python 3.11
@@ -167,7 +170,8 @@ class Preset(CPPythonModel):
     cacheVariables: Optional[dict[str, None | bool | str | dict[str, str | bool]]] = Field(default=None)
 
     @validator("inherits")
-    def validate_str(cls, values: Optional[list[str] | str]):  # pylint: disable=E0213
+    @classmethod
+    def validate_str(cls, values: Optional[list[str] | str]) -> Optional[list[str]]:
         """
         Conform to list
         """
@@ -185,7 +189,8 @@ class ConfigurePreset(Preset):
     toolchainFile: Optional[str] = Field(default=None)
 
     @validator("toolchainFile")
-    def validate_path(cls, value: Optional[str]):  # pylint: disable=E0213
+    @classmethod
+    def validate_path(cls, value: Optional[str]) -> Optional[str]:
         """
         Enforce the posix form of the path as that is what CMake understands
         """
@@ -207,7 +212,8 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
     build_path: DirectoryPath
 
     @validator("install_path", "tool_path", "build_path")
-    def validate_absolute_path(cls, value: DirectoryPath):  # pylint: disable=E0213
+    @classmethod
+    def validate_absolute_path(cls, value: DirectoryPath) -> DirectoryPath:
         """
         Enforce the value is an absolute path
         """
@@ -308,6 +314,8 @@ class Plugin(ABC):
     Abstract plugin type
     """
 
+    _logger: Logger
+
     @abstractmethod
     def __init__(self) -> None:
         super().__init__()
@@ -329,7 +337,6 @@ class Plugin(ABC):
         raise NotImplementedError()
 
     @classmethod
-    @property
     def logger(cls) -> Logger:
         """
         Returns the plugin specific sub-logger

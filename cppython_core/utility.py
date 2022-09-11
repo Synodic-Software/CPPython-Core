@@ -13,7 +13,7 @@ from cppython_core.exceptions import ProcessError
 
 def subprocess_call(
     arguments: list[str | Path], logger: Logger, log_level: int = logging.WARNING, suppress: bool = False, **kwargs: Any
-):
+) -> None:
     """
     Executes a subprocess call with logger and utility attachments. Captures STDOUT and STDERR
     """
