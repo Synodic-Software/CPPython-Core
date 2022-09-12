@@ -45,6 +45,7 @@ test = [
 
 [tool.pdm.scripts]
 check = {shell = "mypy ."}
+format = {shell = "black ."}
 lint = {shell = "pylint cppython_core tests"}
 test = {shell = "pytest tests"}
 
