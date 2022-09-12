@@ -22,13 +22,13 @@ class TestSchema:
     Test validation
     """
 
-    def test_cppython_data(self):
+    def test_cppython_data(self) -> None:
         """
         Ensures that the CPPython config data can be defaulted
         """
         CPPythonData()
 
-    def test_cppython_table(self):
+    def test_cppython_table(self) -> None:
         """
         Ensures that the nesting yaml table behavior can be read properly
         """
@@ -48,7 +48,7 @@ class TestSchema:
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is not None
 
-    def test_empty_cppython(self):
+    def test_empty_cppython(self) -> None:
         """
         Ensure that the common none condition works
         """
@@ -67,7 +67,7 @@ class TestSchema:
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is None
 
-    def test_508(self):
+    def test_508(self) -> None:
         """
         Ensure correct parsing of the 'packaging' type via the PEP508 intermediate type
         """
@@ -79,7 +79,7 @@ class TestSchema:
         with pytest.raises(ValueError):
             PEP508("this is not conforming")
 
-    def test_cppython_resolve(self):
+    def test_cppython_resolve(self) -> None:
         """
         Test the CPPython schema resolve function
         """
@@ -93,7 +93,7 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
-    def test_pep621_resolve(self):
+    def test_pep621_resolve(self) -> None:
         """
         Test the PEP621 schema resolve function
         """

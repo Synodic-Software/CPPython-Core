@@ -14,8 +14,8 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-    "pydantic>=1.10.1",
-    "packaging>=21.3",
+  "pydantic>=1.10.1",
+  "packaging>=21.3",
 ]
 
 [project.license-files]
@@ -25,14 +25,16 @@ paths = ["LICENSE.md"]
 homepage = "https://github.com/Synodic-Software/CPPython-Core"
 repository = "https://github.com/Synodic-Software/CPPython-Core"
 
+[project.optional-dependencies]
 [tool.pdm]
 version = {use_scm = true}
 
 [tool.pdm.dev-dependencies]
 lint = [
   "black>=22.6.0",
-  "pylint>=2.15.0",
   "isort>=5.10.1",
+  "mypy>=0.971",
+  "pylint>=2.15.2",
 ]
 test = [
   "pytest>=7.1.2",
@@ -41,7 +43,14 @@ test = [
   "tomlkit>=0.11.4",
 ]
 
+[tool.pdm.scripts]
+check = {shell = "mypy ."}
+format = {shell = "black ."}
+lint = {shell = "pylint cppython_core tests"}
+test = {shell = "pytest tests"}
+
 [tool.pytest.ini_options]
+log_cli = true
 testpaths = [
   "tests",
 ]
@@ -52,8 +61,11 @@ line-length = 120
 [tool.isort]
 profile = "black"
 
+[tool.mypy]
+exclude = "__pypackages__"
+strict = true
+
 [tool.pylint.messages_control]
-disable = "logging-fstring-interpolation"
 extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.format]

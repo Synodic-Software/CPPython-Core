@@ -23,7 +23,7 @@ class TestUtility:
     Tests the utility functionality
     """
 
-    def test_plugin_log(self, caplog: LogCaptureFixture):
+    def test_plugin_log(self, caplog: LogCaptureFixture) -> None:
         """
         Ensures that the root logger receives the auto-gathered plugin logger
         """
@@ -47,13 +47,13 @@ class TestUtility:
                 """
                 return "group"
 
-        logger = MockPlugin.logger
+        logger = MockPlugin.logger()
 
         with caplog.at_level(logging.INFO):
             logger.info("test")
             assert caplog.record_tuples == [("cppython.group.mock", logging.INFO, "test")]
 
-    def test_subprocess_stdout(self, caplog: LogCaptureFixture):
+    def test_subprocess_stdout(self, caplog: LogCaptureFixture) -> None:
         """
         Test subprocess_call
         """
@@ -66,7 +66,7 @@ class TestUtility:
         assert len(caplog.records) == 1
         assert "Test Out" == caplog.records[0].message
 
-    def test_subprocess_stderr(self, caplog: LogCaptureFixture):
+    def test_subprocess_stderr(self, caplog: LogCaptureFixture) -> None:
         """
         Test subprocess_call
         """
@@ -79,7 +79,7 @@ class TestUtility:
         assert len(caplog.records) == 1
         assert "Test Error" == caplog.records[0].message
 
-    def test_subprocess_suppression(self, caplog: LogCaptureFixture):
+    def test_subprocess_suppression(self, caplog: LogCaptureFixture) -> None:
         """
         Test subprocess_call suppression flag
         """
@@ -92,7 +92,7 @@ class TestUtility:
             )
             assert len(caplog.records) == 0
 
-    def test_subprocess_exit(self, caplog: LogCaptureFixture):
+    def test_subprocess_exit(self, caplog: LogCaptureFixture) -> None:
         """
         Test subprocess_call exception output
         """
@@ -107,7 +107,7 @@ class TestUtility:
 
         assert "Subprocess task failed" in str(exec_info.value)
 
-    def test_subprocess_exception(self, caplog: LogCaptureFixture):
+    def test_subprocess_exception(self, caplog: LogCaptureFixture) -> None:
         """
         Test subprocess_call exception output
         """
@@ -121,7 +121,7 @@ class TestUtility:
 
         assert "Subprocess task failed" in str(exec_info.value)
 
-    def test_stderr_exception(self, caplog: LogCaptureFixture):
+    def test_stderr_exception(self, caplog: LogCaptureFixture) -> None:
         """
         Verify print and exit
         """
@@ -137,7 +137,7 @@ class TestUtility:
 
         assert "Subprocess task failed" in str(exec_info.value)
 
-    def test_stdout_exception(self, caplog: LogCaptureFixture):
+    def test_stdout_exception(self, caplog: LogCaptureFixture) -> None:
         """
         Verify print and exit
         """
