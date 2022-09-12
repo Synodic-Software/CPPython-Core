@@ -5,10 +5,13 @@ Data types for CPPython that encapsulate the requirements between the plugins an
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Callable, Generic, Iterator, Optional, Type, TypeVar
+from typing import Any, Callable
+from typing import Generator as TypingGenerator
+from typing import Generic, Optional, Type, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -20,6 +23,7 @@ class CPPythonModel(BaseModel):
     The base model to use for all CPPython models
     """
 
+    @dataclass
     class Config:
         """
         Pydantic built-in configuration
@@ -134,27 +138,37 @@ class PEP508(Requirement):
     """
 
     @classmethod
-    def __get_validators__(cls) -> Iterator[Callable[[Any], Any]]:
+    def __get_validators__(cls) -> TypingGenerator[Callable[..., Any], None, None]:
         """
         Returns the set of validators defined for this type so pydantic can use them internally
         """
-        yield cls.validate
+        yield cls.validate_requirement
+        yield cls.validate_cppython
 
     @classmethod
-    def validate(cls, value: "PEP508") -> Requirement:
+    def validate_requirement(cls, value: "PEP508") -> PEP508:
         """
-        Enforce type that this class can be
+        Enforce type that this class can be cast to a Requirement
         TODO - Use the Self type python 3.11
         """
         if not isinstance(value, str):
             raise TypeError("string required")
 
         try:
-            definition = Requirement(value)
+            Requirement(value)
         except InvalidRequirement as invalid:
             raise ValueError from invalid
 
-        return definition
+        return value
+
+    @classmethod
+    def validate_cppython(cls, value: "PEP508") -> PEP508:
+        """
+        TODO: Use for something
+        TODO - Use the Self type python 3.11
+        """
+
+        return value
 
 
 class Preset(CPPythonModel):

@@ -43,7 +43,13 @@ test = [
   "tomlkit>=0.11.4",
 ]
 
+[tool.pdm.scripts]
+check = {shell = "mypy ."}
+lint = {shell = "pylint cppython_core tests"}
+test = {shell = "pytest tests"}
+
 [tool.pytest.ini_options]
+log_cli = true
 testpaths = [
   "tests",
 ]
