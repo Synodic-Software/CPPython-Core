@@ -44,10 +44,12 @@ test = [
 ]
 
 [tool.pdm.scripts]
-check = {shell = "mypy ."}
-format = {shell = "black ."}
-lint = {shell = "pylint cppython_core tests"}
-test = {shell = "pytest tests"}
+analyze = {shell = "pylint --verbose cppython_core tests"}
+format = {shell = "black --check --verbose ."}
+lint = {composite = ["analyze", "sort-imports"]}
+sort-imports = {shell = "isort --check-only --diff --verbose ."}
+test = {shell = "pytest --verbose tests"}
+type-check = {shell = "mypy ."}
 
 [tool.pytest.ini_options]
 log_cli = true
@@ -60,6 +62,7 @@ line-length = 120
 
 [tool.isort]
 profile = "black"
+skip_gitignore = true
 
 [tool.mypy]
 exclude = "__pypackages__"
