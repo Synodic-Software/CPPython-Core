@@ -79,15 +79,30 @@ class TestSchema:
         with pytest.raises(ValueError):
             PEP508("this is not conforming")
 
-    def test_cppython_resolve(self) -> None:
+    def test_cppython_resolve(self, tmp_path: Path) -> None:
         """
         Test the CPPython schema resolve function
         """
 
+        # Create a working configuration
+        pyproject = tmp_path / "pyproject.toml"
+        pyproject.write_text("")
+
+        # Data definition
         data = CPPythonData()
-        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        data.install_path = tmp_path
+
+        config = ProjectConfiguration(pyproject_file=pyproject, version="0.1.0")
+
+        # Function to test
         resolved = data.resolve(CPPythonDataResolved, config)
 
+        # Test that paths are created successfully
+        assert resolved.build_path.exists()
+        assert resolved.tool_path.exists()
+        assert resolved.install_path.exists()
+
+        # Ensure that all values are populated
         class_variables = vars(resolved)
 
         assert len(class_variables)
