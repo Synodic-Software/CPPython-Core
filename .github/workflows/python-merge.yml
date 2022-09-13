@@ -1,8 +1,8 @@
 name: Update Python Development Release
 on:
   push: 
-    tags-ignore: 
-      - '*'
+    branches: 
+      - '**'
 
 jobs:
   publish_release:
