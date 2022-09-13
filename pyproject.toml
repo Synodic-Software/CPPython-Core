@@ -48,7 +48,7 @@ analyze = {shell = "pylint --verbose cppython_core tests"}
 format = {shell = "black --check --verbose ."}
 lint = {composite = ["analyze", "sort-imports"]}
 sort-imports = {shell = "isort --check-only --diff --verbose ."}
-test = {shell = "pytest --verbose tests"}
+test = {shell = "pytest --cov=cppython_core --verbose tests"}
 type-check = {shell = "mypy ."}
 
 [tool.pytest.ini_options]
@@ -73,6 +73,9 @@ extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.format]
 max-line-length = "120"
+
+[tool.coverage.report]
+skip_empty = true
 
 [build-system]
 build-backend = "pdm.pep517.api"
