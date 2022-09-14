@@ -84,9 +84,7 @@ class ProjectConfiguration(CPPythonModel):
 
 
 class PEP621Resolved(CPPythonModel):
-    """
-    Resolved PEP621
-    """
+    """PEP621 type with values of the PEP621 model after resolution"""
 
     name: str
     version: str
@@ -94,22 +92,27 @@ class PEP621Resolved(CPPythonModel):
 
 
 class PEP621(CPPythonModel):
-    """
-    CPPython relevant PEP 621 conforming data
+    """CPPython relevant PEP 621 conforming data
     Because only the partial schema is used, we ignore 'extra' attributes
         Schema: https://www.python.org/dev/peps/pep-0621/
     """
 
     dynamic: list[str] = Field(default=[], description="https://peps.python.org/pep-0621/#dynamic")
     name: str = Field(description="https://peps.python.org/pep-0621/#name")
-    version: Optional[str] = Field(default=None, description="https://peps.python.org/pep-0621/#version")
+    version: str | None = Field(default=None, description="https://peps.python.org/pep-0621/#version")
     description: str = Field(default="", description="https://peps.python.org/pep-0621/#description")
 
     @validator("version")
     @classmethod
     def validate_version(cls, value: str | None, values: dict[str, Any]) -> str | None:
-        """
-        Validates that version is present or that the name is present in the dynamic field
+        """Validates that version is present or that the name is present in the dynamic field
+
+        Args:
+            value: The input version
+            values: All values of the Model prior to running this validation
+
+        Returns:
+            The validated input version
         """
 
         if "version" in values["dynamic"]:
