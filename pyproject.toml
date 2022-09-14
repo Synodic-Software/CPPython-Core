@@ -59,6 +59,7 @@ testpaths = [
 
 [tool.black]
 line-length = 120
+preview = true
 
 [tool.isort]
 profile = "black"
@@ -68,11 +69,28 @@ skip_gitignore = true
 exclude = "__pypackages__"
 strict = true
 
+[tool.pylint.MAIN]
+load-plugins = [
+  "pylint.extensions.code_style",
+  "pylint.extensions.typing",
+  "pylint.extensions.docstyle",
+  "pylint.extensions.docparams",
+  "pylint.extensions.private_import",
+  "pylint.extensions.bad_builtin",
+]
+
 [tool.pylint.messages_control]
 extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.format]
 max-line-length = "120"
+
+[tool.pylint.parameter_documentation]
+accept-no-param-doc = false
+accept-no-raise-doc = false
+accept-no-return-doc = false
+accept-no-yields-doc = false
+default-docstring-type = "google"
 
 [tool.coverage.report]
 skip_empty = true
