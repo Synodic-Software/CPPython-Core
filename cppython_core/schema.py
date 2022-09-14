@@ -1,5 +1,4 @@
-"""
-Data types for CPPython that encapsulate the requirements between the plugins and the core library
+"""Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
 from __future__ import annotations
@@ -11,7 +10,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any, Callable
 from typing import Generator as TypingGenerator
-from typing import Generic, Optional, Type, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -19,19 +18,16 @@ from pydantic.types import DirectoryPath, FilePath
 
 
 class CPPythonModel(BaseModel):
-    """
-    The base model to use for all CPPython models
-    """
+    """The base model to use for all CPPython models"""
 
     @dataclass
     class Config:
-        """
-        Pydantic built-in configuration
-        """
+        """Pydantic built-in configuration"""
 
         # Currently, there is no need for programmatically defined data outside tests.
         # Tests will validate via default values and then assignment.
         allow_population_by_field_name = False
+
         validate_assignment = True
 
 
@@ -39,9 +35,7 @@ ModelT = TypeVar("ModelT", bound=CPPythonModel)
 
 
 class TargetEnum(Enum):
-    """
-    The C++ build target type
-    """
+    """The C++ build target type"""
 
     EXE = "executable"
     STATIC = "static"
@@ -49,9 +43,7 @@ class TargetEnum(Enum):
 
 
 class ProjectConfiguration(CPPythonModel):
-    """
-    Project-wide configuration
-    """
+    """Project-wide configuration"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
     version: str = Field(description="The version number a 'dynamic' project version will resolve to")
@@ -60,16 +52,29 @@ class ProjectConfiguration(CPPythonModel):
     @validator("verbosity")
     @classmethod
     def min_max(cls, value: int) -> int:
-        """
-        Clamps the input value to an acceptable range
+        """Validator that clamps the input value
+
+        Args:
+            value: Input to validate
+
+        Returns:
+            The clamped input value
         """
         return min(max(value, 0), 2)
 
     @validator("pyproject_file")
     @classmethod
     def pyproject_name(cls, value: FilePath) -> FilePath:
-        """
-        Verify the name of the file
+        """Validator that verifies the name of the file
+
+        Args:
+            value: Input to validate
+
+        Raises:
+            ValueError: The given filepath is not named "pyproject.toml"
+
+        Returns:
+            The file path
         """
 
         if value.name != "pyproject.toml":
@@ -128,7 +133,6 @@ class PEP621(CPPythonModel):
 
 
 def _default_install_location() -> Path:
-
     return Path.home() / ".cppython"
 
 
@@ -237,7 +241,7 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
         return value
 
     def generator_resolve(
-        self, generator_type: Type[Generator[GeneratorDataT, GeneratorDataResolvedT]]
+        self, generator_type: type[Generator[GeneratorDataT, GeneratorDataResolvedT]]
     ) -> CPPythonDataResolved:
         """
         Returns a deep copy that is modified for the given generator
@@ -270,7 +274,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     build_path: Path = Field(default=Path("build"), alias="build-path")
 
     def resolve(
-        self, resolved_type: Type[CPPythonDataResolvedT], project_configuration: ProjectConfiguration
+        self, resolved_type: type[CPPythonDataResolvedT], project_configuration: ProjectConfiguration
     ) -> CPPythonDataResolvedT:
         """
         Creates a copy and resolves dynamic attributes
@@ -520,7 +524,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @staticmethod
     @abstractmethod
-    def data_type() -> Type[GeneratorDataT]:
+    def data_type() -> type[GeneratorDataT]:
         """
         Returns the pydantic type to cast the generator configuration data to
         """
@@ -528,7 +532,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @staticmethod
     @abstractmethod
-    def resolved_data_type() -> Type[GeneratorDataResolvedT]:
+    def resolved_data_type() -> type[GeneratorDataResolvedT]:
         """
         Returns the pydantic type to cast the resolved generator configuration data to
         """

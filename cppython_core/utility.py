@@ -19,7 +19,6 @@ def subprocess_call(
     """
 
     with subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs) as process:
-
         if process.stdout is None:
             return
 
