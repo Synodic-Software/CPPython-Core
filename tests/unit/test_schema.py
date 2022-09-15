@@ -1,5 +1,4 @@
-"""
-Test custom schema validation that cannot be verified by the Pydantic validation
+"""Test custom schema validation that cannot be verified by the Pydantic validation
 """
 
 from pathlib import Path
@@ -18,20 +17,14 @@ from cppython_core.schema import (
 
 
 class TestSchema:
-    """
-    Test validation
-    """
+    """Test validation"""
 
     def test_cppython_data(self) -> None:
-        """
-        Ensures that the CPPython config data can be defaulted
-        """
+        """Ensures that the CPPython config data can be defaulted"""
         CPPythonData()
 
     def test_cppython_table(self) -> None:
-        """
-        Ensures that the nesting yaml table behavior can be read properly
-        """
+        """Ensures that the nesting yaml table behavior can be read properly"""
 
         data = """
         [project]\n
@@ -49,9 +42,7 @@ class TestSchema:
         assert pyproject.tool.cppython is not None
 
     def test_empty_cppython(self) -> None:
-        """
-        Ensure that the common none condition works
-        """
+        """Ensure that the common none condition works"""
 
         data = """
         [project]\n
@@ -68,9 +59,7 @@ class TestSchema:
         assert pyproject.tool.cppython is None
 
     def test_508(self) -> None:
-        """
-        Ensure correct parsing of the 'packaging' type via the PEP508 intermediate type
-        """
+        """Ensure correct parsing of the 'packaging' type via the PEP508 intermediate type"""
 
         requirement = PEP508('requests [security,tests] >= 2.8.1, == 2.8.* ; python_version < "2.7"')
 
@@ -80,8 +69,10 @@ class TestSchema:
             PEP508("this is not conforming")
 
     def test_cppython_resolve(self, tmp_path: Path) -> None:
-        """
-        Test the CPPython schema resolve function
+        """Test the CPPython schema resolve function
+
+        Args:
+            tmp_path: Temporary path with a lifetime of this test function
         """
 
         # Create a working configuration
@@ -109,9 +100,7 @@ class TestSchema:
         assert not None in class_variables.values()
 
     def test_pep621_resolve(self) -> None:
-        """
-        Test the PEP621 schema resolve function
-        """
+        """Test the PEP621 schema resolve function"""
 
         data = PEP621(name="pep621-resolve-test")
         config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
