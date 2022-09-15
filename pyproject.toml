@@ -46,7 +46,7 @@ test = [
 [tool.pdm.scripts]
 analyze = {shell = "pylint --verbose cppython_core tests"}
 format = {shell = "black --check --verbose ."}
-lint = {composite = ["analyze", "sort-imports"]}
+lint = {composite = ["analyze", "format", "sort-imports", "type-check"]}
 sort-imports = {shell = "isort --check-only --diff --verbose ."}
 test = {shell = "pytest --cov=cppython_core --verbose tests"}
 type-check = {shell = "mypy ."}

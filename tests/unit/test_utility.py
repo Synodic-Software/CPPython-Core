@@ -21,26 +21,30 @@ class TestUtility:
     """Tests the utility functionality"""
 
     def test_plugin_log(self, caplog: LogCaptureFixture) -> None:
-        """
-        Ensures that the root logger receives the auto-gathered plugin logger
+        """Ensures that the root logger receives the auto-gathered plugin logger
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
 
         class MockPlugin(Plugin):
-            """
-            A dummy plugin to verify logging metadata
-            """
+            """A dummy plugin to verify logging metadata"""
 
             @staticmethod
             def name() -> str:
-                """
-                Static name to compare in this test
+                """Static name to compare in this test
+
+                Returns:
+                    Name of the plugin
                 """
                 return "mock"
 
             @staticmethod
             def group() -> str:
-                """
-                Static group to compare in this test
+                """Static group to compare in this test
+
+                Returns:
+                    Name of the group
                 """
                 return "group"
 
@@ -51,8 +55,10 @@ class TestUtility:
             assert caplog.record_tuples == [("cppython.group.mock", logging.INFO, "test")]
 
     def test_subprocess_stdout(self, caplog: LogCaptureFixture) -> None:
-        """
-        Test subprocess_call
+        """Test subprocess_call
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
 
         python = Path(executable)
@@ -64,8 +70,10 @@ class TestUtility:
         assert "Test Out" == caplog.records[0].message
 
     def test_subprocess_stderr(self, caplog: LogCaptureFixture) -> None:
-        """
-        Test subprocess_call
+        """Test subprocess_call
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
 
         python = Path(executable)
@@ -77,8 +85,10 @@ class TestUtility:
         assert "Test Error" == caplog.records[0].message
 
     def test_subprocess_suppression(self, caplog: LogCaptureFixture) -> None:
-        """
-        Test subprocess_call suppression flag
+        """Test subprocess_call suppression flag
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
 
         python = Path(executable)
@@ -90,8 +100,10 @@ class TestUtility:
             assert len(caplog.records) == 0
 
     def test_subprocess_exit(self, caplog: LogCaptureFixture) -> None:
-        """
-        Test subprocess_call exception output
+        """Test subprocess_call exception output
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
 
         python = Path(executable)
@@ -105,8 +117,10 @@ class TestUtility:
         assert "Subprocess task failed" in str(exec_info.value)
 
     def test_subprocess_exception(self, caplog: LogCaptureFixture) -> None:
-        """
-        Test subprocess_call exception output
+        """Test subprocess_call exception output
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
 
         python = Path(executable)
@@ -119,8 +133,10 @@ class TestUtility:
         assert "Subprocess task failed" in str(exec_info.value)
 
     def test_stderr_exception(self, caplog: LogCaptureFixture) -> None:
-        """
-        Verify print and exit
+        """Verify print and exit
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
         python = Path(executable)
         with pytest.raises(ProcessError) as exec_info, caplog.at_level(logging.INFO):
@@ -135,8 +151,10 @@ class TestUtility:
         assert "Subprocess task failed" in str(exec_info.value)
 
     def test_stdout_exception(self, caplog: LogCaptureFixture) -> None:
-        """
-        Verify print and exit
+        """Verify print and exit
+
+        Args:
+            caplog: Fixture for capturing logging input
         """
         python = Path(executable)
         with pytest.raises(ProcessError) as exec_info, caplog.at_level(logging.INFO):

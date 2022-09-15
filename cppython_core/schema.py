@@ -425,7 +425,17 @@ class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=E
 
     @abstractmethod
     def resolve(self, project_configuration: ProjectConfiguration) -> GeneratorDataResolvedT:
-        """Creates a copy and resolves dynamic attributes"""
+        """Creates a copy and resolves dynamic attributes
+
+        Args:
+            project_configuration: The configuration data used to help the resolution
+
+        Raises:
+            NotImplementedError: Must be sub-classed
+
+        Returns:
+            The resolved generator data type
+        """
         raise NotImplementedError()
 
 
@@ -456,7 +466,11 @@ class Interface(Plugin):
 
     @staticmethod
     def group() -> str:
-        """The plugin group name as used by 'setuptools'"""
+        """The plugin group name as used by 'setuptools'summary
+
+        Returns:
+            The group name
+        """
         return "interface"
 
     @abstractmethod
@@ -479,9 +493,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
         cppython: CPPythonDataResolved,
         generator: GeneratorDataResolvedT,
     ) -> None:
-        """
-        Allows CPPython to pass the relevant data to constructed Generator plugin
-        """
+        """Allows CPPython to pass the relevant data to constructed Generator plugin"""
         self._configuration = configuration
         self._project = project
         self._cppython = cppython
@@ -511,7 +523,12 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @staticmethod
     def group() -> str:
-        """The plugin group name as used by 'setuptools'"""
+        """The plugin group name as used by 'setuptools'
+
+        Returns:
+            The group name
+        """
+
         return "generator"
 
     @staticmethod
@@ -535,14 +552,31 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
     @classmethod
     @abstractmethod
     def tooling_downloaded(cls, path: Path) -> bool:
-        """Returns whether the generator tooling needs to be downloaded"""
+        """Returns whether the generator tooling needs to be downloaded
+
+        Args:
+            path: The directory to check for downloaded tooling
+
+        Raises:
+            NotImplementedError: Must be sub-classed
+
+        Returns:
+            Whether the tooling has been downloaded or not
+        """
 
         raise NotImplementedError()
 
     @classmethod
     @abstractmethod
     async def download_tooling(cls, path: Path) -> None:
-        """Installs the external tooling required by the generator"""
+        """Installs the external tooling required by the generator
+
+        Args:
+            path: The directory to download any extra tooling to
+
+        Raises:
+            NotImplementedError: Must be sub-classed
+        """
 
         raise NotImplementedError()
 

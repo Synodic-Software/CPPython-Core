@@ -1,12 +1,9 @@
-"""
-Custom exceptions used by CPPython
+"""Custom exceptions used by CPPython
 """
 
 
 class ConfigError(Exception):
-    """
-    Raised when there is a configuration error
-    """
+    """Raised when there is a configuration error"""
 
     def __init__(self, error: str) -> None:
         self._error = error
@@ -15,8 +12,7 @@ class ConfigError(Exception):
 
     @property
     def error(self) -> str:
-        """
-        Returns the underlying error
+        """Returns the underlying error
 
         Returns:
             str -- The underlying error
@@ -25,9 +21,7 @@ class ConfigError(Exception):
 
 
 class ProcessError(Exception):
-    """
-    Raised when there is a configuration error
-    """
+    """Raised when there is a configuration error"""
 
     def __init__(self, error: str) -> None:
         self._error = error
@@ -36,8 +30,7 @@ class ProcessError(Exception):
 
     @property
     def error(self) -> str:
-        """
-        Returns the underlying error
+        """Returns the underlying error
 
         Returns:
             str -- The underlying error
