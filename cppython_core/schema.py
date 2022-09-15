@@ -43,7 +43,7 @@ class TargetEnum(Enum):
     SHARED = "shared"
 
 
-class ProjectConfiguration(CPPythonModel):
+class ProjectConfiguration(CPPythonModel, extra=Extra.forbid):
     """Project-wide configuration"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
@@ -152,9 +152,6 @@ class PEP508(Requirement):
     def __get_validators__(cls) -> TypingGenerator[Callable[..., Any], None, None]:
         """Yields the set of validators defined for this type so pydantic can use them internally
 
-        Returns:
-            None
-
         Yields:
             A new validator Callable
         """
@@ -214,8 +211,13 @@ class Preset(CPPythonModel):
     @validator("inherits")
     @classmethod
     def validate_str(cls, values: list[str] | str | None) -> list[str] | None:
-        """
-        Conform to list
+        """Modifies the input value to be a list if it is a string
+
+        Args:
+            values: The list of input values
+
+        Returns:
+            The validated and modified values
         """
         if isinstance(values, str):
             return [values]
@@ -224,17 +226,20 @@ class Preset(CPPythonModel):
 
 
 class ConfigurePreset(Preset):
-    """
-    Partial Configure Preset specification
-    """
+    """Partial Configure Preset specification"""
 
     toolchainFile: str | None = Field(default=None)
 
     @validator("toolchainFile")
     @classmethod
     def validate_path(cls, value: str | None) -> str | None:
-        """
-        Enforce the posix form of the path as that is what CMake understands
+        """Modifies the value so it is always in posix form
+
+        Args:
+            value: The input value
+
+        Returns:
+            The validated and modified input value
         """
         if value is not None:
             return Path(value).as_posix()
@@ -243,9 +248,7 @@ class ConfigurePreset(Preset):
 
 
 class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
-    """
-    Resolved CPPythonData
-    """
+    """CPPythonData type with values of the CPPythonData model after resolution"""
 
     target: TargetEnum
     dependencies: list[PEP508]
@@ -256,8 +259,16 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
     @validator("install_path", "tool_path", "build_path")
     @classmethod
     def validate_absolute_path(cls, value: DirectoryPath) -> DirectoryPath:
-        """
-        Enforce the value is an absolute path
+        """Enforce the input is an absolute path
+
+        Args:
+            value: The input value
+
+        Raises:
+            ValueError: Raised if the input is not an absolute path
+
+        Returns:
+            The validated input value
         """
         if not value.is_absolute():
             raise ValueError("Absolute path required")
@@ -267,9 +278,14 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
     def generator_resolve(
         self, generator_type: type[Generator[GeneratorDataT, GeneratorDataResolvedT]]
     ) -> CPPythonDataResolved:
-        """
-        Returns a deep copy that is modified for the given generator
+        """Returns a deep copy that is modified for the given generator
         TODO: Replace return type with Self
+
+        Args:
+            generator_type: The type of the generator
+
+        Returns:
+            The resolved type with generator specific modifications
         """
 
         modified = self.copy(deep=True)
@@ -287,9 +303,7 @@ CPPythonDataResolvedT = TypeVar("CPPythonDataResolvedT", bound=CPPythonDataResol
 
 
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
-    """
-    Data required by the tool
-    """
+    """Data required by the tool"""
 
     target: TargetEnum = Field(default=TargetEnum.EXE)
     dependencies: list[PEP508] = Field(default=[])
@@ -300,8 +314,14 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     def resolve(
         self, resolved_type: type[CPPythonDataResolvedT], project_configuration: ProjectConfiguration
     ) -> CPPythonDataResolvedT:
-        """
-        Creates a copy and resolves dynamic attributes
+        """Creates a copy and resolves dynamic attributes
+
+        Args:
+            resolved_type: The dynamic type used to resolve the tool data
+            project_configuration: Project information to aid in the resolution
+
+        Returns:
+            An instance of the resolved type
         """
 
         modified = self.copy(deep=True)
@@ -327,10 +347,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 
 
 class ToolData(CPPythonModel):
-    """
-    Tool entry
-    This schema is not under our control. Ignore 'extra' attributes
-    """
+    """Tool entry of pyproject.toml"""
 
     cppython: CPPythonData | None = Field(default=None)
 
@@ -339,10 +356,7 @@ ToolDataT = TypeVar("ToolDataT", bound=ToolData)
 
 
 class PyProject(CPPythonModel):
-    """
-    pyproject.toml schema
-    This schema is not under our control. Ignore 'extra' attributes
-    """
+    """pyproject.toml schema"""
 
     project: PEP621
     tool: ToolData | None = Field(default=None)
@@ -352,9 +366,7 @@ PyProjectT = TypeVar("PyProjectT", bound=PyProject)
 
 
 class Plugin(ABC):
-    """
-    Abstract plugin type
-    """
+    """Abstract plugin type"""
 
     _logger: Logger
 
@@ -365,23 +377,21 @@ class Plugin(ABC):
     @staticmethod
     @abstractmethod
     def name() -> str:
-        """
-        The name of the plugin, canonicalized
-        """
+        """The name of the plugin, canonicalized"""
         raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
     def group() -> str:
-        """
-        The plugin group name as used by 'setuptools'
-        """
+        """The plugin group name as used by 'setuptools'"""
         raise NotImplementedError()
 
     @classmethod
     def logger(cls) -> Logger:
-        """
-        Returns the plugin specific sub-logger
+        """Returns the plugin specific sub-logger
+
+        Returns:
+            The plugin's named logger
         """
 
         if not hasattr(cls, "_logger"):
@@ -394,38 +404,28 @@ PluginT = TypeVar("PluginT", bound=Plugin)
 
 
 class InterfaceConfiguration(CPPythonModel, extra=Extra.forbid):
-    """
-    Base class for the configuration data that is passed to the interface
-    """
+    """Base class for the configuration data that is passed to the interface"""
 
 
 class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
-    """
-    Base class for the configuration data that is set by the project for the generator
-    """
+    """Base class for the configuration data that is set by the project for the generator"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
 class GeneratorDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
-    """
-    Base class for the configuration data that will be resolved from 'GeneratorData'
-    """
+    """Base class for the configuration data that will be resolved from 'GeneratorData'"""
 
 
 GeneratorDataResolvedT = TypeVar("GeneratorDataResolvedT", bound=GeneratorDataResolved)
 
 
 class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=Extra.forbid):
-    """
-    Base class for the configuration data that will be read by the interface and given to the generator
-    """
+    """Base class for the configuration data that will be read by the interface and given to the generator"""
 
     @abstractmethod
     def resolve(self, project_configuration: ProjectConfiguration) -> GeneratorDataResolvedT:
-        """
-        Creates a copy and resolves dynamic attributes
-        """
+        """Creates a copy and resolves dynamic attributes"""
         raise NotImplementedError()
 
 
@@ -434,46 +434,34 @@ GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
 
 
 class Interface(Plugin):
-    """
-    Abstract type to be inherited by CPPython interfaces
-    """
+    """Abstract type to be inherited by CPPython interfaces"""
 
     @abstractmethod
     def __init__(self, configuration: InterfaceConfiguration) -> None:
-        """
-        Initializes the class properties and calls the base plugin class
-        """
+        """Initializes the class properties and calls the base plugin class"""
         self._configuration = configuration
 
         super().__init__()
 
     @property
     def configuration(self) -> InterfaceConfiguration:
-        """
-        Returns the InterfaceConfiguration object set at initialization
-        """
+        """Returns the InterfaceConfiguration object set at initialization"""
         return self._configuration
 
     @staticmethod
     @abstractmethod
     def name() -> str:
-        """
-        The name of the plugin, canonicalized
-        """
+        """The name of the plugin, canonicalized"""
         raise NotImplementedError()
 
     @staticmethod
     def group() -> str:
-        """
-        The plugin group name as used by 'setuptools'
-        """
+        """The plugin group name as used by 'setuptools'"""
         return "interface"
 
     @abstractmethod
     def write_pyproject(self) -> None:
-        """
-        Called when CPPython requires the interface to write out pyproject.toml changes
-        """
+        """Called when CPPython requires the interface to write out pyproject.toml changes"""
         raise NotImplementedError()
 
 
@@ -481,9 +469,7 @@ InterfaceT = TypeVar("InterfaceT", bound=Interface)
 
 
 class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
-    """
-    Abstract type to be inherited by CPPython Generator plugins
-    """
+    """Abstract type to be inherited by CPPython Generator plugins"""
 
     @abstractmethod
     def __init__(
@@ -505,99 +491,74 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
 
     @property
     def configuration(self) -> GeneratorConfiguration:
-        """
-        Returns the GeneratorConfiguration object set at initialization
-        """
+        """Returns the GeneratorConfiguration object set at initialization"""
         return self._configuration
 
     @property
     def project(self) -> PEP621Resolved:
-        """
-        Returns the PEP621Resolved object set at initialization
-        """
+        """Returns the PEP621Resolved object set at initialization"""
         return self._project
 
     @property
     def cppython(self) -> CPPythonDataResolved:
-        """
-        Returns the CPPythonDataResolved object set at initialization
-        """
+        """Returns the CPPythonDataResolved object set at initialization"""
         return self._cppython
 
     @property
     def generator(self) -> GeneratorDataResolvedT:
-        """
-        Returns the GeneratorData object set at initialization
-        """
+        """Returns the GeneratorData object set at initialization"""
         return self._generator
 
     @staticmethod
     def group() -> str:
-        """
-        The plugin group name as used by 'setuptools'
-        """
+        """The plugin group name as used by 'setuptools'"""
         return "generator"
 
     @staticmethod
     @abstractmethod
     def name() -> str:
-        """
-        The string that is matched with the [tool.cppython.generator] string
-        """
+        """The string that is matched with the [tool.cppython.generator] string"""
         raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
     def data_type() -> type[GeneratorDataT]:
-        """
-        Returns the pydantic type to cast the generator configuration data to
-        """
+        """Returns the pydantic type to cast the generator configuration data to"""
         raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
     def resolved_data_type() -> type[GeneratorDataResolvedT]:
-        """
-        Returns the pydantic type to cast the resolved generator configuration data to
-        """
+        """Returns the pydantic type to cast the resolved generator configuration data to"""
         raise NotImplementedError()
 
     @classmethod
     @abstractmethod
     def tooling_downloaded(cls, path: Path) -> bool:
-        """
-        Returns whether the generator tooling needs to be downloaded
-        """
+        """Returns whether the generator tooling needs to be downloaded"""
 
         raise NotImplementedError()
 
     @classmethod
     @abstractmethod
     async def download_tooling(cls, path: Path) -> None:
-        """
-        Installs the external tooling required by the generator
-        """
+        """Installs the external tooling required by the generator"""
 
         raise NotImplementedError()
 
     @abstractmethod
     def install(self) -> None:
-        """
-        Called when dependencies need to be installed from a lock file.
-        """
+        """Called when dependencies need to be installed from a lock file."""
         raise NotImplementedError()
 
     @abstractmethod
     def update(self) -> None:
-        """
-        Called when dependencies need to be updated and written to the lock file.
-        """
+        """Called when dependencies need to be updated and written to the lock file."""
         raise NotImplementedError()
 
     @abstractmethod
     def generate_cmake_config(self) -> ConfigurePreset:
-        """
-        Called when dependencies need to be updated and written to the lock file.
+        """Called when dependencies need to be updated and written to the lock file.
 
         @returns - A CMake configure preset
         """

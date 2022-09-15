@@ -1,5 +1,4 @@
-"""
-Test custom schema validation that cannot be verified by the Pydantic validation
+"""Test custom schema validation that cannot be verified by the Pydantic validation
 """
 
 from pathlib import Path
@@ -18,9 +17,7 @@ from cppython_core.schema import (
 
 
 class TestSchema:
-    """
-    Test validation
-    """
+    """Test validation"""
 
     def test_cppython_data(self) -> None:
         """

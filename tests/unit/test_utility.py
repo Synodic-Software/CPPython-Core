@@ -1,5 +1,4 @@
-"""
-Tests the scope of utilities
+"""Tests the scope of utilities
 """
 
 import logging
@@ -19,9 +18,7 @@ cppython_logger.addHandler(StreamHandler())
 
 
 class TestUtility:
-    """
-    Tests the utility functionality
-    """
+    """Tests the utility functionality"""
 
     def test_plugin_log(self, caplog: LogCaptureFixture) -> None:
         """
