@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 from typing import Generator as TypingGenerator
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -123,8 +124,13 @@ class PEP621(CPPythonModel):
         return value
 
     def resolve(self, project_configuration: ProjectConfiguration) -> PEP621Resolved:
-        """
-        Creates a copy and resolves dynamic attributes
+        """Creates a self copy and resolves dynamic attributes
+
+        Args:
+            project_configuration: The input configuration used to aid the resolve
+
+        Returns:
+            The resolved copy
         """
 
         modified = self.copy(deep=True)
@@ -140,23 +146,35 @@ def _default_install_location() -> Path:
 
 
 class PEP508(Requirement):
-    """
-    PEP 508 conforming string
-    """
+    """PEP 508 conforming string"""
 
     @classmethod
     def __get_validators__(cls) -> TypingGenerator[Callable[..., Any], None, None]:
-        """
-        Returns the set of validators defined for this type so pydantic can use them internally
+        """Yields the set of validators defined for this type so pydantic can use them internally
+
+        Returns:
+            None
+
+        Yields:
+            A new validator Callable
         """
         yield cls.validate_requirement
         yield cls.validate_cppython
 
     @classmethod
     def validate_requirement(cls, value: "PEP508") -> PEP508:
-        """
-        Enforce type that this class can be cast to a Requirement
+        """Enforce type that this class can be cast to a Requirement
         TODO - Use the Self type python 3.11
+
+        Args:
+            value: The input value to validate
+
+        Raises:
+            TypeError: Raised if the input value is not the right type
+            ValueError: Raised if a PEP508 requirement can't be parsed
+
+        Returns:
+            The validated input value
         """
         if not isinstance(value, str):
             raise TypeError("string required")
@@ -170,29 +188,32 @@ class PEP508(Requirement):
 
     @classmethod
     def validate_cppython(cls, value: "PEP508") -> PEP508:
-        """
-        TODO: Use for something
+        """TODO: Use for something
         TODO - Use the Self type python 3.11
+
+        Args:
+            value: The input value to validate
+
+        Returns:
+            The validated input value
         """
 
         return value
 
 
 class Preset(CPPythonModel):
-    """
-    Partial Preset specification
-    """
+    """Partial Preset specification"""
 
     name: str
-    hidden: Optional[bool] = Field(default=None)
-    inherits: Optional[list[str] | str] = Field(default=None)
-    displayName: Optional[str] = Field(default=None)
-    description: Optional[str] = Field(default=None)
-    cacheVariables: Optional[dict[str, None | bool | str | dict[str, str | bool]]] = Field(default=None)
+    hidden: bool | None = Field(default=None)
+    inherits: list[str] | str | None = Field(default=None)
+    displayName: str | None = Field(default=None)
+    description: str | None = Field(default=None)
+    cacheVariables: dict[str, None | bool | str | dict[str, str | bool]] | None = Field(default=None)
 
     @validator("inherits")
     @classmethod
-    def validate_str(cls, values: Optional[list[str] | str]) -> Optional[list[str]]:
+    def validate_str(cls, values: list[str] | str | None) -> list[str] | None:
         """
         Conform to list
         """
@@ -207,11 +228,11 @@ class ConfigurePreset(Preset):
     Partial Configure Preset specification
     """
 
-    toolchainFile: Optional[str] = Field(default=None)
+    toolchainFile: str | None = Field(default=None)
 
     @validator("toolchainFile")
     @classmethod
-    def validate_path(cls, value: Optional[str]) -> Optional[str]:
+    def validate_path(cls, value: str | None) -> str | None:
         """
         Enforce the posix form of the path as that is what CMake understands
         """
@@ -311,7 +332,7 @@ class ToolData(CPPythonModel):
     This schema is not under our control. Ignore 'extra' attributes
     """
 
-    cppython: Optional[CPPythonData] = Field(default=None)
+    cppython: CPPythonData | None = Field(default=None)
 
 
 ToolDataT = TypeVar("ToolDataT", bound=ToolData)
@@ -324,7 +345,7 @@ class PyProject(CPPythonModel):
     """
 
     project: PEP621
-    tool: Optional[ToolData] = Field(default=None)
+    tool: ToolData | None = Field(default=None)
 
 
 PyProjectT = TypeVar("PyProjectT", bound=PyProject)
