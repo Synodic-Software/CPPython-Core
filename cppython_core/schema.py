@@ -370,10 +370,6 @@ class Plugin(ABC):
 
     _logger: Logger
 
-    @abstractmethod
-    def __init__(self) -> None:
-        super().__init__()
-
     @staticmethod
     @abstractmethod
     def name() -> str:
@@ -446,12 +442,9 @@ GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
 class Interface(Plugin):
     """Abstract type to be inherited by CPPython interfaces"""
 
-    @abstractmethod
     def __init__(self, configuration: InterfaceConfiguration) -> None:
         """Initializes the class properties and calls the base plugin class"""
         self._configuration = configuration
-
-        super().__init__()
 
     @property
     def configuration(self) -> InterfaceConfiguration:
@@ -485,7 +478,6 @@ InterfaceT = TypeVar("InterfaceT", bound=Interface)
 class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
-    @abstractmethod
     def __init__(
         self,
         configuration: GeneratorConfiguration,
@@ -498,8 +490,6 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
         self._project = project
         self._cppython = cppython
         self._generator = generator
-
-        super().__init__()
 
     @property
     def configuration(self) -> GeneratorConfiguration:
