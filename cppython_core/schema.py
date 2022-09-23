@@ -275,23 +275,23 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
 
         return value
 
-    def generator_resolve(
-        self, generator_type: type[Generator[GeneratorDataT, GeneratorDataResolvedT]]
+    def provider_resolve(
+        self, provider_type: type[Provider[ProviderDataT, ProviderDataResolvedT]]
     ) -> CPPythonDataResolved:
-        """Returns a deep copy that is modified for the given generator
+        """Returns a deep copy that is modified for the given provider
         TODO: Replace return type with Self
 
         Args:
-            generator_type: The type of the generator
+            provider_type: The type of the provider
 
         Returns:
-            The resolved type with generator specific modifications
+            The resolved type with provider specific modifications
         """
 
         modified = self.copy(deep=True)
 
-        # Add generator specific paths to the base path
-        modified.install_path /= generator_type.name()
+        # Add provider specific paths to the base path
+        modified.install_path /= provider_type.name()
 
         # Create directories if they do not exist
         modified.install_path.mkdir(parents=True, exist_ok=True)
@@ -403,24 +403,24 @@ class InterfaceConfiguration(CPPythonModel, extra=Extra.forbid):
     """Base class for the configuration data that is passed to the interface"""
 
 
-class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
-    """Base class for the configuration data that is set by the project for the generator"""
+class ProviderConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
+    """Base class for the configuration data that is set by the project for the provider"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-class GeneratorDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
-    """Base class for the configuration data that will be resolved from 'GeneratorData'"""
+class ProviderDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
+    """Base class for the configuration data that will be resolved from 'ProviderData'"""
 
 
-GeneratorDataResolvedT = TypeVar("GeneratorDataResolvedT", bound=GeneratorDataResolved)
+ProviderDataResolvedT = TypeVar("ProviderDataResolvedT", bound=ProviderDataResolved)
 
 
-class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=Extra.forbid):
-    """Base class for the configuration data that will be read by the interface and given to the generator"""
+class ProviderData(CPPythonModel, ABC, Generic[ProviderDataResolvedT], extra=Extra.forbid):
+    """Base class for the configuration data that will be read by the interface and given to the provider"""
 
     @abstractmethod
-    def resolve(self, project_configuration: ProjectConfiguration) -> GeneratorDataResolvedT:
+    def resolve(self, project_configuration: ProjectConfiguration) -> ProviderDataResolvedT:
         """Creates a copy and resolves dynamic attributes
 
         Args:
@@ -430,13 +430,13 @@ class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=E
             NotImplementedError: Must be sub-classed
 
         Returns:
-            The resolved generator data type
+            The resolved provider data type
         """
         raise NotImplementedError()
 
 
-# GeneratorDataT[GeneratorDataResolvedT] is not allowed. 'Any' will resolve to GeneratorDataResolvedT when implemented
-GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
+# ProviderDataT[ProviderDataResolvedT] is not allowed. 'Any' will resolve to ProviderDataResolvedT when implemented
+ProviderDataT = TypeVar("ProviderDataT", bound=ProviderData[Any])
 
 
 class Interface(Plugin):
@@ -475,25 +475,25 @@ class Interface(Plugin):
 InterfaceT = TypeVar("InterfaceT", bound=Interface)
 
 
-class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
-    """Abstract type to be inherited by CPPython Generator plugins"""
+class Provider(Plugin, Generic[ProviderDataT, ProviderDataResolvedT]):
+    """Abstract type to be inherited by CPPython Provider plugins"""
 
     def __init__(
         self,
-        configuration: GeneratorConfiguration,
+        configuration: ProviderConfiguration,
         project: PEP621Resolved,
         cppython: CPPythonDataResolved,
-        generator: GeneratorDataResolvedT,
+        provider: ProviderDataResolvedT,
     ) -> None:
-        """Allows CPPython to pass the relevant data to constructed Generator plugin"""
+        """Allows CPPython to pass the relevant data to constructed Provider plugin"""
         self._configuration = configuration
         self._project = project
         self._cppython = cppython
-        self._generator = generator
+        self._provider = provider
 
     @property
-    def configuration(self) -> GeneratorConfiguration:
-        """Returns the GeneratorConfiguration object set at initialization"""
+    def configuration(self) -> ProviderConfiguration:
+        """Returns the ProviderConfiguration object set at initialization"""
         return self._configuration
 
     @property
@@ -507,9 +507,9 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
         return self._cppython
 
     @property
-    def generator(self) -> GeneratorDataResolvedT:
-        """Returns the GeneratorData object set at initialization"""
-        return self._generator
+    def provider(self) -> ProviderDataResolvedT:
+        """Returns the ProviderData object set at initialization"""
+        return self._provider
 
     @staticmethod
     def group() -> str:
@@ -519,30 +519,30 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
             The group name
         """
 
-        return "generator"
+        return "provider"
 
     @staticmethod
     @abstractmethod
     def name() -> str:
-        """The string that is matched with the [tool.cppython.generator] string"""
+        """The string that is matched with the [tool.cppython.provider] string"""
         raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
-    def data_type() -> type[GeneratorDataT]:
-        """Returns the pydantic type to cast the generator configuration data to"""
+    def data_type() -> type[ProviderDataT]:
+        """Returns the pydantic type to cast the provider configuration data to"""
         raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
-    def resolved_data_type() -> type[GeneratorDataResolvedT]:
-        """Returns the pydantic type to cast the resolved generator configuration data to"""
+    def resolved_data_type() -> type[ProviderDataResolvedT]:
+        """Returns the pydantic type to cast the resolved provider configuration data to"""
         raise NotImplementedError()
 
     @classmethod
     @abstractmethod
     def tooling_downloaded(cls, path: Path) -> bool:
-        """Returns whether the generator tooling needs to be downloaded
+        """Returns whether the provider tooling needs to be downloaded
 
         Args:
             path: The directory to check for downloaded tooling
@@ -559,7 +559,7 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
     @classmethod
     @abstractmethod
     async def download_tooling(cls, path: Path) -> None:
-        """Installs the external tooling required by the generator
+        """Installs the external tooling required by the provider
 
         Args:
             path: The directory to download any extra tooling to
@@ -589,5 +589,12 @@ class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
         raise NotImplementedError()
 
 
-# Generator[GeneratorDataT] is not allowed. 'Any' will resolve to GeneratorDataT when implemented
-GeneratorT = TypeVar("GeneratorT", bound=Generator[Any, Any])
+# Provider[ProviderDataT] is not allowed. 'Any' will resolve to ProviderDataT when implemented
+ProviderT = TypeVar("ProviderT", bound=Provider[Any, Any])
+
+
+class Generator(Plugin):
+    """Abstract type to be inherited by CPPython Generator plugins"""
+
+
+GeneratorT = TypeVar("GeneratorT", bound=Generator)
