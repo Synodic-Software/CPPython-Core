@@ -591,3 +591,10 @@ class Provider(Plugin, Generic[ProviderDataT, ProviderDataResolvedT]):
 
 # Provider[ProviderDataT] is not allowed. 'Any' will resolve to ProviderDataT when implemented
 ProviderT = TypeVar("ProviderT", bound=Provider[Any, Any])
+
+
+class Generator(Plugin):
+    """Abstract type to be inherited by CPPython Generator plugins"""
+
+
+GeneratorT = TypeVar("GeneratorT", bound=Generator)
