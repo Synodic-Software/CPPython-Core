@@ -544,7 +544,7 @@ class Generator(Plugin):
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
 
 
-class VCS(Plugin):
+class VersionControl(Plugin):
     """Base class for version control systems"""
 
     @abstractmethod
@@ -576,3 +576,6 @@ class VCS(Plugin):
             _description_
         """
         raise NotImplementedError()
+
+
+VersionControlT = TypeVar("VersionControlT", bound=VersionControl)
