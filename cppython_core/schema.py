@@ -198,55 +198,6 @@ class PEP508(Requirement):
         return value
 
 
-class Preset(CPPythonModel):
-    """Partial Preset specification"""
-
-    name: str
-    hidden: bool | None = Field(default=None)
-    inherits: list[str] | str | None = Field(default=None)
-    displayName: str | None = Field(default=None)
-    description: str | None = Field(default=None)
-    cacheVariables: dict[str, None | bool | str | dict[str, str | bool]] | None = Field(default=None)
-
-    @validator("inherits")
-    @classmethod
-    def validate_str(cls, values: list[str] | str | None) -> list[str] | None:
-        """Modifies the input value to be a list if it is a string
-
-        Args:
-            values: The list of input values
-
-        Returns:
-            The validated and modified values
-        """
-        if isinstance(values, str):
-            return [values]
-
-        return values
-
-
-class ConfigurePreset(Preset):
-    """Partial Configure Preset specification"""
-
-    toolchainFile: str | None = Field(default=None)
-
-    @validator("toolchainFile")
-    @classmethod
-    def validate_path(cls, value: str | None) -> str | None:
-        """Modifies the value so it is always in posix form
-
-        Args:
-            value: The input value
-
-        Returns:
-            The validated and modified input value
-        """
-        if value is not None:
-            return Path(value).as_posix()
-
-        return None
-
-
 class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
     """CPPythonData type with values of the CPPythonData model after resolution"""
 
@@ -578,14 +529,6 @@ class Provider(Plugin, Generic[ProviderDataT, ProviderDataResolvedT]):
     @abstractmethod
     def update(self) -> None:
         """Called when dependencies need to be updated and written to the lock file."""
-        raise NotImplementedError()
-
-    @abstractmethod
-    def generate_cmake_config(self) -> ConfigurePreset:
-        """Called when dependencies need to be updated and written to the lock file.
-
-        @returns - A CMake configure preset
-        """
         raise NotImplementedError()
 
 
