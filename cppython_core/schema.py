@@ -14,6 +14,7 @@ from typing import Generator as TypingGenerator
 from typing import Generic, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
+from packaging.version import Version
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
 
@@ -541,3 +542,37 @@ class Generator(Plugin):
 
 
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
+
+
+class VCS(Plugin):
+    """Base class for version control systems"""
+
+    @abstractmethod
+    def is_repository(self, path: Path) -> bool:
+        """_summary_
+
+        Args:
+            path: _description_
+
+        Raises:
+            NotImplementedError: _description_
+
+        Returns:
+            _description_
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def extract_version(self, path: Path) -> Version:
+        """_summary_
+
+        Args:
+            path: _description_
+
+        Raises:
+            NotImplementedError: _description_
+
+        Returns:
+            _description_
+        """
+        raise NotImplementedError()
