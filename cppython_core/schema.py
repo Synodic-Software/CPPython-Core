@@ -578,7 +578,7 @@ class VersionControl(Plugin):
         raise NotImplementedError()
 
     @abstractmethod
-    def extract_version(self, path: Path) -> Version:
+    def extract_version(self, path: Path) -> str:
         """_summary_
 
         Args:
