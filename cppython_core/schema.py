@@ -540,6 +540,21 @@ ProviderT = TypeVar("ProviderT", bound=Provider[Any, Any])
 class Generator(Plugin):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        """The name of the plugin, canonicalized"""
+        raise NotImplementedError()
+
+    @staticmethod
+    def group() -> str:
+        """The plugin group name as used by 'setuptools'summary
+
+        Returns:
+            The group name
+        """
+        return "generator"
+
 
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
 
@@ -576,6 +591,21 @@ class VersionControl(Plugin):
             _description_
         """
         raise NotImplementedError()
+
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        """The name of the plugin, canonicalized"""
+        raise NotImplementedError()
+
+    @staticmethod
+    def group() -> str:
+        """The plugin group name as used by 'setuptools'summary
+
+        Returns:
+            The group name
+        """
+        return "vcs"
 
 
 VersionControlT = TypeVar("VersionControlT", bound=VersionControl)
