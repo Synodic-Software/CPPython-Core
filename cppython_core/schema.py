@@ -14,7 +14,6 @@ from typing import Generator as TypingGenerator
 from typing import Generic, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
-from packaging.version import Version
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
 
@@ -578,7 +577,7 @@ class VersionControl(Plugin):
         raise NotImplementedError()
 
     @abstractmethod
-    def extract_version(self, path: Path) -> Version:
+    def extract_version(self, path: Path) -> str:
         """_summary_
 
         Args:
