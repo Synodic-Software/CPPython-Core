@@ -99,6 +99,15 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
+    def test_pep621_version(self) -> None:
+        """Tests the dynamic version resolution"""
+
+        with pytest.raises(ValueError):
+            PEP621(name="empty-test")
+
+        with pytest.raises(ValueError):
+            PEP621(name="both-test", version="1.0.0", dynamic=["version"])
+
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""
 
