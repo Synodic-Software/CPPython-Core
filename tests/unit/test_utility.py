@@ -10,8 +10,8 @@ import pytest
 from pytest import LogCaptureFixture
 
 from cppython_core.exceptions import ProcessError
-from cppython_core.schema import Plugin
-from cppython_core.utility import subprocess_call
+from cppython_core.schema import CPPythonModel, Plugin
+from cppython_core.utility import read_model_json, subprocess_call, write_model_json
 
 cppython_logger = logging.getLogger("cppython")
 cppython_logger.addHandler(StreamHandler())
@@ -19,6 +19,12 @@ cppython_logger.addHandler(StreamHandler())
 
 class TestUtility:
     """Tests the utility functionality"""
+
+    class ModelTest(CPPythonModel):
+        """Model definition to help test IO utilities"""
+
+        test_path: Path
+        test_int: int
 
     def test_plugin_log(self, caplog: LogCaptureFixture) -> None:
         """Ensures that the root logger receives the auto-gathered plugin logger
@@ -53,6 +59,26 @@ class TestUtility:
         with caplog.at_level(logging.INFO):
             logger.info("test")
             assert caplog.record_tuples == [("cppython.group.mock", logging.INFO, "test")]
+
+    def test_model_read_write(self, tmp_path: Path) -> None:
+        """Tests a full IO write -> read for data maintenance
+
+        Args:
+            tmp_path: Temporary path for writing
+        """
+
+        test_model = TestUtility.ModelTest(test_path=Path(), test_int=3)
+
+        json_path = tmp_path / "test.json"
+
+        write_model_json(json_path, test_model)
+        output = read_model_json(json_path, TestUtility.ModelTest)
+
+        assert test_model == output
+
+
+class TestSubprocess:
+    """Subprocess testing"""
 
     def test_subprocess_stdout(self, caplog: LogCaptureFixture) -> None:
         """Test subprocess_call
