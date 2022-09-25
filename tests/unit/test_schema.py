@@ -99,10 +99,19 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
+    def test_pep621_version(self) -> None:
+        """Tests the dynamic version resolution"""
+
+        with pytest.raises(ValueError):
+            PEP621(name="empty-test")
+
+        with pytest.raises(ValueError):
+            PEP621(name="both-test", version="1.0.0", dynamic=["version"])
+
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""
 
-        data = PEP621(name="pep621-resolve-test")
+        data = PEP621(name="pep621-resolve-test", dynamic=["version"])
         config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         resolved = data.resolve(config)
 

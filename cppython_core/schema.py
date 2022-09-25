@@ -103,23 +103,28 @@ class PEP621(CPPythonModel):
     version: str | None = Field(default=None, description="https://peps.python.org/pep-0621/#version")
     description: str = Field(default="", description="https://peps.python.org/pep-0621/#description")
 
-    @validator("version")
+    @validator("version", always=True)
     @classmethod
-    def validate_version(cls, value: str | None, values: dict[str, Any]) -> str | None:
+    def dynamic_version(cls, value: str | None, values: dict[str, Any]) -> str | None:
         """Validates that version is present or that the name is present in the dynamic field
 
         Args:
             value: The input version
             values: All values of the Model prior to running this validation
 
+        Raises:
+            ValueError: If dynamic versioning is incorrect
+
         Returns:
             The validated input version
         """
 
-        if "version" in values["dynamic"]:
-            assert value is None
+        if "version" not in values["dynamic"]:
+            if value is None:
+                raise ValueError("'version' is not a dynamic field. It must be defined")
         else:
-            assert value is not None
+            if value is not None:
+                raise ValueError("'version' is a dynamic field. It must not be defined")
 
         return value
 
@@ -136,7 +141,9 @@ class PEP621(CPPythonModel):
         modified = self.copy(deep=True)
 
         # Update the dynamic version
-        modified.version = project_configuration.version
+        if "version" in modified.dynamic:
+            modified.dynamic.remove("version")
+            modified.version = project_configuration.version
 
         return PEP621Resolved(**modified.dict())
 
