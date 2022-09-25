@@ -141,7 +141,9 @@ class PEP621(CPPythonModel):
         modified = self.copy(deep=True)
 
         # Update the dynamic version
-        modified.version = project_configuration.version
+        if "version" in modified.dynamic:
+            modified.dynamic.remove("version")
+            modified.version = project_configuration.version
 
         return PEP621Resolved(**modified.dict())
 
