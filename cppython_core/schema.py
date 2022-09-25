@@ -249,10 +249,9 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
         modified = self.copy(deep=True)
 
         # Add provider specific paths to the base path
-        modified.install_path /= provider_type.name()
-
-        # Create directories if they do not exist
-        modified.install_path.mkdir(parents=True, exist_ok=True)
+        generator_install_path = modified.install_path / provider_type.name()
+        generator_install_path.mkdir(parents=True, exist_ok=True)
+        modified.install_path = generator_install_path
 
         return modified
 
