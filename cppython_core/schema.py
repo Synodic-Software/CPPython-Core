@@ -569,31 +569,25 @@ class VersionControl(Plugin):
 
     @abstractmethod
     def is_repository(self, path: Path) -> bool:
-        """_summary_
+        """Queries repository status of a path
 
         Args:
-            path: _description_
-
-        Raises:
-            NotImplementedError: _description_
+            path: The input path to query
 
         Returns:
-            _description_
+            Whether the given path is a repository root
         """
         raise NotImplementedError()
 
     @abstractmethod
     def extract_version(self, path: Path) -> str:
-        """_summary_
+        """Extracts the system's version metadata
 
         Args:
-            path: _description_
-
-        Raises:
-            NotImplementedError: _description_
+            path: The repository path
 
         Returns:
-            _description_
+            A version
         """
         raise NotImplementedError()
 
