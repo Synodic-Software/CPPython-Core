@@ -356,10 +356,6 @@ class Plugin(ABC):
 PluginT = TypeVar("PluginT", bound=Plugin)
 
 
-class InterfaceConfiguration(CPPythonModel, extra=Extra.forbid):
-    """Base class for the configuration data that is passed to the interface"""
-
-
 class ProviderConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     """Base class for the configuration data that is set by the project for the provider"""
 
@@ -398,15 +394,6 @@ ProviderDataT = TypeVar("ProviderDataT", bound=ProviderData[Any])
 
 class Interface(Plugin):
     """Abstract type to be inherited by CPPython interfaces"""
-
-    def __init__(self, configuration: InterfaceConfiguration) -> None:
-        """Initializes the class properties and calls the base plugin class"""
-        self._configuration = configuration
-
-    @property
-    def configuration(self) -> InterfaceConfiguration:
-        """Returns the InterfaceConfiguration object set at initialization"""
-        return self._configuration
 
     @staticmethod
     @abstractmethod
