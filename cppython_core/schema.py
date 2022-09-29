@@ -6,7 +6,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import Enum
 from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any
@@ -33,14 +32,6 @@ class CPPythonModel(BaseModel):
 
 
 ModelT = TypeVar("ModelT", bound=CPPythonModel)
-
-
-class TargetEnum(Enum):
-    """The C++ build target type"""
-
-    EXE = "executable"
-    STATIC = "static"
-    SHARED = "shared"
 
 
 class ProjectConfiguration(CPPythonModel, extra=Extra.forbid):
@@ -208,7 +199,6 @@ class PEP508(Requirement):
 class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
     """CPPythonData type with values of the CPPythonData model after resolution"""
 
-    target: TargetEnum
     dependencies: list[PEP508]
     install_path: DirectoryPath
     tool_path: DirectoryPath
@@ -262,11 +252,16 @@ CPPythonDataResolvedT = TypeVar("CPPythonDataResolvedT", bound=CPPythonDataResol
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """Data required by the tool"""
 
-    target: TargetEnum = Field(default=TargetEnum.EXE)
-    dependencies: list[PEP508] = Field(default=[])
-    install_path: Path = Field(default=_default_install_location(), alias="install-path")
-    tool_path: Path = Field(default=Path("tool"), alias="tool-path")
-    build_path: Path = Field(default=Path("build"), alias="build-path")
+    dependencies: list[PEP508] = Field(default=[], description="List of PEP508 dependencies")
+    install_path: Path = Field(
+        default=_default_install_location(), alias="install-path", description="The global install path for the project"
+    )
+    tool_path: Path = Field(
+        default=Path("tool"), alias="tool-path", description="The local tooling path for the project"
+    )
+    build_path: Path = Field(
+        default=Path("build"), alias="build-path", description="The local build path for the project"
+    )
 
     def resolve(
         self, resolved_type: type[CPPythonDataResolvedT], project_configuration: ProjectConfiguration
