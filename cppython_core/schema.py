@@ -262,14 +262,20 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     build_path: Path = Field(
         default=Path("build"), alias="build-path", description="The local build path for the project"
     )
+    provider: dict[str, dict[str, Any]] = Field(
+        default={}, description="Optional list of dynamically generated 'provider' plugin data"
+    )
+    generator: dict[str, dict[str, Any]] = Field(
+        default={}, description="Optional list of dynamically generated 'generator' plugin data"
+    )
+    vcs: dict[str, dict[str, Any]] = Field(
+        default={}, description="Optional list of dynamically generated 'vcs' plugin data"
+    )
 
-    def resolve(
-        self, resolved_type: type[CPPythonDataResolvedT], project_configuration: ProjectConfiguration
-    ) -> CPPythonDataResolvedT:
+    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonDataResolved:
         """Creates a copy and resolves dynamic attributes
 
         Args:
-            resolved_type: The dynamic type used to resolve the tool data
             project_configuration: Project information to aid in the resolution
 
         Returns:
@@ -295,7 +301,55 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         modified.tool_path.mkdir(parents=True, exist_ok=True)
         modified.build_path.mkdir(parents=True, exist_ok=True)
 
-        return resolved_type(**modified.dict())
+        # Delete the plugin attributes for the resolve
+        del modified.provider
+        del modified.generator
+        del modified.vcs
+
+        return CPPythonDataResolved(**modified.dict())
+
+    def extract_provider(self, name: str, data_type: type[ProviderDataT]) -> ProviderDataT:
+        """Extracts a plugin data type from the CPPython table
+
+        Args:
+            name: The plugin name
+            data_type: The plugin data type
+
+        Returns:
+            The plugin data
+        """
+
+        data = self.provider[name]
+
+        return data_type(**data)
+
+    def extract_generator(self, name: str, data_type: type[GeneratorDataT]) -> GeneratorDataT:
+        """Extracts a plugin data type from the CPPython table
+
+        Args:
+            name: The plugin name
+            data_type: The plugin data type
+
+        Returns:
+            The plugin data
+        """
+        data = self.generator[name]
+
+        return data_type(**data)
+
+    def extract_vcs(self, name: str, data_type: type[VersionControlDataT]) -> VersionControlDataT:
+        """Extracts a plugin data type from the CPPython table
+
+        Args:
+            name: The plugin name
+            data_type: The plugin data type
+
+        Returns:
+            The plugin data
+        """
+        data = self.vcs[name]
+
+        return data_type(**data)
 
 
 class ToolData(CPPythonModel):
@@ -387,7 +441,7 @@ class ProviderData(CPPythonModel, ABC, Generic[ProviderDataResolvedT], extra=Ext
 ProviderDataT = TypeVar("ProviderDataT", bound=ProviderData[Any])
 
 
-class Interface(Plugin):
+class Interface:
     """Abstract type to be inherited by CPPython interfaces"""
 
     @staticmethod
@@ -395,15 +449,6 @@ class Interface(Plugin):
     def name() -> str:
         """The name of the plugin, canonicalized"""
         raise NotImplementedError()
-
-    @staticmethod
-    def group() -> str:
-        """The plugin group name as used by 'setuptools'summary
-
-        Returns:
-            The group name
-        """
-        return "interface"
 
     @abstractmethod
     def write_pyproject(self) -> None:
@@ -524,6 +569,42 @@ class Provider(Plugin, Generic[ProviderDataT, ProviderDataResolvedT]):
 ProviderT = TypeVar("ProviderT", bound=Provider[Any, Any])
 
 
+class GeneratorConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
+    """Base class for the configuration data that is set by the project for the generator"""
+
+    root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
+
+
+class GeneratorDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
+    """Base class for the configuration data that will be resolved from 'GeneratorData'"""
+
+
+GeneratorDataResolvedT = TypeVar("GeneratorDataResolvedT", bound=GeneratorDataResolved)
+
+
+class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=Extra.forbid):
+    """Base class for the configuration data that will be read by the interface and given to the generator"""
+
+    @abstractmethod
+    def resolve(self, project_configuration: ProjectConfiguration) -> GeneratorDataResolvedT:
+        """Creates a copy and resolves dynamic attributes
+
+        Args:
+            project_configuration: The configuration data used to help the resolution
+
+        Raises:
+            NotImplementedError: Must be sub-classed
+
+        Returns:
+            The resolved generator data type
+        """
+        raise NotImplementedError()
+
+
+# GeneratorDataT[GeneratorDataResolvedT] is not allowed. 'Any' will resolve to GeneratorDataResolvedT when implemented
+GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
+
+
 class Generator(Plugin):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
@@ -544,6 +625,42 @@ class Generator(Plugin):
 
 
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
+
+
+class VersionControlConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
+    """Base class for the configuration data that is set by the project for the version control"""
+
+    root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
+
+
+class VersionControlDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
+    """Base class for the configuration data that will be resolved from 'VersionControlData'"""
+
+
+VersionControlDataResolvedT = TypeVar("VersionControlDataResolvedT", bound=VersionControlDataResolved)
+
+
+class VersionControlData(CPPythonModel, ABC, Generic[VersionControlDataResolvedT], extra=Extra.forbid):
+    """Base class for the configuration data that will be read by the interface and given to the version control"""
+
+    @abstractmethod
+    def resolve(self, project_configuration: ProjectConfiguration) -> VersionControlDataResolvedT:
+        """Creates a copy and resolves dynamic attributes
+
+        Args:
+            project_configuration: The configuration data used to help the resolution
+
+        Raises:
+            NotImplementedError: Must be sub-classed
+
+        Returns:
+            The resolved version control data type
+        """
+        raise NotImplementedError()
+
+
+#'Any' will resolve to VersionControlDataResolvedT when implemented
+VersionControlDataT = TypeVar("VersionControlDataT", bound=VersionControlData[Any])
 
 
 class VersionControl(Plugin):

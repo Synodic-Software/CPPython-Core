@@ -10,7 +10,6 @@ from cppython_core.schema import (
     PEP508,
     PEP621,
     CPPythonData,
-    CPPythonDataResolved,
     ProjectConfiguration,
     PyProject,
 )
@@ -33,7 +32,6 @@ class TestSchema:
         description = "A test document"\n
 
         [tool.cppython]\n
-        target = "executable"\n
         """
 
         document = parse(data).value
@@ -86,7 +84,7 @@ class TestSchema:
         config = ProjectConfiguration(pyproject_file=pyproject, version="0.1.0")
 
         # Function to test
-        resolved = data.resolve(CPPythonDataResolved, config)
+        resolved = data.resolve(config)
 
         # Test that paths are created successfully
         assert resolved.build_path.exists()
