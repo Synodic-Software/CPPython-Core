@@ -315,6 +315,9 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
             name: The plugin name
             data_type: The plugin data type
 
+        Raises:
+            KeyError: If there is no plugin data with the given name
+
         Returns:
             The plugin data
         """
@@ -330,6 +333,9 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
             name: The plugin name
             data_type: The plugin data type
 
+        Raises:
+            KeyError: If there is no plugin data with the given name
+
         Returns:
             The plugin data
         """
@@ -343,6 +349,9 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         Args:
             name: The plugin name
             data_type: The plugin data type
+
+        Raises:
+            KeyError: If there is no plugin data with the given name
 
         Returns:
             The plugin data
