@@ -478,7 +478,6 @@ class Provider(Plugin, Generic[ProviderDataT, ProviderDataResolvedT]):
         cppython: CPPythonDataResolved,
         provider: ProviderDataResolvedT,
     ) -> None:
-        """Allows CPPython to pass the relevant data to constructed Provider plugin"""
         self._configuration = configuration
         self._project = project
         self._cppython = cppython
@@ -614,8 +613,40 @@ class GeneratorData(CPPythonModel, ABC, Generic[GeneratorDataResolvedT], extra=E
 GeneratorDataT = TypeVar("GeneratorDataT", bound=GeneratorData[Any])
 
 
-class Generator(Plugin):
+class Generator(Plugin, Generic[GeneratorDataT, GeneratorDataResolvedT]):
     """Abstract type to be inherited by CPPython Generator plugins"""
+
+    def __init__(
+        self,
+        configuration: GeneratorConfiguration,
+        project: PEP621Resolved,
+        cppython: CPPythonDataResolved,
+        generator: GeneratorDataResolvedT,
+    ) -> None:
+        self._configuration = configuration
+        self._project = project
+        self._cppython = cppython
+        self._generator = generator
+
+    @property
+    def configuration(self) -> GeneratorConfiguration:
+        """Returns the GeneratorConfiguration object set at initialization"""
+        return self._configuration
+
+    @property
+    def project(self) -> PEP621Resolved:
+        """Returns the PEP621Resolved object set at initialization"""
+        return self._project
+
+    @property
+    def cppython(self) -> CPPythonDataResolved:
+        """Returns the CPPythonDataResolved object set at initialization"""
+        return self._cppython
+
+    @property
+    def generator(self) -> GeneratorDataResolvedT:
+        """Returns the GeneratorDataResolved object set at initialization"""
+        return self._generator
 
     @staticmethod
     @abstractmethod
@@ -633,7 +664,7 @@ class Generator(Plugin):
         return "generator"
 
 
-GeneratorT = TypeVar("GeneratorT", bound=Generator)
+GeneratorT = TypeVar("GeneratorT", bound=Generator[Any, Any])
 
 
 class VersionControlConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
@@ -672,8 +703,40 @@ class VersionControlData(CPPythonModel, ABC, Generic[VersionControlDataResolvedT
 VersionControlDataT = TypeVar("VersionControlDataT", bound=VersionControlData[Any])
 
 
-class VersionControl(Plugin):
+class VersionControl(Plugin, Generic[VersionControlDataT, VersionControlDataResolvedT]):
     """Base class for version control systems"""
+
+    def __init__(
+        self,
+        configuration: VersionControlConfiguration,
+        project: PEP621Resolved,
+        cppython: CPPythonDataResolved,
+        vcs: VersionControlDataResolvedT,
+    ) -> None:
+        self._configuration = configuration
+        self._project = project
+        self._cppython = cppython
+        self._vcs = vcs
+
+    @property
+    def configuration(self) -> VersionControlConfiguration:
+        """Returns the VersionControlConfiguration object set at initialization"""
+        return self._configuration
+
+    @property
+    def project(self) -> PEP621Resolved:
+        """Returns the PEP621Resolved object set at initialization"""
+        return self._project
+
+    @property
+    def cppython(self) -> CPPythonDataResolved:
+        """Returns the CPPythonDataResolved object set at initialization"""
+        return self._cppython
+
+    @property
+    def vcs(self) -> VersionControlDataResolvedT:
+        """Returns the VersionControlDataResolved object set at initialization"""
+        return self._vcs
 
     @abstractmethod
     def is_repository(self, path: Path) -> bool:
@@ -715,4 +778,4 @@ class VersionControl(Plugin):
         return "vcs"
 
 
-VersionControlT = TypeVar("VersionControlT", bound=VersionControl)
+VersionControlT = TypeVar("VersionControlT", bound=VersionControl[Any, Any])
