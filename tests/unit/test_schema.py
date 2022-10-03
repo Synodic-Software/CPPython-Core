@@ -7,7 +7,6 @@ import pytest
 from pytest_mock import MockerFixture
 from tomlkit import parse
 
-from cppython_core.plugin_schema.provider import Provider
 from cppython_core.schema import (
     PEP508,
     PEP621,
