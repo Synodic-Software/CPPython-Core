@@ -452,17 +452,5 @@ class DataPlugin(Plugin, Generic[PluginDataConfigurationT, PluginDataT, PluginDa
         """Returns the GeneratorDataResolved object set at initialization"""
         return self._generator
 
-    @staticmethod
-    @abstractmethod
-    def data_type() -> type[PluginDataT]:
-        """Returns the pydantic type to cast the provider configuration data to"""
-        raise NotImplementedError()
-
-    @staticmethod
-    @abstractmethod
-    def resolved_data_type() -> type[PluginDataResolvedT]:
-        """Returns the pydantic type to cast the resolved provider configuration data to"""
-        raise NotImplementedError()
-
 
 DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any, Any, Any])
