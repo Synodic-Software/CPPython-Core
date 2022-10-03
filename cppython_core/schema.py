@@ -223,9 +223,7 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
 
         return value
 
-    def resolve_plugin(
-        self, provider_type: type[DataPlugin[PluginDataConfigurationT, PluginDataT, PluginDataResolvedT]]
-    ) -> CPPythonDataResolved:
+    def resolve_plugin(self, provider_type: type[DataPlugin[PluginDataConfigurationT]]) -> CPPythonDataResolved:
         """Returns a deep copy that is modified for the given provider
         TODO: Replace return type with Self
 
@@ -308,12 +306,11 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 
         return CPPythonDataResolved(**modified.dict())
 
-    def extract_plugin_data(self, plugin_type: type[DataPluginT], plugin_data_type: type[PluginDataT]) -> PluginDataT:
+    def extract_plugin_data(self, plugin_type: type[DataPluginT]) -> dict[str, Any]:
         """Extracts a plugin data type from the CPPython table
 
         Args:
             plugin_type: The plugin type
-            plugin_data_type: The plugin data type
 
         Raises:
             KeyError: If there is no plugin data with the given name
@@ -323,9 +320,9 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         """
 
         attribute = getattr(self, plugin_type.group())
-        data = attribute[plugin_type.name()]
+        data: dict[str, Any] = attribute[plugin_type.name()]
 
-        return plugin_data_type(**data)
+        return data
 
 
 class ToolData(CPPythonModel):
@@ -388,36 +385,7 @@ class PluginDataConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
 PluginDataConfigurationT = TypeVar("PluginDataConfigurationT", bound=PluginDataConfiguration)
 
 
-class PluginDataResolved(CPPythonModel, ABC, extra=Extra.forbid):
-    """Base class for the configuration data that will be resolved from 'ProviderData'"""
-
-
-PluginDataResolvedT = TypeVar("PluginDataResolvedT", bound=PluginDataResolved)
-
-
-class PluginData(CPPythonModel, ABC, Generic[PluginDataResolvedT], extra=Extra.forbid):
-    """_summary_"""
-
-    @abstractmethod
-    def resolve(self, project_configuration: ProjectConfiguration) -> PluginDataResolvedT:
-        """Creates a copy and resolves dynamic attributes
-
-        Args:
-            project_configuration: The configuration data used to help the resolution
-
-        Raises:
-            NotImplementedError: Must be sub-classed
-
-        Returns:
-            The resolved data type
-        """
-        raise NotImplementedError()
-
-
-PluginDataT = TypeVar("PluginDataT", bound=PluginData[Any])
-
-
-class DataPlugin(Plugin, Generic[PluginDataConfigurationT, PluginDataT, PluginDataResolvedT]):
+class DataPlugin(Plugin, Generic[PluginDataConfigurationT]):
     """Abstract plugin type for internal CPPython data"""
 
     def __init__(
@@ -425,12 +393,12 @@ class DataPlugin(Plugin, Generic[PluginDataConfigurationT, PluginDataT, PluginDa
         configuration: PluginDataConfigurationT,
         project: PEP621Resolved,
         cppython: CPPythonDataResolved,
-        generator: PluginDataResolvedT,
+        generator_data: dict[str, Any],
     ) -> None:
         self._configuration = configuration
         self._project = project
         self._cppython = cppython
-        self._generator = generator
+        self._generator_data = generator_data
 
     @property
     def configuration(self) -> PluginDataConfigurationT:
@@ -448,15 +416,9 @@ class DataPlugin(Plugin, Generic[PluginDataConfigurationT, PluginDataT, PluginDa
         return self._cppython
 
     @property
-    def generator(self) -> PluginDataResolvedT:
+    def generator_data(self) -> dict[str, Any]:
         """Returns the GeneratorDataResolved object set at initialization"""
-        return self._generator
-
-    @staticmethod
-    @abstractmethod
-    def data_type() -> type[PluginDataT]:
-        """Returns the pydantic type to cast the provider configuration data to"""
-        raise NotImplementedError()
+        return self._generator_data
 
 
-DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any, Any, Any])
+DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])

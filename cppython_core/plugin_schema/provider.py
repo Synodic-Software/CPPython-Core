@@ -2,17 +2,12 @@
 
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import (
-    DataPlugin,
-    PluginData,
-    PluginDataConfiguration,
-    PluginDataResolved,
-)
+from cppython_core.schema import DataPlugin, PluginDataConfiguration
 
 
 class ProviderConfiguration(PluginDataConfiguration):
@@ -21,21 +16,7 @@ class ProviderConfiguration(PluginDataConfiguration):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-class ProviderDataResolved(PluginDataResolved):
-    """Base class for the configuration data that will be resolved from 'ProviderData'"""
-
-
-ProviderDataResolvedT = TypeVar("ProviderDataResolvedT", bound=ProviderDataResolved)
-
-
-class ProviderData(PluginData[ProviderDataResolvedT]):
-    """Base class for the configuration data that will be read by the interface and given to the provider"""
-
-
-ProviderDataT = TypeVar("ProviderDataT", bound=ProviderData[Any])
-
-
-class Provider(DataPlugin[ProviderConfiguration, ProviderDataT, ProviderDataResolvedT]):
+class Provider(DataPlugin[ProviderConfiguration]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
     @staticmethod
@@ -90,4 +71,4 @@ class Provider(DataPlugin[ProviderConfiguration, ProviderDataT, ProviderDataReso
         raise NotImplementedError()
 
 
-ProviderT = TypeVar("ProviderT", bound=Provider[Any, Any])
+ProviderT = TypeVar("ProviderT", bound=Provider)
