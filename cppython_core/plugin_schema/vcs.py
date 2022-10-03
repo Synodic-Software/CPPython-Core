@@ -2,17 +2,12 @@
 
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import (
-    DataPlugin,
-    PluginData,
-    PluginDataConfiguration,
-    PluginDataResolved,
-)
+from cppython_core.schema import DataPlugin, PluginDataConfiguration
 
 
 class VersionControlConfiguration(PluginDataConfiguration):
@@ -21,21 +16,7 @@ class VersionControlConfiguration(PluginDataConfiguration):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-class VersionControlDataResolved(PluginDataResolved):
-    """Base class for the configuration data that will be resolved from 'VersionControlData'"""
-
-
-VersionControlDataResolvedT = TypeVar("VersionControlDataResolvedT", bound=VersionControlDataResolved)
-
-
-class VersionControlData(PluginData[VersionControlDataResolvedT]):
-    """Base class for the configuration data that will be read by the interface and given to the version control"""
-
-
-VersionControlDataT = TypeVar("VersionControlDataT", bound=VersionControlData[Any])
-
-
-class VersionControl(DataPlugin[VersionControlConfiguration, VersionControlDataT, VersionControlDataResolvedT]):
+class VersionControl(DataPlugin[VersionControlConfiguration]):
     """Base class for version control systems"""
 
     @abstractmethod
@@ -72,4 +53,4 @@ class VersionControl(DataPlugin[VersionControlConfiguration, VersionControlDataT
         return "vcs"
 
 
-VersionControlT = TypeVar("VersionControlT", bound=VersionControl[Any, Any])
+VersionControlT = TypeVar("VersionControlT", bound=VersionControl)

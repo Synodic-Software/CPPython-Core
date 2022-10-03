@@ -4,6 +4,7 @@
 from pathlib import Path
 
 import pytest
+from pytest_mock import MockerFixture
 from tomlkit import parse
 
 from cppython_core.schema import (
@@ -117,3 +118,20 @@ class TestSchema:
 
         assert len(class_variables)
         assert not None in class_variables.values()
+
+    def test_extract_plugin_data(self, mocker: MockerFixture) -> None:
+        """Test data extraction for plugins
+
+        Args:
+            mocker: Mock fixture
+        """
+
+        data = CPPythonData(provider={"test": {"heck": "yeah"}})
+
+        with mocker.MagicMock() as mock:
+            mock.name.return_value = "test"
+            mock.group.return_value = "provider"
+
+            extracted_data = data.extract_plugin_data(mock)
+
+        assert data.provider["test"] == extracted_data
