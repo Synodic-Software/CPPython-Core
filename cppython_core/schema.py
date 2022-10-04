@@ -381,6 +381,19 @@ PluginT = TypeVar("PluginT", bound=Plugin)
 class PluginDataConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
     """_summary_"""
 
+    @staticmethod
+    @abstractmethod
+    def create(project_configuration: ProjectConfiguration) -> PluginDataConfiguration:
+        """Creates an instance from the given project
+
+        Args:
+            project_configuration: The input project configuration
+
+        Returns:
+            The plugin specific configuration
+        """
+        raise NotImplementedError()
+
 
 PluginDataConfigurationT = TypeVar("PluginDataConfigurationT", bound=PluginDataConfiguration)
 
