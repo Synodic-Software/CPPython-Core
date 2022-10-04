@@ -20,8 +20,8 @@ class ProviderConfiguration(PluginDataConfiguration):
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
-    @staticmethod
-    def create(project_configuration: ProjectConfiguration) -> ProviderConfiguration:
+    @classmethod
+    def create(cls, project_configuration: ProjectConfiguration) -> ProviderConfiguration:
         """Creates an instance from the given project
 
         Args:
