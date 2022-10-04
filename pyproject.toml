@@ -68,6 +68,7 @@ skip_gitignore = true
 [tool.mypy]
 exclude = "__pypackages__"
 plugins = ["pydantic.mypy"]
+show_error_codes = true
 strict = true
 
 [tool.pylint.MAIN]
