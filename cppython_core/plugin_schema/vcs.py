@@ -11,7 +11,7 @@ from pydantic.types import DirectoryPath
 from cppython_core.schema import (
     DataPlugin,
     PluginDataConfiguration,
-    ProjectConfiguration,
+    ProjectData,
 )
 
 
@@ -21,16 +21,16 @@ class VersionControlConfiguration(PluginDataConfiguration):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
     @classmethod
-    def create(cls, project_configuration: ProjectConfiguration) -> VersionControlConfiguration:
+    def create(cls, project_data: ProjectData) -> VersionControlConfiguration:
         """Creates an instance from the given project
 
         Args:
-            project_configuration: The input project configuration
+            project_data: The input project configuration
 
         Returns:
             The plugin specific configuration
         """
-        configuration = VersionControlConfiguration(root_directory=project_configuration.pyproject_file.parent)
+        configuration = VersionControlConfiguration(root_directory=project_data.pyproject_file.parent)
         return configuration
 
 

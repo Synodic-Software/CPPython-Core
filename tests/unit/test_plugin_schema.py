@@ -8,11 +8,7 @@ from pytest_mock import MockerFixture
 from cppython_core.plugin_schema.generator import Generator, GeneratorConfiguration
 from cppython_core.plugin_schema.provider import Provider, ProviderConfiguration
 from cppython_core.plugin_schema.vcs import VersionControl, VersionControlConfiguration
-from cppython_core.schema import (
-    CPPythonData,
-    PluginDataConfiguration,
-    ProjectConfiguration,
-)
+from cppython_core.schema import CPPythonData, PluginDataConfiguration, ProjectData
 
 
 class TestPluginSchema:
@@ -64,7 +60,7 @@ class TestPluginSchema:
             configuration_type: _description_
         """
 
-        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        config = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         plugin_config = configuration_type.create(config)
 
         assert plugin_config

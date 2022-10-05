@@ -8,11 +8,7 @@ from typing import TypeVar
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import (
-    DataPlugin,
-    PluginDataConfiguration,
-    ProjectConfiguration,
-)
+from cppython_core.schema import DataPlugin, PluginDataConfiguration, ProjectData
 
 
 class ProviderConfiguration(PluginDataConfiguration):
@@ -21,16 +17,16 @@ class ProviderConfiguration(PluginDataConfiguration):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
     @classmethod
-    def create(cls, project_configuration: ProjectConfiguration) -> ProviderConfiguration:
+    def create(cls, project_data: ProjectData) -> ProviderConfiguration:
         """Creates an instance from the given project
 
         Args:
-            project_configuration: The input project configuration
+            project_data: The input project configuration
 
         Returns:
             The plugin specific configuration
         """
-        configuration = ProviderConfiguration(root_directory=project_configuration.pyproject_file.parent)
+        configuration = ProviderConfiguration(root_directory=project_data.pyproject_file.parent)
         return configuration
 
 

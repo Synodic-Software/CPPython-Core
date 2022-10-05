@@ -6,13 +6,7 @@ from pathlib import Path
 import pytest
 from tomlkit import parse
 
-from cppython_core.schema import (
-    PEP508,
-    PEP621,
-    CPPythonData,
-    ProjectConfiguration,
-    PyProject,
-)
+from cppython_core.schema import PEP508, PEP621, CPPythonData, ProjectData, PyProject
 
 
 class TestSchema:
@@ -81,7 +75,7 @@ class TestSchema:
         data = CPPythonData()
         data.install_path = tmp_path
 
-        config = ProjectConfiguration(pyproject_file=pyproject, version="0.1.0")
+        config = ProjectData(pyproject_file=pyproject, version="0.1.0")
 
         # Function to test
         resolved = data.resolve(config)
@@ -110,7 +104,7 @@ class TestSchema:
         """Test the PEP621 schema resolve function"""
 
         data = PEP621(name="pep621-resolve-test", dynamic=["version"])
-        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        config = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         resolved = data.resolve(config)
 
         class_variables = vars(resolved)

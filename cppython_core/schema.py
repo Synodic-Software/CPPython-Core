@@ -34,11 +34,24 @@ class CPPythonModel(BaseModel):
 ModelT = TypeVar("ModelT", bound=CPPythonModel)
 
 
+class ProjectData(CPPythonModel, extra=Extra.forbid):
+    """Resolved data of 'ProjectConfiguration'"""
+
+    pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
+    version: str = Field(description="The version number of the project")
+    verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
+
+
 class ProjectConfiguration(CPPythonModel, extra=Extra.forbid):
     """Project-wide configuration"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
-    version: str = Field(description="The version number a 'dynamic' project version will resolve to")
+    version: str | None = Field(
+        description=(
+            "The version number a 'dynamic' project version will resolve to. If not provided a CPPython project will"
+            " initialize its VCS plugins to discover any available version"
+        )
+    )
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
     @validator("verbosity")
@@ -119,11 +132,11 @@ class PEP621(CPPythonModel):
 
         return value
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621Resolved:
+    def resolve(self, project_data: ProjectData) -> PEP621Resolved:
         """Creates a self copy and resolves dynamic attributes
 
         Args:
-            project_configuration: The input configuration used to aid the resolve
+            project_data: The input configuration used to aid the resolve
 
         Returns:
             The resolved copy
@@ -134,7 +147,7 @@ class PEP621(CPPythonModel):
         # Update the dynamic version
         if "version" in modified.dynamic:
             modified.dynamic.remove("version")
-            modified.version = project_configuration.version
+            modified.version = project_data.version
 
         return PEP621Resolved(**modified.dict())
 
@@ -270,11 +283,11 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
         default={}, description="Optional list of dynamically generated 'vcs' plugin data"
     )
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonDataResolved:
+    def resolve(self, project_data: ProjectData) -> CPPythonDataResolved:
         """Creates a copy and resolves dynamic attributes
 
         Args:
-            project_configuration: Project information to aid in the resolution
+            project_data: Project information to aid in the resolution
 
         Returns:
             An instance of the resolved type
@@ -282,7 +295,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 
         modified = self.copy(deep=True)
 
-        root_directory = project_configuration.pyproject_file.parent.absolute()
+        root_directory = project_data.pyproject_file.parent.absolute()
 
         # Add the base path to all relative paths
         if not modified.install_path.is_absolute():
@@ -383,14 +396,12 @@ class PluginDataConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
 
     @classmethod
     @abstractmethod
-    def create(
-        cls: type[PluginDataConfigurationT], project_configuration: ProjectConfiguration
-    ) -> PluginDataConfigurationT:
+    def create(cls: type[PluginDataConfigurationT], project_data: ProjectData) -> PluginDataConfigurationT:
         """Creates an instance from the given project
             TODO: Replace with Self type
 
         Args:
-            project_configuration: The input project configuration
+            project_data: The input project configuration
 
         Returns:
             The plugin specific configuration
