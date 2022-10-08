@@ -24,7 +24,10 @@ class CPPythonModel(BaseModel):
     class Config:
         """Pydantic built-in configuration"""
 
-        allow_population_by_field_name = True
+        # Data aliases should only exist for Configuration types. Constructors will never take aliases by field name
+        allow_population_by_field_name = False
+
+        # Mutation will happen via data resolution
         allow_mutation = False
 
 

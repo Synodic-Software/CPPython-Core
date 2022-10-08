@@ -60,11 +60,11 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
     """
 
     # Add provider specific paths to the base path
-    generator_install_path = cppython_data.install_path / plugin_type.name()
-    generator_install_path.mkdir(parents=True, exist_ok=True)
+    modified_install_path = cppython_data.install_path / plugin_type.name()
+    modified_install_path.mkdir(parents=True, exist_ok=True)
 
     plugin_data = CPPythonData(
-        install_path=generator_install_path,
+        install_path=modified_install_path,
         tool_path=cppython_data.tool_path,
         build_path=cppython_data.build_path,
         dependencies=cppython_data.dependencies,

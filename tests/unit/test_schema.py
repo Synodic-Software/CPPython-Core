@@ -26,9 +26,22 @@ class TestSchema:
     def test_model_construction(self) -> None:
         """Verifies that the base model type has the expected construction behaviors"""
 
-        # self.TestModel('aliased-variable'=True)
+        model = self.TestModel(aliased_variable=True)
+        assert model.aliased_variable is False
 
-        assert self.TestModel(aliased_variable=True)
+        model = self.TestModel(**{"aliased-variable": True})
+        assert model.aliased_variable is True
+
+    def test_model_construction_from_data(self) -> None:
+        """Verifies that the base model type has the expected construction behaviors"""
+
+        data = """
+        aliased_variable = false\n
+        aliased-variable = true
+        """
+
+        result = self.TestModel.parse_obj(parse(data).value)
+        assert result.aliased_variable is True
 
     def test_cppython_local(self) -> None:
         """Ensures that the CPPython local config data can be defaulted"""
