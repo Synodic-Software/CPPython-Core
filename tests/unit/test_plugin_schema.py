@@ -1,22 +1,19 @@
 """Tests the plugin schema"""
 
-from pathlib import Path
-
 import pytest
+from packaging.utils import canonicalize_name
 from pytest_mock import MockerFixture
 
-from cppython_core.plugin_schema.generator import Generator, GeneratorConfiguration
-from cppython_core.plugin_schema.provider import Provider, ProviderConfiguration
-from cppython_core.plugin_schema.vcs import VersionControl, VersionControlConfiguration
-from cppython_core.schema import (
-    CPPythonData,
-    PluginDataConfiguration,
-    ProjectConfiguration,
-)
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
+from cppython_core.plugin_schema.vcs import VersionControl
+from cppython_core.schema import CPPythonLocalConfiguration, Plugin
 
 
 class TestPluginSchema:
     """Test validation"""
+
+    plugin_types = [Provider, Generator, VersionControl]
 
     @pytest.mark.parametrize(
         "name, group",
@@ -35,7 +32,7 @@ class TestPluginSchema:
             group: The plugin group
         """
 
-        data = CPPythonData()
+        data = CPPythonLocalConfiguration()
 
         plugin_attribute = getattr(data, group)
         plugin_attribute[name] = {"heck": "yeah"}
@@ -50,21 +47,14 @@ class TestPluginSchema:
         assert plugin_attribute[name] == extracted_data
 
     @pytest.mark.parametrize(
-        "configuration_type",
-        [
-            ProviderConfiguration,
-            GeneratorConfiguration,
-            VersionControlConfiguration,
-        ],
+        "plugin_type",
+        plugin_types,
     )
-    def test_plugin_configuration(self, configuration_type: type[PluginDataConfiguration]) -> None:
-        """_summary_
+    def test_group(self, plugin_type: Plugin) -> None:
+        """Validates the group name
 
         Args:
-            configuration_type: _description_
+            plugin_type: The input plugin type
         """
 
-        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
-        plugin_config = configuration_type.create(config)
-
-        assert plugin_config
+        assert plugin_type.group() == canonicalize_name(plugin_type.group())

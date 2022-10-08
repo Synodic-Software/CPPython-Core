@@ -10,7 +10,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any
 from typing import Generator as TypingGenerator
-from typing import Generic, TypeVar
+from typing import Generic, NewType, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -24,21 +24,34 @@ class CPPythonModel(BaseModel):
     class Config:
         """Pydantic built-in configuration"""
 
-        # Currently, there is no need for programmatically defined data outside tests.
-        # Tests will validate via default values and then assignment.
+        # Data aliases should only exist for Configuration types. Constructors will never take aliases by field name
         allow_population_by_field_name = False
 
-        validate_assignment = True
+        # Mutation will happen via data resolution
+        allow_mutation = False
 
 
 ModelT = TypeVar("ModelT", bound=CPPythonModel)
+
+
+class ProjectData(CPPythonModel, extra=Extra.forbid):
+    """Resolved data of 'ProjectConfiguration'"""
+
+    pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
+    version: str = Field(description="The version number of the project")
+    verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
 
 class ProjectConfiguration(CPPythonModel, extra=Extra.forbid):
     """Project-wide configuration"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
-    version: str = Field(description="The version number a 'dynamic' project version will resolve to")
+    version: str | None = Field(
+        description=(
+            "The version number a 'dynamic' project version will resolve to. If not provided a CPPython project will"
+            " initialize its VCS plugins to discover any available version"
+        )
+    )
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
     @validator("verbosity")
@@ -75,15 +88,15 @@ class ProjectConfiguration(CPPythonModel, extra=Extra.forbid):
         return value
 
 
-class PEP621Resolved(CPPythonModel):
-    """PEP621 type with values of the PEP621 model after resolution"""
+class PEP621Data(CPPythonModel):
+    """Resolved PEP621Configuration data"""
 
     name: str
     version: str
     description: str
 
 
-class PEP621(CPPythonModel):
+class PEP621Configuration(CPPythonModel):
     """CPPython relevant PEP 621 conforming data
     Because only the partial schema is used, we ignore 'extra' attributes
         Schema: https://www.python.org/dev/peps/pep-0621/
@@ -118,25 +131,6 @@ class PEP621(CPPythonModel):
                 raise ValueError("'version' is a dynamic field. It must not be defined")
 
         return value
-
-    def resolve(self, project_configuration: ProjectConfiguration) -> PEP621Resolved:
-        """Creates a self copy and resolves dynamic attributes
-
-        Args:
-            project_configuration: The input configuration used to aid the resolve
-
-        Returns:
-            The resolved copy
-        """
-
-        modified = self.copy(deep=True)
-
-        # Update the dynamic version
-        if "version" in modified.dynamic:
-            modified.dynamic.remove("version")
-            modified.version = project_configuration.version
-
-        return PEP621Resolved(**modified.dict())
 
 
 def _default_install_location() -> Path:
@@ -196,13 +190,14 @@ class PEP508(Requirement):
         return value
 
 
-class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
-    """CPPythonData type with values of the CPPythonData model after resolution"""
+class CPPythonData(CPPythonModel, extra=Extra.forbid):
+    """Resolved CPPython data with local and global configuration"""
 
     dependencies: list[PEP508]
     install_path: DirectoryPath
     tool_path: DirectoryPath
     build_path: DirectoryPath
+    current_check: bool
 
     @validator("install_path", "tool_path", "build_path")
     @classmethod
@@ -223,31 +218,17 @@ class CPPythonDataResolved(CPPythonModel, extra=Extra.forbid):
 
         return value
 
-    def resolve_plugin(self, provider_type: type[DataPlugin[PluginDataConfigurationT]]) -> CPPythonDataResolved:
-        """Returns a deep copy that is modified for the given provider
-        TODO: Replace return type with Self
 
-        Args:
-            provider_type: The type of the provider
-
-        Returns:
-            The resolved type with provider specific modifications
-        """
-
-        modified = self.copy(deep=True)
-
-        # Add provider specific paths to the base path
-        generator_install_path = modified.install_path / provider_type.name()
-        generator_install_path.mkdir(parents=True, exist_ok=True)
-        modified.install_path = generator_install_path
-
-        return modified
+CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 
 
-CPPythonDataResolvedT = TypeVar("CPPythonDataResolvedT", bound=CPPythonDataResolved)
+class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
+    """Global data extracted by the tool"""
+
+    current_check: bool = Field(default=True, alias="current-check", description="Checks for a new CPPython version")
 
 
-class CPPythonData(CPPythonModel, extra=Extra.forbid):
+class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     """Data required by the tool"""
 
     dependencies: list[PEP508] = Field(default=[], description="List of PEP508 dependencies")
@@ -269,42 +250,6 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     vcs: dict[str, dict[str, Any]] = Field(
         default={}, description="Optional list of dynamically generated 'vcs' plugin data"
     )
-
-    def resolve(self, project_configuration: ProjectConfiguration) -> CPPythonDataResolved:
-        """Creates a copy and resolves dynamic attributes
-
-        Args:
-            project_configuration: Project information to aid in the resolution
-
-        Returns:
-            An instance of the resolved type
-        """
-
-        modified = self.copy(deep=True)
-
-        root_directory = project_configuration.pyproject_file.parent.absolute()
-
-        # Add the base path to all relative paths
-        if not modified.install_path.is_absolute():
-            modified.install_path = root_directory / modified.install_path
-
-        if not modified.tool_path.is_absolute():
-            modified.tool_path = root_directory / modified.tool_path
-
-        if not modified.build_path.is_absolute():
-            modified.build_path = root_directory / modified.build_path
-
-        # Create directories if they do not exist
-        modified.install_path.mkdir(parents=True, exist_ok=True)
-        modified.tool_path.mkdir(parents=True, exist_ok=True)
-        modified.build_path.mkdir(parents=True, exist_ok=True)
-
-        # Delete the plugin attributes for the resolve
-        del modified.provider
-        del modified.generator
-        del modified.vcs
-
-        return CPPythonDataResolved(**modified.dict())
 
     def extract_plugin_data(self, plugin_type: type[DataPluginT]) -> dict[str, Any]:
         """Extracts a plugin data type from the CPPython table
@@ -328,20 +273,14 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 class ToolData(CPPythonModel):
     """Tool entry of pyproject.toml"""
 
-    cppython: CPPythonData | None = Field(default=None)
-
-
-ToolDataT = TypeVar("ToolDataT", bound=ToolData)
+    cppython: CPPythonLocalConfiguration | None = Field(default=None)
 
 
 class PyProject(CPPythonModel):
     """pyproject.toml schema"""
 
-    project: PEP621
+    project: PEP621Configuration
     tool: ToolData | None = Field(default=None)
-
-
-PyProjectT = TypeVar("PyProjectT", bound=PyProject)
 
 
 class Plugin(ABC):
@@ -352,13 +291,13 @@ class Plugin(ABC):
     @staticmethod
     @abstractmethod
     def name() -> str:
-        """The name of the plugin, canonicalized"""
+        """The name of the plugin"""
         raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
     def group() -> str:
-        """The plugin group name as used by 'setuptools'"""
+        """The plugin group name"""
         raise NotImplementedError()
 
     @classmethod
@@ -378,62 +317,46 @@ class Plugin(ABC):
 PluginT = TypeVar("PluginT", bound=Plugin)
 
 
-class PluginDataConfiguration(CPPythonModel, ABC, extra=Extra.forbid):
+class PluginGroupData(CPPythonModel, ABC, extra=Extra.forbid):
     """_summary_"""
 
-    @classmethod
-    @abstractmethod
-    def create(
-        cls: type[PluginDataConfigurationT], project_configuration: ProjectConfiguration
-    ) -> PluginDataConfigurationT:
-        """Creates an instance from the given project
-            TODO: Replace with Self type
 
-        Args:
-            project_configuration: The input project configuration
-
-        Returns:
-            The plugin specific configuration
-        """
-        raise NotImplementedError()
+PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
 
 
-PluginDataConfigurationT = TypeVar("PluginDataConfigurationT", bound=PluginDataConfiguration)
-
-
-class DataPlugin(Plugin, Generic[PluginDataConfigurationT]):
+class DataPlugin(Plugin, Generic[PluginGroupDataT]):
     """Abstract plugin type for internal CPPython data"""
 
     def __init__(
         self,
-        configuration: PluginDataConfigurationT,
-        project: PEP621Resolved,
-        cppython: CPPythonDataResolved,
+        group_data: PluginGroupDataT,
+        project: PEP621Data,
+        cppython: CPPythonData,
         generator_data: dict[str, Any],
     ) -> None:
-        self._configuration = configuration
+        self._group_data = group_data
         self._project = project
         self._cppython = cppython
         self._generator_data = generator_data
 
     @property
-    def configuration(self) -> PluginDataConfigurationT:
-        """Returns the GeneratorConfiguration object set at initialization"""
-        return self._configuration
+    def group_data(self) -> PluginGroupDataT:
+        """Returns the PluginGroupData object set at initialization"""
+        return self._group_data
 
     @property
-    def project(self) -> PEP621Resolved:
-        """Returns the PEP621Resolved object set at initialization"""
+    def project(self) -> PEP621Data:
+        """Returns the PEP621Data object set at initialization"""
         return self._project
 
     @property
-    def cppython(self) -> CPPythonDataResolved:
-        """Returns the CPPythonDataResolved object set at initialization"""
+    def cppython(self) -> CPPythonData:
+        """Returns the CPPythonDataData object set at initialization"""
         return self._cppython
 
     @property
     def generator_data(self) -> dict[str, Any]:
-        """Returns the GeneratorDataResolved object set at initialization"""
+        """Returns the data set at initialization"""
         return self._generator_data
 
 
