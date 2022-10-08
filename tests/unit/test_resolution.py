@@ -3,10 +3,19 @@
 
 from pathlib import Path
 
-from cppython_core.plugin_schema.generator import GeneratorData
-from cppython_core.plugin_schema.provider import ProviderData
-from cppython_core.plugin_schema.vcs import VersionControlData
-from cppython_core.schema import PEP621, CPPythonData, PluginGroupData, ProjectData
+from cppython_core.resolution import (
+    resolve_cppython,
+    resolve_generator,
+    resolve_pep621,
+    resolve_provider,
+    resolve_vcs,
+)
+from cppython_core.schema import (
+    CPPythonGlobalConfiguration,
+    CPPythonLocalConfiguration,
+    PEP621Configuration,
+    ProjectData,
+)
 
 
 class TestSchema:
@@ -24,13 +33,13 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        data = CPPythonData()
-        data.install_path = tmp_path
+        local_config = CPPythonLocalConfiguration(install_path=tmp_path)
+        global_config = CPPythonGlobalConfiguration()
 
-        config = ProjectData(pyproject_file=pyproject, version="0.1.0")
+        project_config = ProjectData(pyproject_file=pyproject, version="0.1.0")
 
         # Function to test
-        resolved = data.resolve(config)
+        resolved = resolve_cppython(local_config, global_config, project_config)
 
         # Test that paths are created successfully
         assert resolved.build_path.exists()
@@ -43,34 +52,45 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
+    def test_cppython_plugin_resolve(self, tmp_path: Path) -> None:
+        """Test the CPPython plugin schema resolve function
+
+        Args:
+            tmp_path: Temporary path with a lifetime of this test function
+        """
+
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""
 
-        data = PEP621(name="pep621-resolve-test", dynamic=["version"])
+        data = PEP621Configuration(name="pep621-resolve-test", dynamic=["version"])
         config = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
-        resolved = data.resolve(config)
+        resolved = resolve_pep621(data, config)
 
         class_variables = vars(resolved)
 
         assert len(class_variables)
         assert not None in class_variables.values()
 
-    @pytest.mark.parametrize(
-        "configuration_type",
-        [
-            ProviderData,
-            GeneratorData,
-            VersionControlData,
-        ],
-    )
-    def test_plugin_configuration(self, configuration_type: type[PluginGroupData]) -> None:
-        """_summary_
+    def test_generator_resolve(self) -> None:
+        """Tests generator resolution"""
 
-        Args:
-            configuration_type: _description_
-        """
+        project_data = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        plugin_config = resolve_generator(project_data)
 
-        config = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
-        plugin_config = configuration_type.create(config)
+        assert plugin_config
+
+    def test_provider_resolve(self) -> None:
+        """Tests provider resolution"""
+
+        project_data = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        plugin_config = resolve_provider(project_data)
+
+        assert plugin_config
+
+    def test_vcs_resolve(self) -> None:
+        """Tests vcs resolution"""
+
+        project_data = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        plugin_config = resolve_vcs(project_data)
 
         assert plugin_config

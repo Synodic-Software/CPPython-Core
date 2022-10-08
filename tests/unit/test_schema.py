@@ -26,16 +26,9 @@ class TestSchema:
     def test_model_construction(self) -> None:
         """Verifies that the base model type has the expected construction behaviors"""
 
-        instance = self.TestModel('aliased-variable'=True)
+        # self.TestModel('aliased-variable'=True)
 
-        instance = self.TestModel(aliased_variable=True)
-
-    def test_model_assignment(self) -> None:
-        """Verifies that the base model type has the expected assignment behaviors"""
-
-        instance = self.TestModel()
-
-        instance.aliased_variable = True
+        assert self.TestModel(aliased_variable=True)
 
     def test_cppython_local(self) -> None:
         """Ensures that the CPPython local config data can be defaulted"""

@@ -194,6 +194,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     install_path: DirectoryPath
     tool_path: DirectoryPath
     build_path: DirectoryPath
+    current_check: bool
 
     @validator("install_path", "tool_path", "build_path")
     @classmethod
@@ -220,6 +221,8 @@ CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 
 class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
     """Global data extracted by the tool"""
+
+    current_check: bool = Field(default=True, alias="current-check", description="Checks for a new CPPython version")
 
 
 class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
