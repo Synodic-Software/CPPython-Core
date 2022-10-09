@@ -2,6 +2,7 @@
 
 from typing import cast
 
+from cppython_core.exceptions import ConfigError
 from cppython_core.plugin_schema.generator import GeneratorData
 from cppython_core.plugin_schema.provider import ProviderData
 from cppython_core.plugin_schema.vcs import VersionControlData
@@ -13,18 +14,34 @@ from cppython_core.schema import (
     DataPluginT,
     PEP621Configuration,
     PEP621Data,
+    ProjectConfiguration,
     ProjectData,
 )
 
 
-def resolve_pep621(pep621_configuration: PEP621Configuration, project_data: ProjectData) -> PEP621Data:
+def resolve_project_configuration(project_configuration: ProjectConfiguration) -> ProjectData:
+    """Creates a resolved type
+
+    Args:
+        project_configuration: Input configuration
+
+    Returns:
+        The resolved data
+    """
+    return ProjectData(pyproject_file=project_configuration.pyproject_file, verbosity=project_configuration.verbosity)
+
+
+def resolve_pep621(
+    pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration
+) -> PEP621Data:
     """Creates a resolved type
 
     Args:
         pep621_configuration: Input PEP621 configuration
-        project_data: The input configuration used to aid the resolve
+        project_configuration: The input configuration used to aid the resolve
 
     Raises:
+        ConfigError: Raised when the tooling did not satisfy the configuration request
         ValueError: Raised if there is a broken schema
 
     Returns:
@@ -33,7 +50,10 @@ def resolve_pep621(pep621_configuration: PEP621Configuration, project_data: Proj
 
     # Update the dynamic version
     if "version" in pep621_configuration.dynamic:
-        modified_version = project_data.version
+        if project_configuration.version is not None:
+            modified_version = project_configuration.version
+        else:
+            raise ConfigError("'version' is dynamic but the interface did not provide a version value")
 
     elif pep621_configuration.version is not None:
         modified_version = pep621_configuration.version

@@ -10,6 +10,7 @@ from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
     resolve_pep621,
+    resolve_project_configuration,
     resolve_provider,
     resolve_vcs,
 )
@@ -17,6 +18,7 @@ from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
     PEP621Configuration,
+    ProjectConfiguration,
     ProjectData,
 )
 
@@ -39,7 +41,7 @@ class TestSchema:
         local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path})
         global_config = CPPythonGlobalConfiguration()
 
-        project_config = ProjectData(pyproject_file=pyproject, version="0.1.0")
+        project_config = ProjectData(pyproject_file=pyproject)
 
         # Function to test
         resolved = resolve_cppython(local_config, global_config, project_config)
@@ -71,7 +73,7 @@ class TestSchema:
         local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path})
         global_config = CPPythonGlobalConfiguration()
 
-        project_config = ProjectData(pyproject_file=pyproject, version="0.1.0")
+        project_config = ProjectData(pyproject_file=pyproject)
 
         resolved = resolve_cppython(local_config, global_config, project_config)
 
@@ -83,7 +85,7 @@ class TestSchema:
         """Test the PEP621 schema resolve function"""
 
         data = PEP621Configuration(name="pep621-resolve-test", dynamic=["version"])
-        config = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         resolved = resolve_pep621(data, config)
 
         class_variables = vars(resolved)
@@ -91,20 +93,26 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
+    def test_project_resolve(self) -> None:
+        """Tests project configuration resolution"""
+
+        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        assert resolve_project_configuration(config)
+
     def test_generator_resolve(self) -> None:
         """Tests generator resolution"""
 
-        project_data = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
         assert resolve_generator(project_data)
 
     def test_provider_resolve(self) -> None:
         """Tests provider resolution"""
 
-        project_data = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
         assert resolve_provider(project_data)
 
     def test_vcs_resolve(self) -> None:
         """Tests vcs resolution"""
 
-        project_data = ProjectData(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
         assert resolve_vcs(project_data)
