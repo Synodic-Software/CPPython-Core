@@ -5,7 +5,6 @@ from typing import cast
 from cppython_core.exceptions import ConfigError
 from cppython_core.plugin_schema.generator import GeneratorData
 from cppython_core.plugin_schema.provider import ProviderData
-from cppython_core.plugin_schema.vcs import VersionControlData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -166,17 +165,4 @@ def resolve_provider(project_data: ProjectData) -> ProviderData:
         The plugin specific configuration
     """
     configuration = ProviderData(root_directory=project_data.pyproject_file.parent)
-    return configuration
-
-
-def resolve_vcs(project_data: ProjectData) -> VersionControlData:
-    """Creates an instance from the given project
-
-    Args:
-        project_data: The input project configuration
-
-    Returns:
-        The plugin specific configuration
-    """
-    configuration = VersionControlData(root_directory=project_data.pyproject_file.parent)
     return configuration

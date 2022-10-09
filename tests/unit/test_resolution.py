@@ -12,7 +12,6 @@ from cppython_core.resolution import (
     resolve_pep621,
     resolve_project_configuration,
     resolve_provider,
-    resolve_vcs,
 )
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
@@ -110,9 +109,3 @@ class TestSchema:
 
         project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
         assert resolve_provider(project_data)
-
-    def test_vcs_resolve(self) -> None:
-        """Tests vcs resolution"""
-
-        project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
-        assert resolve_vcs(project_data)
