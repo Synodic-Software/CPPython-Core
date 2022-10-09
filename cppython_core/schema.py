@@ -38,7 +38,6 @@ class ProjectData(CPPythonModel, extra=Extra.forbid):
     """Resolved data of 'ProjectConfiguration'"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
-    version: str = Field(description="The version number of the project")
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
 
