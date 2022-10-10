@@ -31,6 +31,17 @@ class CPPythonModel(BaseModel):
         allow_mutation = False
 
 
+class CPPythonConfigurationModel(BaseModel):
+    """The model to use for all CPPython configuration models"""
+
+    @dataclass
+    class Config:
+        """Pydantic built-in configuration"""
+
+        # Data aliases should only exist for Configuration types. Constructors will never take aliases by field name
+        allow_population_by_field_name = False
+
+
 ModelT = TypeVar("ModelT", bound=CPPythonModel)
 
 
@@ -41,7 +52,7 @@ class ProjectData(CPPythonModel, extra=Extra.forbid):
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
 
-class ProjectConfiguration(CPPythonModel, extra=Extra.forbid):
+class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
     """Project-wide configuration"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
