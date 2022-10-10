@@ -26,7 +26,7 @@ class TestSchema:
     def test_model_construction(self) -> None:
         """Verifies that the base model type has the expected construction behaviors"""
 
-        model = self.TestModel(aliased_variable=True)
+        model = self.TestModel(**{"aliased_variable": True})
         assert model.aliased_variable is False
 
         model = self.TestModel(**{"aliased-variable": True})
