@@ -293,6 +293,14 @@ class PyProject(CPPythonModel):
     tool: ToolData | None = Field(default=None)
 
 
+class CoreData(CPPythonModel):
+    """Structural"""
+
+    project_data: ProjectData
+    pep621_data: PEP621Data
+    cppython_data: CPPythonData
+
+
 class Plugin(ABC):
     """Abstract plugin type"""
 
@@ -340,13 +348,11 @@ class DataPlugin(Plugin, Generic[PluginGroupDataT]):
     def __init__(
         self,
         group_data: PluginGroupDataT,
-        project: PEP621Data,
-        cppython: CPPythonData,
+        core_data: CoreData,
         generator_data: dict[str, Any],
     ) -> None:
         self._group_data = group_data
-        self._project = project
-        self._cppython = cppython
+        self._core_data = core_data
         self._generator_data = generator_data
 
     @property
@@ -355,14 +361,9 @@ class DataPlugin(Plugin, Generic[PluginGroupDataT]):
         return self._group_data
 
     @property
-    def project(self) -> PEP621Data:
-        """Returns the PEP621Data object set at initialization"""
-        return self._project
-
-    @property
-    def cppython(self) -> CPPythonData:
-        """Returns the CPPythonDataData object set at initialization"""
-        return self._cppython
+    def core_data(self) -> CoreData:
+        """Returns the data object set at initialization"""
+        return self._core_data
 
     @property
     def generator_data(self) -> dict[str, Any]:
