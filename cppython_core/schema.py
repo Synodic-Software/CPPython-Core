@@ -294,11 +294,11 @@ class PyProject(CPPythonModel):
 
 
 class CoreData(CPPythonModel):
-    """Structural"""
+    """Core resolved data that will be passed to data plugins"""
 
     project_data: ProjectData
     pep621_data: PEP621Data
-    cppython_data: CPPythonData
+    cppython_data: CPPythonPluginData
 
 
 class Plugin(ABC):
