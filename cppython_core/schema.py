@@ -291,6 +291,14 @@ class PyProject(CPPythonModel):
 
 
 class CoreData(CPPythonModel):
+    """Core resolved data that will be resolved"""
+
+    project_data: ProjectData
+    pep621_data: PEP621Data
+    cppython_data: CPPythonData
+
+
+class CorePluginData(CPPythonModel):
     """Core resolved data that will be passed to data plugins"""
 
     project_data: ProjectData
@@ -345,7 +353,7 @@ class DataPlugin(Plugin, Generic[PluginGroupDataT]):
     def __init__(
         self,
         group_data: PluginGroupDataT,
-        core_data: CoreData,
+        core_data: CorePluginData,
         generator_data: dict[str, Any],
     ) -> None:
         self._group_data = group_data
@@ -358,7 +366,7 @@ class DataPlugin(Plugin, Generic[PluginGroupDataT]):
         return self._group_data
 
     @property
-    def core_data(self) -> CoreData:
+    def core_data(self) -> CorePluginData:
         """Returns the data object set at initialization"""
         return self._core_data
 
