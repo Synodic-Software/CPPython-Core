@@ -252,13 +252,10 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
         default=Path("build"), alias="build-path", description="The local build path for the project"
     )
     provider: dict[str, dict[str, Any]] = Field(
-        default={}, description="Optional list of dynamically generated 'provider' plugin data"
+        default={}, description="List of dynamically generated 'provider' plugin data"
     )
     generator: dict[str, dict[str, Any]] = Field(
-        default={}, description="Optional list of dynamically generated 'generator' plugin data"
-    )
-    vcs: dict[str, dict[str, Any]] = Field(
-        default={}, description="Optional list of dynamically generated 'vcs' plugin data"
+        default={}, description="A dynamically generated 'generator' plugin's data"
     )
 
     def extract_plugin_data(self, plugin_type: type[DataPluginT]) -> dict[str, Any]:
