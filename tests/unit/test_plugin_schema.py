@@ -20,7 +20,6 @@ class TestPluginSchema:
         [
             ("test_provider", Provider.group()),
             ("test_generator", Generator.group()),
-            ("test_vcs", VersionControl.group()),
         ],
     )
     def test_extract_plugin_data(self, mocker: MockerFixture, name: str, group: str) -> None:
