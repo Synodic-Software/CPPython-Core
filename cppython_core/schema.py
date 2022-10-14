@@ -341,7 +341,7 @@ PluginT = TypeVar("PluginT", bound=Plugin)
 
 
 class PluginGroupData(CPPythonModel, ABC, extra=Extra.forbid):
-    """_summary_"""
+    """Group data"""
 
 
 PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
@@ -350,15 +350,9 @@ PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
 class DataPlugin(Plugin, Generic[PluginGroupDataT]):
     """Abstract plugin type for internal CPPython data"""
 
-    def __init__(
-        self,
-        group_data: PluginGroupDataT,
-        core_data: CorePluginData,
-        generator_data: dict[str, Any],
-    ) -> None:
+    def __init__(self, group_data: PluginGroupDataT, core_data: CorePluginData) -> None:
         self._group_data = group_data
         self._core_data = core_data
-        self._generator_data = generator_data
 
     @property
     def group_data(self) -> PluginGroupDataT:
@@ -370,10 +364,13 @@ class DataPlugin(Plugin, Generic[PluginGroupDataT]):
         """Returns the data object set at initialization"""
         return self._core_data
 
-    @property
-    def generator_data(self) -> dict[str, Any]:
-        """Returns the data set at initialization"""
-        return self._generator_data
+    def activate(self, data: dict[str, Any]) -> None:
+        """Called when the plugin configuration data is available after initialization
+
+        Args:
+            data: Input configuration data the plugin needs to parse
+        """
+        raise NotImplementedError()
 
 
 DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
