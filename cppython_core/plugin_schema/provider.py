@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from pathlib import Path
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
@@ -59,6 +59,30 @@ class Provider(DataPlugin[ProviderData]):
             NotImplementedError: Must be sub-classed
         """
 
+        raise NotImplementedError()
+
+    @abstractmethod
+    def supports_generator(self, name: str) -> bool:
+        """Queries generator support of the provider
+
+        Args:
+            name: ID token describing the generator
+
+        Returns:
+            True if the generator is supported by the provider
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def gather_input(self, name: str) -> Any:
+        """Requests generator information
+
+        Args:
+            name: ID token describing the generator
+
+        Returns:
+            Input only recognizable to the generator
+        """
         raise NotImplementedError()
 
     @abstractmethod

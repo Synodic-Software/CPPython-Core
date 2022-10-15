@@ -1,7 +1,8 @@
 """Generator data plugin definitions"""
 from __future__ import annotations
 
-from typing import TypeVar
+from abc import abstractmethod
+from typing import Any, TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
@@ -26,6 +27,14 @@ class Generator(DataPlugin[GeneratorData]):
             The group name
         """
         return "generator"
+
+    @abstractmethod
+    def sync(self, results: list[Any]) -> None:
+        """Synchronizes generator files and state with the generators input
+
+        Args:
+            results: List of information gathered from providers
+        """
 
 
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
