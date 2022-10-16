@@ -95,6 +95,15 @@ class TestSchema:
         with pytest.raises(ValueError):
             PEP508("this is not conforming")
 
+        class NestedModel(CPPythonModel):
+            """Tests that PEP508 can be referenced as its own type"""
+
+            requirement: PEP508
+
+        model = NestedModel(requirement=requirement)
+
+        assert model.requirement.name == "requests"
+
     def test_pep621_version(self) -> None:
         """Tests the dynamic version validation"""
 
