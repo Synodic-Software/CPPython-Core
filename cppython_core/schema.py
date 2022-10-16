@@ -157,11 +157,11 @@ class PEP508(Requirement):
         Yields:
             A new validator Callable
         """
-        yield cls.validate_requirement
-        yield cls.validate_cppython
+        yield cls.validate_type
+        yield cls.validate_construction
 
     @classmethod
-    def validate_requirement(cls, value: "PEP508") -> PEP508:
+    def validate_type(cls, value: "PEP508") -> PEP508:
         """Enforce type that this class can be cast to a Requirement
         TODO - Use the Self type python 3.11
 
@@ -170,32 +170,34 @@ class PEP508(Requirement):
 
         Raises:
             TypeError: Raised if the input value is not the right type
-            ValueError: Raised if a PEP508 requirement can't be parsed
 
         Returns:
             The validated input value
         """
-        if not isinstance(value, str):
-            raise TypeError("string required")
-
-        try:
-            Requirement(value)
-        except InvalidRequirement as invalid:
-            raise ValueError from invalid
+        if not isinstance(value, str) and not isinstance(value, PEP508):
+            raise TypeError("'str' or 'PEP508' type required")
 
         return value
 
     @classmethod
-    def validate_cppython(cls, value: "PEP508") -> PEP508:
-        """TODO: Use for something
+    def validate_construction(cls, value: "PEP508") -> PEP508:
+        """Enforce type that this class can be cast to a Requirement
         TODO - Use the Self type python 3.11
 
         Args:
             value: The input value to validate
 
+        Raises:
+            ValueError: Raised if a PEP508 requirement can't be parsed
+
         Returns:
             The validated input value
         """
+        if isinstance(value, str):
+            try:
+                Requirement(value)
+            except InvalidRequirement as invalid:
+                raise ValueError from invalid
 
         return value
 
