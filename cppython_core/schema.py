@@ -195,7 +195,7 @@ class PEP508(Requirement):
         """
         if isinstance(value, str):
             try:
-                Requirement(value)
+                value = PEP508(value)
             except InvalidRequirement as invalid:
                 raise ValueError from invalid
 
