@@ -104,6 +104,18 @@ class TestSchema:
 
         assert model.requirement.name == "requests"
 
+    def test_508_extraction(self) -> None:
+        """_summary_"""
+
+        data = """
+        dependencies = ["requests"]
+        """
+
+        document = parse(data).value
+        cppython_configuration = CPPythonLocalConfiguration(**document)
+
+        assert cppython_configuration.dependencies[0].name == "requests"
+
     def test_pep621_version(self) -> None:
         """Tests the dynamic version validation"""
 
