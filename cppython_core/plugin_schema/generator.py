@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData
+from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
 
 
 class GeneratorData(PluginGroupData):
@@ -29,7 +29,7 @@ class Generator(DataPlugin[GeneratorData]):
         return "generator"
 
     @abstractmethod
-    def sync(self, results: list[Any]) -> None:
+    def sync(self, results: list[SyncData]) -> None:
         """Synchronizes generator files and state with the generators input
 
         Args:
