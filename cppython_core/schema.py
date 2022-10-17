@@ -308,6 +308,13 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
+class SyncData(CPPythonModel):
+    """Data that passes in a plugin sync"""
+
+    name: str
+    data: Any
+
+
 class Plugin(ABC):
     """Abstract plugin type"""
 

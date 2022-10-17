@@ -3,12 +3,12 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData
+from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
 
 
 class ProviderData(PluginGroupData):
@@ -74,7 +74,7 @@ class Provider(DataPlugin[ProviderData]):
         raise NotImplementedError()
 
     @abstractmethod
-    def gather_input(self, name: str) -> Any:
+    def sync_data(self, name: str) -> SyncData:
         """Requests generator information
 
         Args:
