@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from pathlib import Path
 from typing import TypeVar
 
 from pydantic import Field
@@ -27,6 +28,19 @@ class Generator(DataPlugin[GeneratorData]):
             The group name
         """
         return "generator"
+
+    @staticmethod
+    @abstractmethod
+    def is_supported(path: Path) -> bool:
+        """Queries if the path can support this generator
+
+        Args:
+            path: The input directory to query
+
+        Returns:
+            Whether the given path is a compatible with the generator
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def sync(self, results: list[SyncData]) -> None:
