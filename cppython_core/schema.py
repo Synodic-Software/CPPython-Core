@@ -1,8 +1,6 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -10,7 +8,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any
 from typing import Generator as TypingGenerator
-from typing import Generic, NewType, TypeVar
+from typing import Generic, NewType, Self, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -161,9 +159,8 @@ class PEP508(Requirement):
         yield cls.validate_construction
 
     @classmethod
-    def validate_type(cls, value: "PEP508") -> PEP508:
+    def validate_type(cls, value: Self) -> Self:
         """Enforce type that this class can be cast to a Requirement
-        TODO - Use the Self type python 3.11
 
         Args:
             value: The input value to validate
@@ -180,9 +177,8 @@ class PEP508(Requirement):
         return value
 
     @classmethod
-    def validate_construction(cls, value: "PEP508") -> PEP508:
+    def validate_construction(cls, value: Self) -> Self:
         """Enforce type that this class can be cast to a Requirement
-        TODO - Use the Self type python 3.11
 
         Args:
             value: The input value to validate
@@ -232,6 +228,91 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 
 
 CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
+
+
+class SyncData(CPPythonModel):
+    """Data that passes in a plugin sync"""
+
+    name: str
+    data: Any
+
+
+class Plugin(ABC):
+    """Abstract plugin type"""
+
+    _logger: Logger
+
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        """The name of the plugin"""
+        raise NotImplementedError()
+
+    @staticmethod
+    @abstractmethod
+    def group() -> str:
+        """The plugin group name"""
+        raise NotImplementedError()
+
+    @classmethod
+    def logger(cls) -> Logger:
+        """Returns the plugin specific sub-logger
+
+        Returns:
+            The plugin's named logger
+        """
+
+        if not hasattr(cls, "_logger"):
+            cls._logger = getLogger(f"cppython.{cls.group()}.{cls.name()}")
+
+        return cls._logger
+
+
+PluginT = TypeVar("PluginT", bound=Plugin)
+
+
+class PluginGroupData(CPPythonModel, ABC, extra=Extra.forbid):
+    """Group data"""
+
+
+PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
+
+
+class CorePluginData(CPPythonModel):
+    """Core resolved data that will be passed to data plugins"""
+
+    project_data: ProjectData
+    pep621_data: PEP621Data
+    cppython_data: CPPythonPluginData
+
+
+class DataPlugin(Plugin, Generic[PluginGroupDataT]):
+    """Abstract plugin type for internal CPPython data"""
+
+    def __init__(self, group_data: PluginGroupDataT, core_data: CorePluginData) -> None:
+        self._group_data = group_data
+        self._core_data = core_data
+
+    @property
+    def group_data(self) -> PluginGroupDataT:
+        """Returns the PluginGroupData object set at initialization"""
+        return self._group_data
+
+    @property
+    def core_data(self) -> CorePluginData:
+        """Returns the data object set at initialization"""
+        return self._core_data
+
+    def activate(self, data: dict[str, Any]) -> None:
+        """Called when the plugin configuration data is available after initialization
+
+        Args:
+            data: Input configuration data the plugin needs to parse
+        """
+        raise NotImplementedError()
+
+
+DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
 
 
 class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
@@ -298,88 +379,3 @@ class CoreData(CPPythonModel):
     project_data: ProjectData
     pep621_data: PEP621Data
     cppython_data: CPPythonData
-
-
-class CorePluginData(CPPythonModel):
-    """Core resolved data that will be passed to data plugins"""
-
-    project_data: ProjectData
-    pep621_data: PEP621Data
-    cppython_data: CPPythonPluginData
-
-
-class SyncData(CPPythonModel):
-    """Data that passes in a plugin sync"""
-
-    name: str
-    data: Any
-
-
-class Plugin(ABC):
-    """Abstract plugin type"""
-
-    _logger: Logger
-
-    @staticmethod
-    @abstractmethod
-    def name() -> str:
-        """The name of the plugin"""
-        raise NotImplementedError()
-
-    @staticmethod
-    @abstractmethod
-    def group() -> str:
-        """The plugin group name"""
-        raise NotImplementedError()
-
-    @classmethod
-    def logger(cls) -> Logger:
-        """Returns the plugin specific sub-logger
-
-        Returns:
-            The plugin's named logger
-        """
-
-        if not hasattr(cls, "_logger"):
-            cls._logger = getLogger(f"cppython.{cls.group()}.{cls.name()}")
-
-        return cls._logger
-
-
-PluginT = TypeVar("PluginT", bound=Plugin)
-
-
-class PluginGroupData(CPPythonModel, ABC, extra=Extra.forbid):
-    """Group data"""
-
-
-PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
-
-
-class DataPlugin(Plugin, Generic[PluginGroupDataT]):
-    """Abstract plugin type for internal CPPython data"""
-
-    def __init__(self, group_data: PluginGroupDataT, core_data: CorePluginData) -> None:
-        self._group_data = group_data
-        self._core_data = core_data
-
-    @property
-    def group_data(self) -> PluginGroupDataT:
-        """Returns the PluginGroupData object set at initialization"""
-        return self._group_data
-
-    @property
-    def core_data(self) -> CorePluginData:
-        """Returns the data object set at initialization"""
-        return self._core_data
-
-    def activate(self, data: dict[str, Any]) -> None:
-        """Called when the plugin configuration data is available after initialization
-
-        Args:
-            data: Input configuration data the plugin needs to parse
-        """
-        raise NotImplementedError()
-
-
-DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
