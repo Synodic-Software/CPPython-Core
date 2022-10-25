@@ -68,7 +68,6 @@ def resolve_pep621(
 
 def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPluginT]) -> CPPythonPluginData:
     """Resolve project configuration for plugins
-    TODO: Replace return type with Self
 
     Args:
         cppython_data: The CPPython data
