@@ -30,23 +30,6 @@ class Provider(DataPlugin[ProviderData]):
 
     @classmethod
     @abstractmethod
-    def tooling_downloaded(cls, path: Path) -> bool:
-        """Returns whether the provider tooling needs to be downloaded
-
-        Args:
-            path: The directory to check for downloaded tooling
-
-        Raises:
-            NotImplementedError: Must be sub-classed
-
-        Returns:
-            Whether the tooling has been downloaded or not
-        """
-
-        raise NotImplementedError()
-
-    @classmethod
-    @abstractmethod
     async def download_tooling(cls, path: Path) -> None:
         """Installs the external tooling required by the provider
 
