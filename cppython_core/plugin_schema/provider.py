@@ -43,23 +43,14 @@ class Provider(DataPlugin[ProviderData]):
         raise NotImplementedError()
 
     @abstractmethod
-    def supports_generator(self, name: str) -> bool:
-        """Queries generator support of the provider
-
-        Args:
-            name: ID token describing the generator
-
-        Returns:
-            True if the generator is supported by the provider
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def sync_data(self, name: str) -> SyncData:
+    def sync_data(self, generator_name: str) -> SyncData:
         """Requests generator information
 
         Args:
-            name: ID token describing the generator
+            generator_name: ID token describing the generator
+
+        Raises:
+            NotSupportedError: Thrown if the given generator name is not supported
 
         Returns:
             Input only recognizable to the generator
