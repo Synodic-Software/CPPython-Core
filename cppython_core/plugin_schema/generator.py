@@ -1,7 +1,7 @@
 """Generator data plugin definitions"""
 from abc import abstractmethod
 from pathlib import Path
-from typing import TypeVar
+from typing import LiteralString, TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
@@ -19,7 +19,7 @@ class Generator(DataPlugin[GeneratorData]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
     @staticmethod
-    def group() -> str:
+    def group() -> LiteralString:
         """The plugin group name as used by 'setuptools'summary
 
         Returns:

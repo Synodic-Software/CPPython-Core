@@ -1,7 +1,7 @@
 """Version control data plugin definitions"""
 from abc import abstractmethod
 from pathlib import Path
-from typing import TypeVar
+from typing import LiteralString, TypeVar
 
 from cppython_core.schema import Plugin
 
@@ -34,7 +34,7 @@ class VersionControl(Plugin):
         raise NotImplementedError()
 
     @staticmethod
-    def group() -> str:
+    def group() -> LiteralString:
         """The plugin group name as used by 'setuptools'summary
 
         Returns:

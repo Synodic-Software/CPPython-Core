@@ -8,7 +8,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any
 from typing import Generator as TypingGenerator
-from typing import Generic, NewType, Self, TypeVar
+from typing import Generic, LiteralString, NewType, Self, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -250,7 +250,7 @@ class Plugin(ABC):
 
     @staticmethod
     @abstractmethod
-    def group() -> str:
+    def group() -> LiteralString:
         """The plugin group name"""
         raise NotImplementedError()
 
