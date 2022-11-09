@@ -1,6 +1,6 @@
 """Data conversion routines"""
 
-from typing import cast
+from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
 from cppython_core.plugin_schema.generator import GeneratorData
@@ -10,7 +10,7 @@ from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
     CPPythonPluginData,
-    DataPluginT,
+    DataPlugin,
     PEP621Configuration,
     PEP621Data,
     ProjectConfiguration,
@@ -66,19 +66,19 @@ def resolve_pep621(
     return pep621_data
 
 
-def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPluginT]) -> CPPythonPluginData:
+def resolve_cppython_plugin(cppython_data: CPPythonData, plugin: DataPlugin[Any]) -> CPPythonPluginData:
     """Resolve project configuration for plugins
 
     Args:
         cppython_data: The CPPython data
-        plugin_type: The type of the plugin
+        plugin: The plugin
 
     Returns:
         The resolved type with provider specific modifications
     """
 
     # Add provider specific paths to the base path
-    modified_install_path = cppython_data.install_path / plugin_type.name()
+    modified_install_path = cppython_data.install_path / plugin.name
     modified_install_path.mkdir(parents=True, exist_ok=True)
 
     plugin_data = CPPythonData(

@@ -1,14 +1,16 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from collections.abc import Callable
 from dataclasses import dataclass
+from functools import cached_property
+from importlib.metadata import EntryPoint
 from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any
 from typing import Generator as TypingGenerator
-from typing import Generic, LiteralString, NewType, Self, TypeVar
+from typing import Generic, NewType, Self, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -240,32 +242,35 @@ class SyncData(CPPythonModel):
 class Plugin(ABC):
     """Abstract plugin type"""
 
-    _logger: Logger
+    def __init__(self, entry: EntryPoint) -> None:
+        """_summary_
 
-    @staticmethod
-    @abstractmethod
-    def name() -> str:
-        """The name of the plugin"""
-        raise NotImplementedError()
+        Args:
+            entry: _description_
+        """
 
-    @staticmethod
-    @abstractmethod
-    def group() -> LiteralString:
-        """The plugin group name"""
-        raise NotImplementedError()
+        self.name = entry.name
+        self.value = entry.value
+        self.group = entry.group
 
-    @classmethod
-    def logger(cls) -> Logger:
+    @property
+    def full_name(self) -> str:
+        """Concatenates group and name values
+
+        Returns:
+            Concatenated name
+        """
+        return f"{self.group}.{self.name}"
+
+    @cached_property
+    def logger(self) -> Logger:
         """Returns the plugin specific sub-logger
 
         Returns:
             The plugin's named logger
         """
 
-        if not hasattr(cls, "_logger"):
-            cls._logger = getLogger(f"cppython.{cls.group()}.{cls.name()}")
-
-        return cls._logger
+        return getLogger(self.full_name)
 
 
 PluginT = TypeVar("PluginT", bound=Plugin)
@@ -289,9 +294,11 @@ class CorePluginData(CPPythonModel):
 class DataPlugin(Plugin, Generic[PluginGroupDataT]):
     """Abstract plugin type for internal CPPython data"""
 
-    def __init__(self, group_data: PluginGroupDataT, core_data: CorePluginData) -> None:
+    def __init__(self, entry: EntryPoint, group_data: PluginGroupDataT, core_data: CorePluginData) -> None:
         self._group_data = group_data
         self._core_data = core_data
+
+        super().__init__(entry)
 
     @property
     def group_data(self) -> PluginGroupDataT:
@@ -341,11 +348,11 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
         default={}, description="A dynamically generated 'generator' plugin's data"
     )
 
-    def extract_plugin_data(self, plugin_type: type[DataPluginT]) -> dict[str, Any]:
+    def extract_plugin_data(self, plugin: DataPlugin[Any]) -> dict[str, Any]:
         """Extracts a plugin data type from the CPPython table
 
         Args:
-            plugin_type: The plugin type
+            plugin: The plugin
 
         Raises:
             KeyError: If there is no plugin data with the given name
@@ -354,8 +361,8 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
             The plugin data
         """
 
-        attribute = getattr(self, plugin_type.group())
-        data: dict[str, Any] = attribute[plugin_type.name()]
+        attribute = getattr(self, plugin.group)
+        data: dict[str, Any] = attribute[plugin.name]
 
         return data
 

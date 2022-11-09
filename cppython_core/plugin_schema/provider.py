@@ -1,7 +1,7 @@
 """Provider data plugin definitions"""
 from abc import abstractmethod
 from pathlib import Path
-from typing import LiteralString, TypeVar
+from typing import TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
@@ -17,16 +17,6 @@ class ProviderData(PluginGroupData):
 
 class Provider(DataPlugin[ProviderData]):
     """Abstract type to be inherited by CPPython Provider plugins"""
-
-    @staticmethod
-    def group() -> LiteralString:
-        """The plugin group name as used by 'setuptools'
-
-        Returns:
-            The group name
-        """
-
-        return "provider"
 
     @classmethod
     @abstractmethod

@@ -1,25 +1,20 @@
 """Tests the plugin schema"""
 
+from importlib.metadata import EntryPoint
 import pytest
-from packaging.utils import canonicalize_name
 from pytest_mock import MockerFixture
 
-from cppython_core.plugin_schema.generator import Generator
-from cppython_core.plugin_schema.provider import Provider
-from cppython_core.plugin_schema.vcs import VersionControl
-from cppython_core.schema import CPPythonLocalConfiguration, Plugin
+from cppython_core.schema import CPPythonLocalConfiguration, DataPlugin, PluginGroupData
 
 
-class TestPluginSchema:
+class TestDataPluginSchema:
     """Test validation"""
-
-    plugin_types = [Provider, Generator, VersionControl]
 
     @pytest.mark.parametrize(
         "name, group",
         [
-            ("test_provider", Provider.group()),
-            ("test_generator", Generator.group()),
+            ("test_provider", "provider"),
+            ("test_generator", "generator"),
         ],
     )
     def test_extract_plugin_data(self, mocker: MockerFixture, name: str, group: str) -> None:
@@ -37,23 +32,29 @@ class TestPluginSchema:
         plugin_attribute[name] = {"heck": "yeah"}
 
         with mocker.MagicMock() as mock:
-            mock.name.return_value = name
-            mock.group.return_value = group
+            mock.name = name
+            mock.group = group
 
             extracted_data = data.extract_plugin_data(mock)
 
         plugin_attribute = getattr(data, group)
         assert plugin_attribute[name] == extracted_data
 
-    @pytest.mark.parametrize(
-        "plugin_type",
-        plugin_types,
-    )
-    def test_group(self, plugin_type: Plugin) -> None:
-        """Validates the group name
+    def test_construction(self, mocker: MockerFixture) -> None:
+        """Tests DataPlugin construction
 
         Args:
-            plugin_type: The input plugin type
+            mocker: Mocking fixture
         """
 
-        assert plugin_type.group() == canonicalize_name(plugin_type.group())
+        class DataPluginImplementationData(PluginGroupData):
+            """Currently Empty"""
+
+        class DataPluginImplementation(DataPlugin[DataPluginImplementationData]):
+            """Currently Empty"""
+
+        entry = EntryPoint(name="test", value="value", group="cppython.group")
+
+        with mocker.MagicMock() as mock:
+            plugin = DataPluginImplementation(entry, DataPluginImplementationData(), mock)
+            assert plugin
