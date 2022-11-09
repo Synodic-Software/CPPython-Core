@@ -19,15 +19,6 @@ class Generator(DataPlugin[GeneratorData]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
     @staticmethod
-    def group() -> str:
-        """The plugin group name as used by 'setuptools'summary
-
-        Returns:
-            The group name
-        """
-        return "generator"
-
-    @staticmethod
     @abstractmethod
     def is_supported(path: Path) -> bool:
         """Queries if the path can support this generator

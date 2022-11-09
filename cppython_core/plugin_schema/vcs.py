@@ -33,14 +33,5 @@ class VersionControl(Plugin):
         """
         raise NotImplementedError()
 
-    @staticmethod
-    def group() -> str:
-        """The plugin group name as used by 'setuptools'summary
-
-        Returns:
-            The group name
-        """
-        return "vcs"
-
 
 VersionControlT = TypeVar("VersionControlT", bound=VersionControl)

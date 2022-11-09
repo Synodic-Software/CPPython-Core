@@ -2,6 +2,7 @@
 """
 
 import logging
+from importlib.metadata import EntryPoint
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
@@ -36,25 +37,9 @@ class TestUtility:
         class MockPlugin(Plugin):
             """A dummy plugin to verify logging metadata"""
 
-            @staticmethod
-            def name() -> str:
-                """Static name to compare in this test
-
-                Returns:
-                    Name of the plugin
-                """
-                return "mock"
-
-            @staticmethod
-            def group() -> str:
-                """Static group to compare in this test
-
-                Returns:
-                    Name of the group
-                """
-                return "group"
-
-        logger = MockPlugin.logger()
+        entry = EntryPoint(name="mock", value="value", group="cppython.group")
+        plugin = MockPlugin(entry)
+        logger = plugin.logger
 
         with caplog.at_level(logging.INFO):
             logger.info("test")

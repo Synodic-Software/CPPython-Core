@@ -18,16 +18,6 @@ class ProviderData(PluginGroupData):
 class Provider(DataPlugin[ProviderData]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
-    @staticmethod
-    def group() -> str:
-        """The plugin group name as used by 'setuptools'
-
-        Returns:
-            The group name
-        """
-
-        return "provider"
-
     @classmethod
     @abstractmethod
     async def download_tooling(cls, path: Path) -> None:

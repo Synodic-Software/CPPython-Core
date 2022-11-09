@@ -18,7 +18,7 @@ from cppython_core.schema import (
 class TestSchema:
     """Test validation"""
 
-    class TestModel(CPPythonModel):
+    class Model(CPPythonModel):
         """Testing Model"""
 
         aliased_variable: bool = Field(default=False, alias="aliased-variable", description="Alias test")
@@ -26,10 +26,10 @@ class TestSchema:
     def test_model_construction(self) -> None:
         """Verifies that the base model type has the expected construction behaviors"""
 
-        model = self.TestModel(**{"aliased_variable": True})
+        model = self.Model(**{"aliased_variable": True})
         assert model.aliased_variable is False
 
-        model = self.TestModel(**{"aliased-variable": True})
+        model = self.Model(**{"aliased-variable": True})
         assert model.aliased_variable is True
 
     def test_model_construction_from_data(self) -> None:
@@ -40,7 +40,7 @@ class TestSchema:
         aliased-variable = true
         """
 
-        result = self.TestModel.parse_obj(parse(data).value)
+        result = self.Model.parse_obj(parse(data).value)
         assert result.aliased_variable is True
 
     def test_cppython_local(self) -> None:
