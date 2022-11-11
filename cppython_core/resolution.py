@@ -3,8 +3,8 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import GeneratorData
-from cppython_core.plugin_schema.provider import ProviderData
+from cppython_core.plugin_schema.generator import Generator, GeneratorData
+from cppython_core.plugin_schema.provider import Provider, ProviderData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -87,6 +87,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin: DataPlugin[Any]
         build_path=cppython_data.build_path,
         dependencies=cppython_data.dependencies,
         current_check=cppython_data.current_check,
+        generator_name=cppython_data.generator_name,
     )
 
     return cast(CPPythonPluginData, plugin_data)
@@ -103,6 +104,9 @@ def resolve_cppython(
         local_configuration: Local project configuration
         global_configuration: Shared project configuration
         project_data: Project information to aid in the resolution
+
+    Raises:
+        ConfigError: Raised when the tooling did not satisfy the configuration request
 
     Returns:
         An instance of the resolved type
@@ -131,12 +135,16 @@ def resolve_cppython(
     modified_tool_path.mkdir(parents=True, exist_ok=True)
     modified_build_path.mkdir(parents=True, exist_ok=True)
 
+    if local_configuration.generator_name is None:
+        raise ConfigError("CPPython did not fill the 'generator_name' value")
+
     cppython_data = CPPythonData(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
         build_path=modified_build_path,
         dependencies=local_configuration.dependencies,
         current_check=global_configuration.current_check,
+        generator_name=local_configuration.generator_name,
     )
     return cppython_data
 
@@ -154,14 +162,57 @@ def resolve_generator(project_data: ProjectData) -> GeneratorData:
     return configuration
 
 
-def resolve_provider(project_data: ProjectData) -> ProviderData:
+def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderData:
     """Creates an instance from the given project
 
     Args:
         project_data: The input project configuration
+        cppython_data: TODO
 
     Returns:
         The plugin specific configuration
     """
-    configuration = ProviderData(root_directory=project_data.pyproject_file.parent)
+    configuration = ProviderData(
+        root_directory=project_data.pyproject_file.parent, generator=cppython_data.generator_name
+    )
     return configuration
+
+
+def extract_provider_data(cppython_local_configuration: CPPythonLocalConfiguration, plugin: Provider) -> dict[str, Any]:
+    """Extracts a plugin data type from the CPPython table
+
+    Args:
+        cppython_local_configuration: Configuration data
+        plugin: The plugin
+
+    Raises:
+        KeyError: If there is no plugin data with the given name
+
+    Returns:
+        The plugin data
+    """
+
+    data: dict[str, Any] = cppython_local_configuration.provider[plugin.name]
+
+    return data
+
+
+def extract_generator_data(
+    cppython_local_configuration: CPPythonLocalConfiguration, plugin: Generator[Any]
+) -> dict[str, Any]:
+    """Extracts a plugin data type from the CPPython table
+
+    Args:
+        cppython_local_configuration: Configuration data
+        plugin: The plugin
+
+    Raises:
+        KeyError: If there is no plugin data with the given name
+
+    Returns:
+        The plugin data
+    """
+
+    data: dict[str, Any] = cppython_local_configuration.generator[plugin.name]
+
+    return data

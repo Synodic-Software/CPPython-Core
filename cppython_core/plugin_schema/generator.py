@@ -1,12 +1,11 @@
 """Generator data plugin definitions"""
 from abc import abstractmethod
-from pathlib import Path
-from typing import TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
+from cppython_core.schema import DataPlugin, PluginGroupData, SyncDataT
 
 
 class GeneratorData(PluginGroupData):
@@ -15,29 +14,30 @@ class GeneratorData(PluginGroupData):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-class Generator(DataPlugin[GeneratorData]):
+class Generator(DataPlugin[GeneratorData], Generic[SyncDataT]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
     @staticmethod
     @abstractmethod
-    def is_supported(path: Path) -> bool:
-        """Queries if the path can support this generator
+    def sync_data_type() -> SyncDataT:
+        """_summary_
 
-        Args:
-            path: The input directory to query
+        Raises:
+            NotImplementedError: _description_
 
         Returns:
-            Whether the given path is a compatible with the generator
+            _description_
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def sync(self, results: list[SyncData]) -> None:
-        """Synchronizes generator files and state with the generators input
+    def sync(self, sync_data: list[SyncDataT]) -> None:
+        """Synchronizes generator files and state with the providers input
 
         Args:
-            results: List of information gathered from providers
+            sync_data: List of information gathered from providers
         """
+        raise NotImplementedError()
 
 
-GeneratorT = TypeVar("GeneratorT", bound=Generator)
+GeneratorT = TypeVar("GeneratorT", bound=Generator[Any])

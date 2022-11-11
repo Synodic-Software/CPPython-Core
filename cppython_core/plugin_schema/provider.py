@@ -6,13 +6,14 @@ from typing import TypeVar
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
+from cppython_core.schema import DataPlugin, PluginGroupData, SyncDataT
 
 
 class ProviderData(PluginGroupData):
     """Base class for the configuration data that is set by the project for the provider"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
+    generator: str
 
 
 class Provider(DataPlugin[ProviderData]):
@@ -33,17 +34,15 @@ class Provider(DataPlugin[ProviderData]):
         raise NotImplementedError()
 
     @abstractmethod
-    def sync_data(self, generator_name: str) -> SyncData:
-        """Requests generator information
+    def sync_data(self, generator_sync_data_type: type[SyncDataT]) -> SyncDataT:
+        """Requests generator information from the provider. The generator is either defined by a provider specific file
+        or the CPPython configuration table
 
         Args:
-            generator_name: ID token describing the generator
-
-        Raises:
-            NotSupportedError: Thrown if the given generator name is not supported
+            generator_sync_data_type: The SyncData subclass to identify the generator to the provider
 
         Returns:
-            Input only recognizable to the generator
+            An instantiated data type
         """
         raise NotImplementedError()
 
