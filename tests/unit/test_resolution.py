@@ -37,7 +37,7 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path})
+        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path, "generator-name": "test_generator"})
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)
@@ -69,7 +69,7 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path})
+        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path, "generator-name": "test_generator"})
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)
@@ -104,8 +104,27 @@ class TestSchema:
         project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
         assert resolve_generator(project_data)
 
-    def test_provider_resolve(self) -> None:
-        """Tests provider resolution"""
+    def test_provider_resolve(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Tests provider resolution
+
+        Args:
+            tmp_path: _description_
+        """
+
+        # Create a working configuration
+        pyproject = tmp_path / "pyproject.toml"
+        pyproject.write_text("")
+
+        # Data definition
+        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path, "generator-name": "test_generator"})
+        global_config = CPPythonGlobalConfiguration()
+
+        project_config = ProjectData(pyproject_file=pyproject)
+
+        resolved = resolve_cppython(local_config, global_config, project_config)
 
         project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
-        assert resolve_provider(project_data)
+        assert resolve_provider(project_data, resolved)

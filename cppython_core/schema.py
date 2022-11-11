@@ -208,6 +208,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: DirectoryPath
     build_path: DirectoryPath
     current_check: bool
+    generator_name: str
 
     @validator("install_path", "tool_path", "build_path")
     @classmethod
@@ -232,11 +233,13 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 
 
-class SyncData(CPPythonModel):
+class SyncData(CPPythonModel, ABC):
     """Data that passes in a plugin sync"""
 
     name: str
-    data: Any
+
+
+SyncDataT = TypeVar("SyncDataT", bound=SyncData)
 
 
 class Plugin(ABC):
@@ -344,27 +347,10 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     provider: dict[str, dict[str, Any]] = Field(
         default={}, description="List of dynamically generated 'provider' plugin data"
     )
-    generator: dict[str, dict[str, Any]] = Field(
-        default={}, description="A dynamically generated 'generator' plugin's data"
+    generator: dict[str, Any] = Field(default={}, description="Generator plugin data associated with 'generator_name'")
+    generator_name: str | None = Field(
+        default=None, alias="generator-name", description="If empty, the generator will be automatically deduced."
     )
-
-    def extract_plugin_data(self, plugin: DataPlugin[Any]) -> dict[str, Any]:
-        """Extracts a plugin data type from the CPPython table
-
-        Args:
-            plugin: The plugin
-
-        Raises:
-            KeyError: If there is no plugin data with the given name
-
-        Returns:
-            The plugin data
-        """
-
-        attribute = getattr(self, plugin.group)
-        data: dict[str, Any] = attribute[plugin.name]
-
-        return data
 
 
 class ToolData(CPPythonModel):
