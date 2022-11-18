@@ -9,6 +9,14 @@ from cppython_core.schema import Plugin
 class VersionControl(Plugin):
     """Base class for version control systems"""
 
+    @staticmethod
+    def cppython_group() -> str:
+        """The cppython plugin group name. An EntryPoint sub-group
+        Returns:
+            The group name
+        """
+        return "vcs"
+
     @abstractmethod
     def is_repository(self, path: Path) -> bool:
         """Queries repository status of a path

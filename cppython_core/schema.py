@@ -1,7 +1,7 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
@@ -10,7 +10,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any
 from typing import Generator as TypingGenerator
-from typing import Generic, NewType, Self, TypeVar
+from typing import Generic, LiteralString, NewType, Self, TypeVar
 
 from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
@@ -264,6 +264,12 @@ class Plugin(ABC):
             Concatenated name
         """
         return f"{self.group}.{self.name}"
+
+    @staticmethod
+    @abstractmethod
+    def cppython_group() -> LiteralString:
+        """The cppython plugin group name. An EntryPoint sub-group"""
+        raise NotImplementedError()
 
     @cached_property
     def logger(self) -> Logger:
