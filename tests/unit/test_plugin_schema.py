@@ -1,6 +1,7 @@
 """Tests the plugin schema"""
 
 from importlib.metadata import EntryPoint
+from typing import LiteralString
 
 from pytest_mock import MockerFixture
 
@@ -69,6 +70,15 @@ class TestDataPluginSchema:
 
         class DataPluginImplementation(DataPlugin[DataPluginImplementationData]):
             """Currently Empty"""
+
+            @staticmethod
+            def cppython_group() -> LiteralString:
+                """Mocked function
+
+                Returns:
+                    The group name
+                """
+                return "group"
 
         entry = EntryPoint(name="test", value="value", group="cppython.group")
 

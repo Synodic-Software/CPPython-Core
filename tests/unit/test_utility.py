@@ -6,6 +6,7 @@ from importlib.metadata import EntryPoint
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
+from typing import LiteralString
 
 import pytest
 from pytest import LogCaptureFixture
@@ -36,6 +37,15 @@ class TestUtility:
 
         class MockPlugin(Plugin):
             """A dummy plugin to verify logging metadata"""
+
+            @staticmethod
+            def cppython_group() -> LiteralString:
+                """Mocked function
+
+                Returns:
+                    The group name
+                """
+                return "mock"
 
         entry = EntryPoint(name="mock", value="value", group="cppython.group")
         plugin = MockPlugin(entry)
