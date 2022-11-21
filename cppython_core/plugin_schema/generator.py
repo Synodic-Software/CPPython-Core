@@ -27,7 +27,7 @@ class Generator(DataPlugin[GeneratorData], Generic[SyncDataT]):
 
     @staticmethod
     @abstractmethod
-    def sync_data_type() -> SyncDataT:
+    def sync_data_type() -> type[SyncDataT]:
         """_summary_
 
         Raises:

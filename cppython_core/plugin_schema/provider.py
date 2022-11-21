@@ -42,7 +42,7 @@ class Provider(DataPlugin[ProviderData]):
         raise NotImplementedError()
 
     @abstractmethod
-    def sync_data(self, generator_sync_data_type: type[SyncDataT]) -> SyncDataT:
+    def sync_data(self, generator_sync_data_type: type[SyncDataT]) -> SyncDataT | None:
         """Requests generator information from the provider. The generator is either defined by a provider specific file
         or the CPPython configuration table
 
