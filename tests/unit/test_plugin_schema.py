@@ -3,8 +3,6 @@
 from importlib.metadata import EntryPoint
 from typing import LiteralString
 
-from pytest_mock import MockerFixture
-
 from cppython_core.resolution import extract_generator_data, extract_provider_data
 from cppython_core.schema import CPPythonLocalConfiguration, DataPlugin, PluginGroupData
 
@@ -12,12 +10,8 @@ from cppython_core.schema import CPPythonLocalConfiguration, DataPlugin, PluginG
 class TestDataPluginSchema:
     """Test validation"""
 
-    def test_extract_provider_data(self, mocker: MockerFixture) -> None:
-        """Test data extraction for plugins
-
-        Args:
-            mocker: Mocking fixture
-        """
+    def test_extract_provider_data(self) -> None:
+        """Test data extraction for plugin"""
 
         name = "test_provider"
         group = "provider"
@@ -35,12 +29,8 @@ class TestDataPluginSchema:
         plugin_attribute = getattr(data, group)
         assert plugin_attribute[name] == extracted_data
 
-    def test_extract_generators_data(self, mocker: MockerFixture) -> None:
-        """Test data extraction for plugins
-
-        Args:
-            mocker: Mocking fixture
-        """
+    def test_extract_generators_data(self) -> None:
+        """Test data extraction for plugins"""
 
         name = "test_generator"
         group = "generator"
@@ -58,7 +48,7 @@ class TestDataPluginSchema:
         plugin_attribute = getattr(data, group)
         assert plugin_attribute[name] == extracted_data
 
-    def test_construction(self, mocker: MockerFixture) -> None:
+    def test_construction(self) -> None:
         """Tests DataPlugin construction
 
         Args:

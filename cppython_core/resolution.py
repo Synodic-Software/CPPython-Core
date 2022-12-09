@@ -66,33 +66,6 @@ def resolve_pep621(
     return pep621_data
 
 
-def resolve_cppython_plugin(cppython_data: CPPythonData, plugin: DataPlugin[Any]) -> CPPythonPluginData:
-    """Resolve project configuration for plugins
-
-    Args:
-        cppython_data: The CPPython data
-        plugin: The plugin
-
-    Returns:
-        The resolved type with provider specific modifications
-    """
-
-    # Add provider specific paths to the base path
-    modified_install_path = cppython_data.install_path / plugin.name
-    modified_install_path.mkdir(parents=True, exist_ok=True)
-
-    plugin_data = CPPythonData(
-        install_path=modified_install_path,
-        tool_path=cppython_data.tool_path,
-        build_path=cppython_data.build_path,
-        dependencies=cppython_data.dependencies,
-        current_check=cppython_data.current_check,
-        generator_name=cppython_data.generator_name,
-    )
-
-    return cast(CPPythonPluginData, plugin_data)
-
-
 def resolve_cppython(
     local_configuration: CPPythonLocalConfiguration,
     global_configuration: CPPythonGlobalConfiguration,
@@ -142,11 +115,36 @@ def resolve_cppython(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
         build_path=modified_build_path,
-        dependencies=local_configuration.dependencies,
         current_check=global_configuration.current_check,
         generator_name=local_configuration.generator_name,
     )
     return cppython_data
+
+
+def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPlugin[Any]]) -> CPPythonPluginData:
+    """Resolve project configuration for plugins
+
+    Args:
+        cppython_data: The CPPython data
+        plugin_type: The plugin type
+
+    Returns:
+        The resolved type with plugin specific modifications
+    """
+
+    # Add plugin specific paths to the base path
+    modified_install_path = cppython_data.install_path / plugin_type.name
+    modified_install_path.mkdir(parents=True, exist_ok=True)
+
+    plugin_data = CPPythonData(
+        install_path=modified_install_path,
+        tool_path=cppython_data.tool_path,
+        build_path=cppython_data.build_path,
+        current_check=cppython_data.current_check,
+        generator_name=cppython_data.generator_name,
+    )
+
+    return cast(CPPythonPluginData, plugin_data)
 
 
 def resolve_generator(project_data: ProjectData) -> GeneratorData:

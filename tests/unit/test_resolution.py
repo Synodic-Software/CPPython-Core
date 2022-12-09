@@ -3,8 +3,6 @@
 
 from pathlib import Path
 
-from pytest_mock import MockerFixture
-
 from cppython_core.resolution import (
     resolve_cppython,
     resolve_cppython_plugin,
@@ -56,12 +54,11 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
-    def test_cppython_plugin_resolve(self, tmp_path: Path, mocker: MockerFixture) -> None:
+    def test_cppython_plugin_resolve(self, tmp_path: Path) -> None:
         """Test the CPPython plugin schema resolve function
 
         Args:
             tmp_path: Temporary path with a lifetime of this test function
-            mocker: Mocker fixture
         """
 
         # Create a working configuration
@@ -76,9 +73,9 @@ class TestSchema:
 
         resolved = resolve_cppython(local_config, global_config, project_config)
 
-        with mocker.MagicMock() as plugin_type:
-            plugin_type.name.return_value = "mock"
-            assert resolve_cppython_plugin(resolved, plugin_type)
+        plugin_type
+
+        assert resolve_cppython_plugin(resolved, plugin_type)
 
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""

@@ -2,17 +2,13 @@
 """
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cached_property
 from importlib.metadata import EntryPoint
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any
-from typing import Generator as TypingGenerator
-from typing import Generic, LiteralString, NewType, Self, TypeVar
+from typing import Any, Generic, LiteralString, NewType, TypeVar
 
-from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
 
@@ -147,63 +143,9 @@ def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
 
-class PEP508(Requirement):
-    """PEP 508 conforming string"""
-
-    @classmethod
-    def __get_validators__(cls) -> TypingGenerator[Callable[..., Any], None, None]:
-        """Yields the set of validators defined for this type so pydantic can use them internally
-
-        Yields:
-            A new validator Callable
-        """
-        yield cls.validate_type
-        yield cls.validate_construction
-
-    @classmethod
-    def validate_type(cls, value: Self) -> Self:
-        """Enforce type that this class can be cast to a Requirement
-
-        Args:
-            value: The input value to validate
-
-        Raises:
-            TypeError: Raised if the input value is not the right type
-
-        Returns:
-            The validated input value
-        """
-        if not isinstance(value, str) and not isinstance(value, PEP508):
-            raise TypeError("'str' or 'PEP508' type required")
-
-        return value
-
-    @classmethod
-    def validate_construction(cls, value: Self) -> Self:
-        """Enforce type that this class can be cast to a Requirement
-
-        Args:
-            value: The input value to validate
-
-        Raises:
-            ValueError: Raised if a PEP508 requirement can't be parsed
-
-        Returns:
-            The validated input value
-        """
-        if isinstance(value, str):
-            try:
-                value = PEP508(value)
-            except InvalidRequirement as invalid:
-                raise ValueError from invalid
-
-        return value
-
-
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """Resolved CPPython data with local and global configuration"""
 
-    dependencies: list[PEP508]
     install_path: DirectoryPath
     tool_path: DirectoryPath
     build_path: DirectoryPath
@@ -340,7 +282,6 @@ class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
 class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     """Data required by the tool"""
 
-    dependencies: list[PEP508] = Field(default=[], description="List of PEP508 dependencies")
     install_path: Path = Field(
         default=_default_install_location(), alias="install-path", description="The global install path for the project"
     )
