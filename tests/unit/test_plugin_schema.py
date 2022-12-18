@@ -3,23 +3,20 @@
 from importlib.metadata import EntryPoint
 from typing import LiteralString
 
-from cppython_core.plugin_schema.provider import Provider
 from cppython_core.resolution import extract_generator_data, extract_provider_data
 from cppython_core.schema import CPPythonLocalConfiguration, DataPlugin, PluginGroupData
+from tests.data.mock import MockAbstractPlugin
 
 
 class TestDataPluginSchema:
     """Test validation"""
 
-    class MockPlugin(Provider):
-        """_summary_
+    def test_extract_provider_data(self) -> None:
+        """Test data extraction for plugin
 
         Args:
-            Provider: _description_
+            mock_plugin_type: _description_
         """
-
-    def test_extract_provider_data(self) -> None:
-        """Test data extraction for plugin"""
 
         name = "test_provider"
         group = "provider"
@@ -28,7 +25,7 @@ class TestDataPluginSchema:
         plugin_attribute = getattr(data, group)
         plugin_attribute[name] = {"heck": "yeah"}
 
-        plugin = TestDataPluginSchema.MockPlugin()
+        plugin = mock_plugin_type()
 
         extracted_data = extract_provider_data(data, plugin)
 

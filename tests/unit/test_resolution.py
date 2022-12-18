@@ -18,6 +18,7 @@ from cppython_core.schema import (
     ProjectConfiguration,
     ProjectData,
 )
+from tests.data.mock import MockAbstractPlugin
 
 
 class TestSchema:
@@ -73,9 +74,7 @@ class TestSchema:
 
         resolved = resolve_cppython(local_config, global_config, project_config)
 
-        plugin_type
-
-        assert resolve_cppython_plugin(resolved, plugin_type)
+        assert resolve_cppython_plugin(resolved, mock_plugin_type)
 
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""

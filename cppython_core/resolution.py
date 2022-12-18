@@ -133,7 +133,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
     """
 
     # Add plugin specific paths to the base path
-    modified_install_path = cppython_data.install_path / plugin_type.name
+    modified_install_path = cppython_data.install_path / plugin_type.name()
     modified_install_path.mkdir(parents=True, exist_ok=True)
 
     plugin_data = CPPythonData(
@@ -190,7 +190,7 @@ def extract_provider_data(cppython_local_configuration: CPPythonLocalConfigurati
         The plugin data
     """
 
-    data: dict[str, Any] = cppython_local_configuration.provider[plugin.name]
+    data: dict[str, Any] = cppython_local_configuration.provider[plugin.name()]
 
     return data
 
@@ -211,6 +211,6 @@ def extract_generator_data(
         The plugin data
     """
 
-    data: dict[str, Any] = cppython_local_configuration.generator[plugin.name]
+    data: dict[str, Any] = cppython_local_configuration.generator[plugin.name()]
 
     return data

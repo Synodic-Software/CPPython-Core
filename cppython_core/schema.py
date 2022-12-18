@@ -9,6 +9,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any, Generic, LiteralString, NewType, TypeVar
 
+from packaging.utils import canonicalize_name
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
 
@@ -194,18 +195,37 @@ class Plugin(ABC):
             entry: _description_
         """
 
-        self.name = entry.name
         self.value = entry.value
-        self.group = entry.group
 
-    @property
-    def full_name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
+        """_summary_
+
+        Returns:
+            _description_
+        """
+        name = canonicalize_name(cls.__name__)
+        return name
+
+    @classmethod
+    def group(cls) -> str:
+        """_summary_
+
+        Returns:
+            _description_
+        """
+
+        name = canonicalize_name(cls.__name__)
+        return name
+
+    @classmethod
+    def full_name(cls) -> str:
         """Concatenates group and name values
 
         Returns:
             Concatenated name
         """
-        return f"{self.group}.{self.name}"
+        return f"{cls.group()}.{cls.name()}"
 
     @staticmethod
     @abstractmethod
@@ -221,7 +241,7 @@ class Plugin(ABC):
             The plugin's named logger
         """
 
-        return getLogger(self.full_name)
+        return getLogger(self.full_name())
 
 
 PluginT = TypeVar("PluginT", bound=Plugin)
