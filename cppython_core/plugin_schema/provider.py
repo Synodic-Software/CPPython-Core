@@ -9,14 +9,14 @@ from pydantic.types import DirectoryPath
 from cppython_core.schema import DataPlugin, PluginGroupData, SyncDataT
 
 
-class ProviderData(PluginGroupData):
+class ProviderGroupData(PluginGroupData):
     """Base class for the configuration data that is set by the project for the provider"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
     generator: str
 
 
-class Provider(DataPlugin[ProviderData]):
+class Provider(DataPlugin[ProviderGroupData]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
     @staticmethod

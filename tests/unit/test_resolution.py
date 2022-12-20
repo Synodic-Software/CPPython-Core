@@ -2,6 +2,9 @@
 """
 
 from pathlib import Path
+from typing import Any
+
+from pytest_mock import MockerFixture
 
 from cppython_core.resolution import (
     resolve_cppython,
@@ -14,11 +17,11 @@ from cppython_core.resolution import (
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
+    DataPlugin,
     PEP621Configuration,
     ProjectConfiguration,
     ProjectData,
 )
-from tests.data.mock import MockAbstractPlugin
 
 
 class TestSchema:
@@ -55,11 +58,12 @@ class TestSchema:
         assert len(class_variables)
         assert not None in class_variables.values()
 
-    def test_cppython_plugin_resolve(self, tmp_path: Path) -> None:
+    def test_cppython_plugin_resolve(self, tmp_path: Path, mocker: MockerFixture) -> None:
         """Test the CPPython plugin schema resolve function
 
         Args:
             tmp_path: Temporary path with a lifetime of this test function
+            mocker: Mocking fixture
         """
 
         # Create a working configuration
@@ -74,7 +78,10 @@ class TestSchema:
 
         resolved = resolve_cppython(local_config, global_config, project_config)
 
-        assert resolve_cppython_plugin(resolved, mock_plugin_type)
+        mock_plugin_type = mocker.create_autospec(DataPlugin[Any])
+
+        resolve_cppython_plugin(resolved, mock_plugin_type)
+        mock_plugin_type.name.assert_called()
 
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""

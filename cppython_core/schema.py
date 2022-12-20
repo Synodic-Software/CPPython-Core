@@ -299,6 +299,10 @@ class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
     current_check: bool = Field(default=True, alias="current-check", description="Checks for a new CPPython version")
 
 
+ProviderData = NewType("ProviderData", dict[str, Any])
+GeneratorData = NewType("GeneratorData", dict[str, Any])
+
+
 class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     """Data required by the tool"""
 
@@ -311,10 +315,10 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     build_path: Path = Field(
         default=Path("build"), alias="build-path", description="The local build path for the project"
     )
-    provider: dict[str, dict[str, Any]] = Field(
+    provider: dict[str, ProviderData] = Field(
         default={}, description="List of dynamically generated 'provider' plugin data"
     )
-    generator: dict[str, Any] = Field(default={}, description="Generator plugin data associated with 'generator_name'")
+    generator: GeneratorData = Field(default={}, description="Generator plugin data associated with 'generator_name'")
     generator_name: str | None = Field(
         default=None, alias="generator-name", description="If empty, the generator will be automatically deduced."
     )

@@ -3,8 +3,8 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import Generator, GeneratorData
-from cppython_core.plugin_schema.provider import Provider, ProviderData
+from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -147,7 +147,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
     return cast(CPPythonPluginData, plugin_data)
 
 
-def resolve_generator(project_data: ProjectData) -> GeneratorData:
+def resolve_generator(project_data: ProjectData) -> GeneratorGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -156,11 +156,11 @@ def resolve_generator(project_data: ProjectData) -> GeneratorData:
     Returns:
         The plugin specific configuration
     """
-    configuration = GeneratorData(root_directory=project_data.pyproject_file.parent)
+    configuration = GeneratorGroupData(root_directory=project_data.pyproject_file.parent)
     return configuration
 
 
-def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderData:
+def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -170,7 +170,7 @@ def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> 
     Returns:
         The plugin specific configuration
     """
-    configuration = ProviderData(
+    configuration = ProviderGroupData(
         root_directory=project_data.pyproject_file.parent, generator=cppython_data.generator_name
     )
     return configuration
