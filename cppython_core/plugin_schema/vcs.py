@@ -6,16 +6,8 @@ from typing import TypeVar
 from cppython_core.schema import Plugin
 
 
-class VersionControl(Plugin):
+class SCM(Plugin):
     """Base class for version control systems"""
-
-    @staticmethod
-    def cppython_group() -> str:
-        """The cppython plugin group name. An EntryPoint sub-group
-        Returns:
-            The group name
-        """
-        return "vcs"
 
     @abstractmethod
     def is_repository(self, path: Path) -> bool:
@@ -42,4 +34,4 @@ class VersionControl(Plugin):
         raise NotImplementedError()
 
 
-VersionControlT = TypeVar("VersionControlT", bound=VersionControl)
+SCMT = TypeVar("SCMT", bound=SCM)

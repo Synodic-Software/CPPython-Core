@@ -18,14 +18,6 @@ class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
     @staticmethod
-    def cppython_group() -> str:
-        """The cppython plugin group name. An EntryPoint sub-group
-        Returns:
-            The group name
-        """
-        return "generator"
-
-    @staticmethod
     @abstractmethod
     def sync_data_type() -> type[SyncDataT]:
         """_summary_

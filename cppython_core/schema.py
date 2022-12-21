@@ -240,11 +240,14 @@ class Plugin(ABC):
 
         return f"{name}.{group}"
 
-    @staticmethod
-    @abstractmethod
-    def cppython_group() -> LiteralString:
-        """The cppython plugin group name. An EntryPoint sub-group"""
-        raise NotImplementedError()
+    @classmethod
+    def cppython_group(cls) -> str:
+        """he cppython plugin group name. An EntryPoint sub-group
+
+        Returns:
+            _description_
+        """
+        return ""
 
     @cached_property
     def logger(self) -> Logger:

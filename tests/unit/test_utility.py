@@ -38,15 +38,6 @@ class TestUtility:
         class MockPlugin(Plugin):
             """A dummy plugin to verify logging metadata"""
 
-            @staticmethod
-            def cppython_group() -> LiteralString:
-                """Mocked function
-
-                Returns:
-                    The group name
-                """
-                return "group"
-
         entry = EntryPoint(name="mock", value="value", group="cppython.group")
         plugin = MockPlugin(entry)
         logger = plugin.logger

@@ -19,14 +19,6 @@ class ProviderGroupData(PluginGroupData):
 class Provider(DataPlugin[ProviderGroupData]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
-    @staticmethod
-    def cppython_group() -> str:
-        """The cppython plugin group name. An EntryPoint sub-group
-        Returns:
-            The group name
-        """
-        return "provider"
-
     @classmethod
     @abstractmethod
     async def download_tooling(cls, path: Path) -> None:
