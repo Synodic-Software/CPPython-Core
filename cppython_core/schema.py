@@ -7,6 +7,7 @@ from functools import cached_property
 from importlib.metadata import EntryPoint
 from logging import Logger, getLogger
 from pathlib import Path
+from re import sub
 from typing import Any, Generic, LiteralString, NewType, TypeVar
 
 from packaging.utils import canonicalize_name
@@ -204,8 +205,8 @@ class Plugin(ABC):
         Returns:
             _description_
         """
-        name = canonicalize_name(cls.__name__)
-        return name
+        split_string = cls.full_name().split(sep=".")
+        return split_string[0]
 
     @classmethod
     def group(cls) -> str:
@@ -215,17 +216,29 @@ class Plugin(ABC):
             _description_
         """
 
-        name = canonicalize_name(cls.__name__)
-        return name
+        split_string = cls.full_name().split(sep=".")
+        return split_string[1]
 
     @classmethod
     def full_name(cls) -> str:
         """Concatenates group and name values
 
+        Raises:
+            ValueError: When the class name is incorrect
+
         Returns:
             Concatenated name
         """
-        return f"{cls.group()}.{cls.name()}"
+
+        split_string = sub(r"(?<![A-Z\W])(?=[A-Z])", " ", cls.__name__).split()
+
+        if len(split_string) != 2:
+            raise ValueError("The class name must be of format 'NameGroup' with <name> and <group>")
+
+        name = canonicalize_name(split_string[0])
+        group = canonicalize_name(split_string[1])
+
+        return f"{name}.{group}"
 
     @staticmethod
     @abstractmethod
@@ -318,7 +331,9 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     provider: dict[str, ProviderData] = Field(
         default={}, description="List of dynamically generated 'provider' plugin data"
     )
-    generator: GeneratorData = Field(default={}, description="Generator plugin data associated with 'generator_name'")
+    generator: GeneratorData = Field(
+        default=GeneratorData({}), description="Generator plugin data associated with 'generator_name'"
+    )
     generator_name: str | None = Field(
         default=None, alias="generator-name", description="If empty, the generator will be automatically deduced."
     )

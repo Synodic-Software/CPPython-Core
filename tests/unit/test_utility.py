@@ -45,7 +45,7 @@ class TestUtility:
                 Returns:
                     The group name
                 """
-                return "mock"
+                return "group"
 
         entry = EntryPoint(name="mock", value="value", group="cppython.group")
         plugin = MockPlugin(entry)

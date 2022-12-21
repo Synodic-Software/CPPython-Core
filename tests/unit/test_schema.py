@@ -118,8 +118,3 @@ class TestSchema:
             """Verifies the name can't be parsed, given only one word"""
 
         assert AcronymYA.full_name() == "acronym.ya"
-
-        class YAAcronym(Plugin):
-            """Verifies the name can't be parsed, given only one word"""
-
-        assert YAAcronym.full_name() == "ya.acronym"
