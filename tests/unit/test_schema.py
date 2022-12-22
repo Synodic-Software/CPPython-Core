@@ -93,28 +93,3 @@ class TestSchema:
 
         with pytest.raises(ValueError):
             PEP621Configuration(name="both-test", version="1.0.0", dynamic=["version"])
-
-    def test_plugin_strings(self) -> None:
-        """_summary_"""
-
-        class BasicPlugin(Plugin):
-            """Verifies the basic name and group parsing"""
-
-        assert BasicPlugin.full_name() == "basic.plugin"
-
-        class Broken(Plugin):
-            """Verifies the name can't be parsed, given only one word"""
-
-        with pytest.raises(ValueError):
-            assert Broken.full_name()
-
-        class BROKEN(Plugin):
-            """Verifies the name can't be parsed, given only all-caps word"""
-
-        with pytest.raises(ValueError):
-            assert BROKEN.full_name()
-
-        class AcronymYA(Plugin):
-            """Verifies the name can't be parsed, given only one word"""
-
-        assert AcronymYA.full_name() == "acronym.ya"

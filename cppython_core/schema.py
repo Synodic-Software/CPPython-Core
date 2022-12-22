@@ -1,18 +1,19 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
 from functools import cached_property
 from importlib.metadata import EntryPoint
 from logging import Logger, getLogger
 from pathlib import Path
-from re import sub
-from typing import Any, Generic, LiteralString, NewType, TypeVar
+from typing import Any, Generic, NewType, TypeVar
 
 from packaging.utils import canonicalize_name
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
+
+from cppython_core.utility import canonicalize_name as cppython_canonicalize_name
 
 
 class CPPythonModel(BaseModel):
@@ -230,7 +231,7 @@ class Plugin(ABC):
             Concatenated name
         """
 
-        split_string = sub(r"(?<![A-Z\W])(?=[A-Z])", " ", cls.__name__).split()
+        split_string = cppython_canonicalize_name(cls.__name__)
 
         if len(split_string) != 2:
             raise ValueError("The class name must be of format 'NameGroup' with <name> and <group>")
@@ -247,7 +248,7 @@ class Plugin(ABC):
         Returns:
             _description_
         """
-        return ""
+        return cppython_canonicalize_name(cls.__name__)
 
     @cached_property
     def logger(self) -> Logger:

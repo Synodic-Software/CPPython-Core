@@ -3,15 +3,15 @@
 
 import json
 import logging
+import re
 import subprocess
 from logging import Logger
 from pathlib import Path
-from typing import Any
+from typing import Any, NewType, cast
 
 from pydantic import BaseModel
 
 from cppython_core.exceptions import ProcessError
-from cppython_core.schema import ModelT
 
 
 def subprocess_call(
@@ -41,20 +41,6 @@ def subprocess_call(
 
     if process.returncode != 0:
         raise ProcessError("Subprocess task failed")
-
-
-def read_model_json(path: Path, model: type[ModelT]) -> ModelT:
-    """Reading routine. Only keeps Model data
-
-    Args:
-        path: The file to read
-        model: The model to read
-
-    Returns:
-        The read model
-    """
-
-    return model.parse_file(path=path)
 
 
 def read_json(path: Path) -> Any:
@@ -94,3 +80,21 @@ def write_json(path: Path, data: Any) -> None:
 
     with open(path, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
+
+
+_canonicalize_regex = re.compile(r"[A-Z](?:[A-Z]*(?![a-z])|[a-z]*)")
+NormalizedName = NewType("NormalizedName", str)
+
+
+def canonicalize_name(name: str) -> NormalizedName:
+    """_summary_
+
+    Args:
+        name: _description_
+
+    Returns:
+        _description_
+    """
+
+    value = ".".join(_canonicalize_regex.findall(name)).lower()
+    return cast(NormalizedName, value)

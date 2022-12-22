@@ -6,14 +6,13 @@ from importlib.metadata import EntryPoint
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
-from typing import LiteralString
 
 import pytest
 from pytest import LogCaptureFixture
 
 from cppython_core.exceptions import ProcessError
 from cppython_core.schema import CPPythonModel, Plugin
-from cppython_core.utility import read_model_json, subprocess_call, write_model_json
+from cppython_core.utility import canonicalize_name, subprocess_call
 
 cppython_logger = logging.getLogger("cppython")
 cppython_logger.addHandler(StreamHandler())
@@ -46,21 +45,14 @@ class TestUtility:
             logger.info("test")
             assert caplog.record_tuples == [("cppython.group.mock", logging.INFO, "test")]
 
-    def test_model_read_write(self, tmp_path: Path) -> None:
-        """Tests a full IO write -> read for data maintenance
+    def test_name_normalization(self) -> None:
+        """_summary_"""
 
-        Args:
-            tmp_path: Temporary path for writing
-        """
-
-        test_model = TestUtility.ModelTest(test_path=Path(), test_int=3)
-
-        json_path = tmp_path / "test.json"
-
-        write_model_json(json_path, test_model)
-        output = read_model_json(json_path, TestUtility.ModelTest)
-
-        assert test_model == output
+        assert canonicalize_name("BasicPlugin") == "basic.plugin"
+        assert canonicalize_name("Test") == "test"
+        assert canonicalize_name("TEST") == "test"
+        assert canonicalize_name("AcronymYA") == "acronym.ya"
+        assert canonicalize_name("YAAcronym") == "ya.acronym"
 
 
 class TestSubprocess:
