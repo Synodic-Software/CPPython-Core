@@ -197,28 +197,16 @@ class Plugin(ABC):
             entry: _description_
         """
 
-        self.value = entry.value
+        self._entry_point = entry
 
-    @classmethod
-    def name(cls) -> str:
+    @property
+    def entry_point(self) -> EntryPoint:
         """_summary_
 
         Returns:
             _description_
         """
-        split_string = cls.full_name().split(sep=".")
-        return split_string[0]
-
-    @classmethod
-    def group(cls) -> str:
-        """_summary_
-
-        Returns:
-            _description_
-        """
-
-        split_string = cls.full_name().split(sep=".")
-        return split_string[1]
+        return self._entry_point
 
     @classmethod
     def full_name(cls) -> str:
@@ -231,18 +219,15 @@ class Plugin(ABC):
             Concatenated name
         """
 
-        split_string = cppython_canonicalize_name(cls.__name__)
+        name = cppython_canonicalize_name(cls.__name__)
 
         if len(split_string) != 2:
             raise ValueError("The class name must be of format 'NameGroup' with <name> and <group>")
 
-        name = canonicalize_name(split_string[0])
-        group = canonicalize_name(split_string[1])
-
-        return f"{name}.{group}"
+        return f"{name}"
 
     @classmethod
-    def cppython_group(cls) -> str:
+    def group(cls) -> str:
         """he cppython plugin group name. An EntryPoint sub-group
 
         Returns:

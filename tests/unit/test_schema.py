@@ -10,7 +10,6 @@ from cppython_core.schema import (
     CPPythonLocalConfiguration,
     CPPythonModel,
     PEP621Configuration,
-    Plugin,
     PyProject,
 )
 
