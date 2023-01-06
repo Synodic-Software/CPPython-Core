@@ -1,22 +1,21 @@
 """Tests the plugin schema"""
 
-from importlib.metadata import EntryPoint
-from typing import LiteralString
-
 from pytest_mock import MockerFixture
 
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
 from cppython_core.resolution import extract_generator_data, extract_provider_data
-from cppython_core.schema import CPPythonLocalConfiguration, DataPlugin, PluginGroupData
+from cppython_core.schema import CPPythonLocalConfiguration
 
 
 class TestDataPluginSchema:
     """Test validation"""
 
     def test_extract_provider_data(self, mocker: MockerFixture) -> None:
-        """Test data extraction for plugins
+        """Test data extraction for plugin
 
         Args:
-            mocker: Mocking fixture
+            mocker: _description_
         """
 
         name = "test_provider"
@@ -26,11 +25,10 @@ class TestDataPluginSchema:
         plugin_attribute = getattr(data, group)
         plugin_attribute[name] = {"heck": "yeah"}
 
-        with mocker.MagicMock() as mock:
-            mock.name = name
-            mock.group = group
+        plugin = mocker.create_autospec(Provider)
+        plugin.name.return_value = "test_provider"
 
-            extracted_data = extract_provider_data(data, mock)
+        extracted_data = extract_provider_data(data, plugin)
 
         plugin_attribute = getattr(data, group)
         assert plugin_attribute[name] == extracted_data
@@ -39,7 +37,7 @@ class TestDataPluginSchema:
         """Test data extraction for plugins
 
         Args:
-            mocker: Mocking fixture
+            mocker: _description_
         """
 
         name = "test_generator"
@@ -49,39 +47,10 @@ class TestDataPluginSchema:
         plugin_attribute = getattr(data, group)
         plugin_attribute[name] = {"heck": "yeah"}
 
-        with mocker.MagicMock() as mock:
-            mock.name = name
-            mock.group = group
+        plugin = mocker.create_autospec(Generator)
+        plugin.name.return_value = "test_generator"
 
-            extracted_data = extract_generator_data(data, mock)
+        extracted_data = extract_generator_data(data, plugin)
 
         plugin_attribute = getattr(data, group)
         assert plugin_attribute[name] == extracted_data
-
-    def test_construction(self, mocker: MockerFixture) -> None:
-        """Tests DataPlugin construction
-
-        Args:
-            mocker: Mocking fixture
-        """
-
-        class DataPluginImplementationData(PluginGroupData):
-            """Currently Empty"""
-
-        class DataPluginImplementation(DataPlugin[DataPluginImplementationData]):
-            """Currently Empty"""
-
-            @staticmethod
-            def cppython_group() -> LiteralString:
-                """Mocked function
-
-                Returns:
-                    The group name
-                """
-                return "group"
-
-        entry = EntryPoint(name="test", value="value", group="cppython.group")
-
-        with mocker.MagicMock() as mock:
-            plugin = DataPluginImplementation(entry, DataPluginImplementationData(), mock)
-            assert plugin

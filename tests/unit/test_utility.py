@@ -6,14 +6,13 @@ from importlib.metadata import EntryPoint
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
-from typing import LiteralString
 
 import pytest
 from pytest import LogCaptureFixture
 
 from cppython_core.exceptions import ProcessError
 from cppython_core.schema import CPPythonModel, Plugin
-from cppython_core.utility import read_model_json, subprocess_call, write_model_json
+from cppython_core.utility import canonicalize_name, subprocess_call
 
 cppython_logger = logging.getLogger("cppython")
 cppython_logger.addHandler(StreamHandler())
@@ -38,38 +37,30 @@ class TestUtility:
         class MockPlugin(Plugin):
             """A dummy plugin to verify logging metadata"""
 
-            @staticmethod
-            def cppython_group() -> LiteralString:
-                """Mocked function
-
-                Returns:
-                    The group name
-                """
-                return "mock"
-
-        entry = EntryPoint(name="mock", value="value", group="cppython.group")
+        entry = EntryPoint(name="mock", value="value", group="cppython.plugin")
         plugin = MockPlugin(entry)
         logger = plugin.logger
 
         with caplog.at_level(logging.INFO):
             logger.info("test")
-            assert caplog.record_tuples == [("cppython.group.mock", logging.INFO, "test")]
+            assert caplog.record_tuples == [("cppython.plugin.mock", logging.INFO, "test")]
 
-    def test_model_read_write(self, tmp_path: Path) -> None:
-        """Tests a full IO write -> read for data maintenance
+    def test_name_normalization(self) -> None:
+        """_summary_"""
 
-        Args:
-            tmp_path: Temporary path for writing
-        """
+        test = canonicalize_name("BasicPlugin")
 
-        test_model = TestUtility.ModelTest(test_path=Path(), test_int=3)
+        assert test.group == "plugin"
+        assert test.name == "basic"
 
-        json_path = tmp_path / "test.json"
+        test = canonicalize_name("AcronymYA")
 
-        write_model_json(json_path, test_model)
-        output = read_model_json(json_path, TestUtility.ModelTest)
+        assert test.group == "ya"
+        assert test.name == "acronym"
 
-        assert test_model == output
+        test = canonicalize_name("YAAcronym")
+        assert test.group == "acronym"
+        assert test.name == "ya"
 
 
 class TestSubprocess:

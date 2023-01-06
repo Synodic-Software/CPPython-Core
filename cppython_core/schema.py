@@ -1,20 +1,18 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from abc import ABC, abstractmethod
-from collections.abc import Callable
+from abc import ABC
 from dataclasses import dataclass
 from functools import cached_property
 from importlib.metadata import EntryPoint
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any
-from typing import Generator as TypingGenerator
-from typing import Generic, LiteralString, NewType, Self, TypeVar
+from typing import Any, Generic, NewType, TypeVar
 
-from packaging.requirements import InvalidRequirement, Requirement
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
+
+from cppython_core.utility import canonicalize_name
 
 
 class CPPythonModel(BaseModel):
@@ -147,63 +145,9 @@ def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
 
-class PEP508(Requirement):
-    """PEP 508 conforming string"""
-
-    @classmethod
-    def __get_validators__(cls) -> TypingGenerator[Callable[..., Any], None, None]:
-        """Yields the set of validators defined for this type so pydantic can use them internally
-
-        Yields:
-            A new validator Callable
-        """
-        yield cls.validate_type
-        yield cls.validate_construction
-
-    @classmethod
-    def validate_type(cls, value: Self) -> Self:
-        """Enforce type that this class can be cast to a Requirement
-
-        Args:
-            value: The input value to validate
-
-        Raises:
-            TypeError: Raised if the input value is not the right type
-
-        Returns:
-            The validated input value
-        """
-        if not isinstance(value, str) and not isinstance(value, PEP508):
-            raise TypeError("'str' or 'PEP508' type required")
-
-        return value
-
-    @classmethod
-    def validate_construction(cls, value: Self) -> Self:
-        """Enforce type that this class can be cast to a Requirement
-
-        Args:
-            value: The input value to validate
-
-        Raises:
-            ValueError: Raised if a PEP508 requirement can't be parsed
-
-        Returns:
-            The validated input value
-        """
-        if isinstance(value, str):
-            try:
-                value = PEP508(value)
-            except InvalidRequirement as invalid:
-                raise ValueError from invalid
-
-        return value
-
-
 class CPPythonData(CPPythonModel, extra=Extra.forbid):
     """Resolved CPPython data with local and global configuration"""
 
-    dependencies: list[PEP508]
     install_path: DirectoryPath
     tool_path: DirectoryPath
     build_path: DirectoryPath
@@ -252,24 +196,51 @@ class Plugin(ABC):
             entry: _description_
         """
 
-        self.name = entry.name
-        self.value = entry.value
-        self.group = entry.group
+        self._entry_point = entry
 
     @property
-    def full_name(self) -> str:
+    def entry_point(self) -> EntryPoint:
+        """_summary_
+
+        Returns:
+            _description_
+        """
+        return self._entry_point
+
+    @classmethod
+    def full_name(cls) -> str:
         """Concatenates group and name values
+
+        Raises:
+            ValueError: When the class name is incorrect
 
         Returns:
             Concatenated name
         """
-        return f"{self.group}.{self.name}"
 
-    @staticmethod
-    @abstractmethod
-    def cppython_group() -> LiteralString:
-        """The cppython plugin group name. An EntryPoint sub-group"""
-        raise NotImplementedError()
+        name = canonicalize_name(cls.__name__)
+
+        return ".".join(name)
+
+    @classmethod
+    def name(cls) -> str:
+        """he cppython plugin group name. An EntryPoint sub-group
+
+        Returns:
+            _description_
+        """
+        name = canonicalize_name(cls.__name__)
+        return name.name
+
+    @classmethod
+    def group(cls) -> str:
+        """he cppython plugin group name. An EntryPoint sub-group
+
+        Returns:
+            _description_
+        """
+        name = canonicalize_name(cls.__name__)
+        return name.group
 
     @cached_property
     def logger(self) -> Logger:
@@ -279,7 +250,7 @@ class Plugin(ABC):
             The plugin's named logger
         """
 
-        return getLogger(self.full_name)
+        return getLogger(f"cppython.{self.group()}.{self.name()}")
 
 
 PluginT = TypeVar("PluginT", bound=Plugin)
@@ -337,10 +308,13 @@ class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
     current_check: bool = Field(default=True, alias="current-check", description="Checks for a new CPPython version")
 
 
+ProviderData = NewType("ProviderData", dict[str, Any])
+GeneratorData = NewType("GeneratorData", dict[str, Any])
+
+
 class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     """Data required by the tool"""
 
-    dependencies: list[PEP508] = Field(default=[], description="List of PEP508 dependencies")
     install_path: Path = Field(
         default=_default_install_location(), alias="install-path", description="The global install path for the project"
     )
@@ -350,10 +324,12 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     build_path: Path = Field(
         default=Path("build"), alias="build-path", description="The local build path for the project"
     )
-    provider: dict[str, dict[str, Any]] = Field(
+    provider: dict[str, ProviderData] = Field(
         default={}, description="List of dynamically generated 'provider' plugin data"
     )
-    generator: dict[str, Any] = Field(default={}, description="Generator plugin data associated with 'generator_name'")
+    generator: GeneratorData = Field(
+        default=GeneratorData({}), description="Generator plugin data associated with 'generator_name'"
+    )
     generator_name: str | None = Field(
         default=None, alias="generator-name", description="If empty, the generator will be automatically deduced."
     )

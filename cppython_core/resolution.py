@@ -3,8 +3,8 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import Generator, GeneratorData
-from cppython_core.plugin_schema.provider import Provider, ProviderData
+from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -66,33 +66,6 @@ def resolve_pep621(
     return pep621_data
 
 
-def resolve_cppython_plugin(cppython_data: CPPythonData, plugin: DataPlugin[Any]) -> CPPythonPluginData:
-    """Resolve project configuration for plugins
-
-    Args:
-        cppython_data: The CPPython data
-        plugin: The plugin
-
-    Returns:
-        The resolved type with provider specific modifications
-    """
-
-    # Add provider specific paths to the base path
-    modified_install_path = cppython_data.install_path / plugin.name
-    modified_install_path.mkdir(parents=True, exist_ok=True)
-
-    plugin_data = CPPythonData(
-        install_path=modified_install_path,
-        tool_path=cppython_data.tool_path,
-        build_path=cppython_data.build_path,
-        dependencies=cppython_data.dependencies,
-        current_check=cppython_data.current_check,
-        generator_name=cppython_data.generator_name,
-    )
-
-    return cast(CPPythonPluginData, plugin_data)
-
-
 def resolve_cppython(
     local_configuration: CPPythonLocalConfiguration,
     global_configuration: CPPythonGlobalConfiguration,
@@ -142,14 +115,39 @@ def resolve_cppython(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
         build_path=modified_build_path,
-        dependencies=local_configuration.dependencies,
         current_check=global_configuration.current_check,
         generator_name=local_configuration.generator_name,
     )
     return cppython_data
 
 
-def resolve_generator(project_data: ProjectData) -> GeneratorData:
+def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPlugin[Any]]) -> CPPythonPluginData:
+    """Resolve project configuration for plugins
+
+    Args:
+        cppython_data: The CPPython data
+        plugin_type: The plugin type
+
+    Returns:
+        The resolved type with plugin specific modifications
+    """
+
+    # Add plugin specific paths to the base path
+    modified_install_path = cppython_data.install_path / plugin_type.name()
+    modified_install_path.mkdir(parents=True, exist_ok=True)
+
+    plugin_data = CPPythonData(
+        install_path=modified_install_path,
+        tool_path=cppython_data.tool_path,
+        build_path=cppython_data.build_path,
+        current_check=cppython_data.current_check,
+        generator_name=cppython_data.generator_name,
+    )
+
+    return cast(CPPythonPluginData, plugin_data)
+
+
+def resolve_generator(project_data: ProjectData) -> GeneratorGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -158,11 +156,11 @@ def resolve_generator(project_data: ProjectData) -> GeneratorData:
     Returns:
         The plugin specific configuration
     """
-    configuration = GeneratorData(root_directory=project_data.pyproject_file.parent)
+    configuration = GeneratorGroupData(root_directory=project_data.pyproject_file.parent)
     return configuration
 
 
-def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderData:
+def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -172,7 +170,7 @@ def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> 
     Returns:
         The plugin specific configuration
     """
-    configuration = ProviderData(
+    configuration = ProviderGroupData(
         root_directory=project_data.pyproject_file.parent, generator=cppython_data.generator_name
     )
     return configuration
@@ -192,7 +190,7 @@ def extract_provider_data(cppython_local_configuration: CPPythonLocalConfigurati
         The plugin data
     """
 
-    data: dict[str, Any] = cppython_local_configuration.provider[plugin.name]
+    data: dict[str, Any] = cppython_local_configuration.provider[plugin.name()]
 
     return data
 
@@ -213,6 +211,6 @@ def extract_generator_data(
         The plugin data
     """
 
-    data: dict[str, Any] = cppython_local_configuration.generator[plugin.name]
+    data: dict[str, Any] = cppython_local_configuration.generator[plugin.name()]
 
     return data

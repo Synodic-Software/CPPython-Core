@@ -6,7 +6,6 @@ from pydantic import Field
 from tomlkit import parse
 
 from cppython_core.schema import (
-    PEP508,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
     CPPythonModel,
@@ -84,37 +83,6 @@ class TestSchema:
         pyproject = PyProject(**document)
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is None
-
-    def test_508(self) -> None:
-        """Ensure correct parsing of the 'packaging' type via the PEP508 intermediate type"""
-
-        requirement = PEP508('requests [security,tests] >= 2.8.1, == 2.8.* ; python_version < "2.7"')
-
-        assert requirement.name == "requests"
-
-        with pytest.raises(ValueError):
-            PEP508("this is not conforming")
-
-        class NestedModel(CPPythonModel):
-            """Tests that PEP508 can be referenced as its own type"""
-
-            requirement: PEP508
-
-        model = NestedModel(requirement=requirement)
-
-        assert model.requirement.name == "requests"
-
-    def test_508_extraction(self) -> None:
-        """_summary_"""
-
-        data = """
-        dependencies = ["requests"]
-        """
-
-        document = parse(data).value
-        cppython_configuration = CPPythonLocalConfiguration(**document)
-
-        assert cppython_configuration.dependencies[0].name == "requests"
 
     def test_pep621_version(self) -> None:
         """Tests the dynamic version validation"""
