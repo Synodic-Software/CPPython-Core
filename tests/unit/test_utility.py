@@ -37,22 +37,30 @@ class TestUtility:
         class MockPlugin(Plugin):
             """A dummy plugin to verify logging metadata"""
 
-        entry = EntryPoint(name="mock", value="value", group="cppython.group")
+        entry = EntryPoint(name="mock", value="value", group="cppython.plugin")
         plugin = MockPlugin(entry)
         logger = plugin.logger
 
         with caplog.at_level(logging.INFO):
             logger.info("test")
-            assert caplog.record_tuples == [("cppython.group.mock", logging.INFO, "test")]
+            assert caplog.record_tuples == [("cppython.plugin.mock", logging.INFO, "test")]
 
     def test_name_normalization(self) -> None:
         """_summary_"""
 
-        assert canonicalize_name("BasicPlugin") == "basic.plugin"
-        assert canonicalize_name("Test") == "test"
-        assert canonicalize_name("TEST") == "test"
-        assert canonicalize_name("AcronymYA") == "acronym.ya"
-        assert canonicalize_name("YAAcronym") == "ya.acronym"
+        test = canonicalize_name("BasicPlugin")
+
+        assert test.group == "plugin"
+        assert test.name == "basic"
+
+        test = canonicalize_name("AcronymYA")
+
+        assert test.group == "ya"
+        assert test.name == "acronym"
+
+        test = canonicalize_name("YAAcronym")
+        assert test.group == "acronym"
+        assert test.name == "ya"
 
 
 class TestSubprocess:

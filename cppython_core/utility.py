@@ -7,7 +7,7 @@ import re
 import subprocess
 from logging import Logger
 from pathlib import Path
-from typing import Any, NewType, cast
+from typing import Any, NamedTuple
 
 from pydantic import BaseModel
 
@@ -83,7 +83,13 @@ def write_json(path: Path, data: Any) -> None:
 
 
 _canonicalize_regex = re.compile(r"[A-Z](?:[A-Z]*(?![a-z])|[a-z]*)")
-NormalizedName = NewType("NormalizedName", str)
+
+
+class NormalizedName(NamedTuple):
+    """Normalized name"""
+
+    name: str
+    group: str
 
 
 def canonicalize_name(name: str) -> NormalizedName:
@@ -96,5 +102,5 @@ def canonicalize_name(name: str) -> NormalizedName:
         _description_
     """
 
-    value = ".".join(_canonicalize_regex.findall(name)).lower()
-    return cast(NormalizedName, value)
+    values = _canonicalize_regex.findall(name)
+    return NormalizedName(values[0].lower(), values[1].lower())

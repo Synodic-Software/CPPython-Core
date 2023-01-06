@@ -9,11 +9,10 @@ from logging import Logger, getLogger
 from pathlib import Path
 from typing import Any, Generic, NewType, TypeVar
 
-from packaging.utils import canonicalize_name
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
 
-from cppython_core.utility import canonicalize_name as cppython_canonicalize_name
+from cppython_core.utility import canonicalize_name
 
 
 class CPPythonModel(BaseModel):
@@ -219,12 +218,19 @@ class Plugin(ABC):
             Concatenated name
         """
 
-        name = cppython_canonicalize_name(cls.__name__)
+        name = canonicalize_name(cls.__name__)
 
-        if len(split_string) != 2:
-            raise ValueError("The class name must be of format 'NameGroup' with <name> and <group>")
+        return ".".join(name)
 
-        return f"{name}"
+    @classmethod
+    def name(cls) -> str:
+        """he cppython plugin group name. An EntryPoint sub-group
+
+        Returns:
+            _description_
+        """
+        name = canonicalize_name(cls.__name__)
+        return name.name
 
     @classmethod
     def group(cls) -> str:
@@ -233,7 +239,8 @@ class Plugin(ABC):
         Returns:
             _description_
         """
-        return cppython_canonicalize_name(cls.__name__)
+        name = canonicalize_name(cls.__name__)
+        return name.group
 
     @cached_property
     def logger(self) -> Logger:
@@ -243,7 +250,7 @@ class Plugin(ABC):
             The plugin's named logger
         """
 
-        return getLogger(self.full_name())
+        return getLogger(f"cppython.{self.group()}.{self.name()}")
 
 
 PluginT = TypeVar("PluginT", bound=Plugin)
