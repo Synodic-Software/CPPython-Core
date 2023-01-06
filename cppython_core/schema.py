@@ -57,7 +57,7 @@ class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
     version: str | None = Field(
         description=(
             "The version number a 'dynamic' project version will resolve to. If not provided a CPPython project will"
-            " initialize its VCS plugins to discover any available version"
+            " initialize its SCM plugins to discover any available version"
         )
     )
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
@@ -190,20 +190,14 @@ class Plugin(ABC):
     """Abstract plugin type"""
 
     def __init__(self, entry: EntryPoint) -> None:
-        """_summary_
-
-        Args:
-            entry: _description_
-        """
-
         self._entry_point = entry
 
     @property
     def entry_point(self) -> EntryPoint:
-        """_summary_
+        """Returns the EntryPoint specification
 
         Returns:
-            _description_
+            The EntryPoint
         """
         return self._entry_point
 
@@ -224,20 +218,20 @@ class Plugin(ABC):
 
     @classmethod
     def name(cls) -> str:
-        """he cppython plugin group name. An EntryPoint sub-group
+        """The plugin name
 
         Returns:
-            _description_
+            The name
         """
         name = canonicalize_name(cls.__name__)
         return name.name
 
     @classmethod
     def group(cls) -> str:
-        """he cppython plugin group name. An EntryPoint sub-group
+        """The cppython plugin group name
 
         Returns:
-            _description_
+            The group name
         """
         name = canonicalize_name(cls.__name__)
         return name.group

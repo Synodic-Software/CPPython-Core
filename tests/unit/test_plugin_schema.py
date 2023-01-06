@@ -15,7 +15,7 @@ class TestDataPluginSchema:
         """Test data extraction for plugin
 
         Args:
-            mocker: _description_
+            mocker: Mocker fixture
         """
 
         name = "test_provider"
@@ -37,7 +37,7 @@ class TestDataPluginSchema:
         """Test data extraction for plugins
 
         Args:
-            mocker: _description_
+            mocker: Mocker fixture
         """
 
         name = "test_generator"

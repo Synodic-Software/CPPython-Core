@@ -46,7 +46,7 @@ class TestUtility:
             assert caplog.record_tuples == [("cppython.plugin.mock", logging.INFO, "test")]
 
     def test_name_normalization(self) -> None:
-        """_summary_"""
+        """Test that canonicalization works"""
 
         test = canonicalize_name("BasicPlugin")
 

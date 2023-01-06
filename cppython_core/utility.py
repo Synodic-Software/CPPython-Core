@@ -93,14 +93,15 @@ class NormalizedName(NamedTuple):
 
 
 def canonicalize_name(name: str) -> NormalizedName:
-    """_summary_
+    """Performs normalization on an input string
 
     Args:
-        name: _description_
+        name: The string to parse
 
     Returns:
-        _description_
+        The normalized name
     """
 
     values = _canonicalize_regex.findall(name)
+
     return NormalizedName(values[0].lower(), values[1].lower())
