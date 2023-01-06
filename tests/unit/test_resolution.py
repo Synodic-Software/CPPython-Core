@@ -114,7 +114,7 @@ class TestSchema:
         """Tests provider resolution
 
         Args:
-            tmp_path: _description_
+            tmp_path: Mocker fixture
         """
 
         # Create a working configuration

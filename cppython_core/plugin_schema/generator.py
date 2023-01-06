@@ -20,13 +20,10 @@ class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
     @staticmethod
     @abstractmethod
     def sync_data_type() -> type[SyncDataT]:
-        """_summary_
-
-        Raises:
-            NotImplementedError: _description_
+        """The sync data type to use for data transfer
 
         Returns:
-            _description_
+            The data type
         """
         raise NotImplementedError()
 
