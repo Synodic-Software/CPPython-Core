@@ -57,7 +57,7 @@ class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
     version: str | None = Field(
         description=(
             "The version number a 'dynamic' project version will resolve to. If not provided a CPPython project will"
-            " initialize its VCS plugins to discover any available version"
+            " initialize its SCM plugins to discover any available version"
         )
     )
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
