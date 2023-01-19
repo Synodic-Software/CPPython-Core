@@ -1,5 +1,6 @@
 """Generator data plugin definitions"""
 from abc import abstractmethod
+from pathlib import Path
 from typing import Any, Generic, TypeVar
 
 from pydantic import Field
@@ -16,6 +17,19 @@ class GeneratorGroupData(PluginGroupData):
 
 class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
     """Abstract type to be inherited by CPPython Generator plugins"""
+
+    @staticmethod
+    @abstractmethod
+    def supported(directory: Path) -> bool:
+        """Queries a given directory for generator related files
+
+        Args:
+            directory: The directory to investigate
+
+        Returns:
+            Whether the directory has pre-existing generator support
+        """
+        raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
