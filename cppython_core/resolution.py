@@ -108,9 +108,6 @@ def resolve_cppython(
     modified_tool_path.mkdir(parents=True, exist_ok=True)
     modified_build_path.mkdir(parents=True, exist_ok=True)
 
-    if local_configuration.generator_name is None:
-        raise ConfigError("CPPython did not fill the 'generator_name' value")
-
     cppython_data = CPPythonData(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
