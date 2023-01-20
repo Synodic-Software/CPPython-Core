@@ -152,7 +152,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: DirectoryPath
     build_path: DirectoryPath
     current_check: bool
-    generator_name: str
+    generator_name: str | None
 
     @validator("install_path", "tool_path", "build_path")
     @classmethod
