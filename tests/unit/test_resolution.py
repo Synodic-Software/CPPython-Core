@@ -39,7 +39,9 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path, "generator-name": "test_generator"})
+        local_config = CPPythonLocalConfiguration(
+            **{"install-path": tmp_path, "generator-name": "test_generator", "provider-name": "test_provider"}
+        )
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)
@@ -71,7 +73,9 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path, "generator-name": "test_generator"})
+        local_config = CPPythonLocalConfiguration(
+            **{"install-path": tmp_path, "generator-name": "test_generator", "provider-name": "test_provider"}
+        )
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)
@@ -122,7 +126,9 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        local_config = CPPythonLocalConfiguration(**{"install-path": tmp_path, "generator-name": "test_generator"})
+        local_config = CPPythonLocalConfiguration(
+            **{"install-path": tmp_path, "generator-name": "test_generator", "provider-name": "test_provider"}
+        )
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)

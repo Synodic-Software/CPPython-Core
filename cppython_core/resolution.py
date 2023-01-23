@@ -108,6 +108,9 @@ def resolve_cppython(
     modified_tool_path.mkdir(parents=True, exist_ok=True)
     modified_build_path.mkdir(parents=True, exist_ok=True)
 
+    if local_configuration.provider_name is None:
+        raise ConfigError("CPPython did not fill the 'provider_name' value")
+
     if local_configuration.generator_name is None:
         raise ConfigError("CPPython did not fill the 'generator_name' value")
 
@@ -116,6 +119,7 @@ def resolve_cppython(
         tool_path=modified_tool_path,
         build_path=modified_build_path,
         current_check=global_configuration.current_check,
+        provider_name=local_configuration.provider_name,
         generator_name=local_configuration.generator_name,
     )
     return cppython_data
@@ -141,6 +145,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
         tool_path=cppython_data.tool_path,
         build_path=cppython_data.build_path,
         current_check=cppython_data.current_check,
+        provider_name=cppython_data.provider_name,
         generator_name=cppython_data.generator_name,
     )
 
