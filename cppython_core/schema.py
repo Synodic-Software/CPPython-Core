@@ -180,10 +180,14 @@ CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 class SyncData(CPPythonModel, ABC):
     """Data that passes in a plugin sync"""
 
-    name: str
+    provider_name: str
 
 
 SyncDataT = TypeVar("SyncDataT", bound=SyncData)
+
+PluginName = NewType("PluginName", str)
+PluginGroup = NewType("PluginGroup", str)
+PluginFullName = NewType("PluginFullName", str)
 
 
 class Plugin(ABC):
@@ -202,7 +206,7 @@ class Plugin(ABC):
         return self._entry_point
 
     @classmethod
-    def full_name(cls) -> str:
+    def full_name(cls) -> PluginFullName:
         """Concatenates group and name values
 
         Raises:
@@ -214,27 +218,27 @@ class Plugin(ABC):
 
         name = canonicalize_name(cls.__name__)
 
-        return ".".join(name)
+        return PluginFullName(".".join(name))
 
     @classmethod
-    def name(cls) -> str:
+    def name(cls) -> PluginName:
         """The plugin name
 
         Returns:
             The name
         """
         name = canonicalize_name(cls.__name__)
-        return name.name
+        return PluginName(name.name)
 
     @classmethod
-    def group(cls) -> str:
+    def group(cls) -> PluginGroup:
         """The cppython plugin group name
 
         Returns:
             The group name
         """
         name = canonicalize_name(cls.__name__)
-        return name.group
+        return PluginGroup(name.group)
 
     @cached_property
     def logger(self) -> Logger:
