@@ -196,7 +196,7 @@ def extract_provider_data(cppython_local_configuration: CPPythonLocalConfigurati
 
 
 def extract_generator_data(
-    cppython_local_configuration: CPPythonLocalConfiguration, plugin: Generator[Any]
+    cppython_local_configuration: CPPythonLocalConfiguration, plugin: Generator
 ) -> dict[str, Any]:
     """Extracts a plugin data type from the CPPython table
 

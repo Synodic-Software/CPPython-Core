@@ -1,12 +1,12 @@
 """Generator data plugin definitions"""
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Generic, TypeVar
+from typing import TypeVar
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, SyncDataT
+from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
 
 
 class GeneratorGroupData(PluginGroupData):
@@ -15,7 +15,7 @@ class GeneratorGroupData(PluginGroupData):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
+class Generator(DataPlugin[GeneratorGroupData]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
     @staticmethod
@@ -31,18 +31,8 @@ class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
         """
         raise NotImplementedError()
 
-    @staticmethod
     @abstractmethod
-    def sync_data_type() -> type[SyncDataT]:
-        """The sync data type to use for data transfer
-
-        Returns:
-            The data type
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def sync(self, sync_data: SyncDataT) -> None:
+    def sync(self, sync_data: SyncData) -> None:
         """Synchronizes generator files and state with the providers input
 
         Args:
@@ -51,4 +41,4 @@ class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
         raise NotImplementedError()
 
 
-GeneratorT = TypeVar("GeneratorT", bound=Generator[Any])
+GeneratorT = TypeVar("GeneratorT", bound=Generator)
