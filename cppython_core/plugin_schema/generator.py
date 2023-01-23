@@ -42,7 +42,7 @@ class Generator(DataPlugin[GeneratorGroupData], Generic[SyncDataT]):
         raise NotImplementedError()
 
     @abstractmethod
-    def sync(self, sync_data: list[SyncDataT]) -> None:
+    def sync(self, sync_data: SyncDataT) -> None:
         """Synchronizes generator files and state with the providers input
 
         Args:
