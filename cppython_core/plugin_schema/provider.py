@@ -6,7 +6,7 @@ from typing import TypeVar
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, SyncDataT
+from cppython_core.schema import DataPlugin, PluginGroupData, PluginName, SyncData
 
 
 class ProviderGroupData(PluginGroupData):
@@ -47,12 +47,12 @@ class Provider(DataPlugin[ProviderGroupData]):
         raise NotImplementedError()
 
     @abstractmethod
-    def sync_data(self, generator_sync_data_type: type[SyncDataT]) -> SyncDataT | None:
+    def sync_data(self, generator_name: PluginName) -> SyncData | None:
         """Requests generator information from the provider. The generator is either defined by a provider specific file
         or the CPPython configuration table
 
         Args:
-            generator_sync_data_type: The SyncData subclass to identify the generator to the provider
+            generator_name: The name of the generator requesting sync information
 
         Returns:
             An instantiated data type
