@@ -152,7 +152,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     tool_path: DirectoryPath
     build_path: DirectoryPath
     current_check: bool
-    generator_name: str | None
+    generator_name: str
 
     @validator("install_path", "tool_path", "build_path")
     @classmethod
@@ -318,8 +318,11 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
     build_path: Path = Field(
         default=Path("build"), alias="build-path", description="The local build path for the project"
     )
-    provider: dict[str, ProviderData] = Field(
-        default={}, description="List of dynamically generated 'provider' plugin data"
+    provider: ProviderData = Field(
+        default=ProviderData({}), description="Provider plugin data associated with 'provider_name"
+    )
+    provider_name: str | None = Field(
+        default=None, alias="provider-name", description="If empty, the provider will be automatically deduced."
     )
     generator: GeneratorData = Field(
         default=GeneratorData({}), description="Generator plugin data associated with 'generator_name'"

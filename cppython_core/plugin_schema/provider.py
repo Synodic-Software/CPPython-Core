@@ -19,6 +19,19 @@ class ProviderGroupData(PluginGroupData):
 class Provider(DataPlugin[ProviderGroupData]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
+    @staticmethod
+    @abstractmethod
+    def supported(directory: Path) -> bool:
+        """Queries a given directory for provider related files
+
+        Args:
+            directory: The directory to investigate
+
+        Returns:
+            Whether the directory has pre-existing provider support
+        """
+        raise NotImplementedError()
+
     @classmethod
     @abstractmethod
     async def download_tooling(cls, path: Path) -> None:

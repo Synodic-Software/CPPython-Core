@@ -3,12 +3,11 @@
 
 [[package]]
 name = "astroid"
-version = "2.13.2"
+version = "2.13.3"
 requires_python = ">=3.7.2"
 summary = "An abstract syntax tree for Python with inference support."
 dependencies = [
     "lazy-object-proxy>=1.4.0",
-    "typing-extensions>=4.0.0",
     "wrapt<2,>=1.14; python_version >= \"3.11\"",
 ]
 
@@ -209,9 +208,9 @@ lock_version = "4.1"
 content_hash = "sha256:1cdfbbf2604a4028064936d7040452a9241d81c13816312602d5b0392b1010ec"
 
 [metadata.files]
-"astroid 2.13.2" = [
-    {url = "https://files.pythonhosted.org/packages/1b/1a/b39c78909f72793ae75fb2daaecfd0393f413448ce30381f5052c2a7ce31/astroid-2.13.2-py3-none-any.whl", hash = "sha256:8f6a8d40c4ad161d6fc419545ae4b2f275ed86d1c989c97825772120842ee0d2"},
-    {url = "https://files.pythonhosted.org/packages/c2/49/5dd5f36b2cd2b315d45023ed4e2d6f1ba57d054ea9a1378f91f093ec57bb/astroid-2.13.2.tar.gz", hash = "sha256:3bc7834720e1a24ca797fd785d77efb14f7a28ee8e635ef040b6e2d80ccb3303"},
+"astroid 2.13.3" = [
+    {url = "https://files.pythonhosted.org/packages/03/9d/153f58eb80395e0f2a84c3a5e5945889da902a8b3eba62d9e2ff2c5618f9/astroid-2.13.3-py3-none-any.whl", hash = "sha256:14c1603c41cc61aae731cad1884a073c4645e26f126d13ac8346113c95577f3b"},
+    {url = "https://files.pythonhosted.org/packages/13/b2/413625f369b9861778b7872987ed76fe573c9558249a865344882c46d265/astroid-2.13.3.tar.gz", hash = "sha256:6afc22718a48a689ca24a97981ad377ba7fb78c133f40335dfd16772f29bcfb1"},
 ]
 "attrs 22.2.0" = [
     {url = "https://files.pythonhosted.org/packages/21/31/3f468da74c7de4fcf9b25591e682856389b3400b4b62f201e65f15ea3e07/attrs-22.2.0.tar.gz", hash = "sha256:c9227bfc2f01993c03f68db37d1d15c9690188323c067c641f1a35ca58185f99"},
