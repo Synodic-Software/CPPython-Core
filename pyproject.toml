@@ -29,10 +29,10 @@ version = {use_scm = true}
 
 [tool.pdm.dev-dependencies]
 lint = [
-  "black>=22.6.0",
+  "black>=23.1.0",
   "isort>=5.10.1",
-  "mypy>=0.971",
-  "pylint>=2.15.2",
+  "mypy>=1.0.0",
+  "pylint>=2.16.1",
 ]
 test = [
   "pytest>=7.1.2",
