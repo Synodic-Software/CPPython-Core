@@ -1,5 +1,5 @@
 """Provider data plugin definitions"""
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import TypeVar
 
@@ -16,11 +16,7 @@ class ProviderGroupData(PluginGroupData):
     generator: str
 
 
-class ProviderPlugin(DataPlugin[ProviderGroupData]):
-    """Concrete Provider plugin type"""
-
-
-class Provider(ProviderPlugin, ABC):
+class Provider(DataPlugin[ProviderGroupData]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
     @staticmethod

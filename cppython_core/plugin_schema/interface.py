@@ -1,15 +1,11 @@
 """Interface plugin definitions"""
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import TypeVar
 
 from cppython_core.schema import Plugin
 
 
-class InterfacePlugin(Plugin):
-    """Concrete Interface plugin type"""
-
-
-class Interface(InterfacePlugin, ABC):
+class Interface(Plugin):
     """Abstract type to be inherited by CPPython interfaces"""
 
     @abstractmethod
