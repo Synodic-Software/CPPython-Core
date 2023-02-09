@@ -1,5 +1,5 @@
 """Generator data plugin definitions"""
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import TypeVar
 
@@ -15,11 +15,7 @@ class GeneratorGroupData(PluginGroupData):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-class GeneratorPlugin(DataPlugin[GeneratorGroupData]):
-    """Concrete Generator plugin type"""
-
-
-class Generator(GeneratorPlugin, ABC):
+class Generator(DataPlugin[GeneratorGroupData]):
     """Abstract type to be inherited by CPPython Generator plugins"""
 
     @staticmethod
