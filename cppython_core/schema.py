@@ -7,7 +7,7 @@ from functools import cached_property
 from importlib.metadata import EntryPoint
 from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Generic, NewType, TypeVar
+from typing import Any, Generic, NewType, Protocol, TypeVar
 
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
@@ -356,3 +356,14 @@ class CoreData(CPPythonModel):
     project_data: ProjectData
     pep621_data: PEP621Data
     cppython_data: CPPythonData
+
+
+class Interface(Protocol):
+    """Defines"""
+
+    def write_pyproject(self) -> None:
+        """Called when CPPython requires the interface to write out pyproject.toml changes"""
+        raise NotImplementedError()
+
+
+InterfaceT = TypeVar("InterfaceT", bound=Interface)
