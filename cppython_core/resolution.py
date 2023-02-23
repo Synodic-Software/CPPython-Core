@@ -13,9 +13,48 @@ from cppython_core.schema import (
     DataPlugin,
     PEP621Configuration,
     PEP621Data,
+    PluginFullName,
+    PluginGroup,
+    PluginName,
     ProjectConfiguration,
     ProjectData,
 )
+from cppython_core.utility import canonicalize_name
+
+
+def resolve_full_name(input_type: type[Any]) -> PluginFullName:
+    """Concatenates group and name values
+    Args:
+        input_type: The input type to resolve
+    Raises:
+        ValueError: When the class name is incorrect
+    Returns:
+        Concatenated name
+    """
+    name = canonicalize_name(input_type.__name__)
+    return PluginFullName(".".join(name))
+
+
+def resolve_name(input_type: type[Any]) -> PluginName:
+    """The plugin name
+    Args:
+        input_type: The input type to resolve
+    Returns:
+        The name
+    """
+    name = canonicalize_name(input_type.__name__)
+    return PluginName(name.name)
+
+
+def resolve_group(input_type: type[Any]) -> PluginGroup:
+    """The cppython plugin group name
+    Args:
+        input_type: The input type to resolve
+    Returns:
+        The group name
+    """
+    name = canonicalize_name(input_type.__name__)
+    return PluginGroup(name.group)
 
 
 def resolve_project_configuration(project_configuration: ProjectConfiguration) -> ProjectData:
@@ -137,7 +176,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
     """
 
     # Add plugin specific paths to the base path
-    modified_install_path = cppython_data.install_path / plugin_type.name()
+    modified_install_path = cppython_data.install_path / resolve_name(plugin_type)
     modified_install_path.mkdir(parents=True, exist_ok=True)
 
     plugin_data = CPPythonData(
@@ -195,7 +234,7 @@ def extract_provider_data(cppython_local_configuration: CPPythonLocalConfigurati
         The plugin data
     """
 
-    data: dict[str, Any] = cppython_local_configuration.provider[plugin.name()]
+    data: dict[str, Any] = cppython_local_configuration.provider[resolve_name(type(plugin))]
 
     return data
 
@@ -216,6 +255,6 @@ def extract_generator_data(
         The plugin data
     """
 
-    data: dict[str, Any] = cppython_local_configuration.generator[plugin.name()]
+    data: dict[str, Any] = cppython_local_configuration.generator[resolve_name(type(plugin))]
 
     return data

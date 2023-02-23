@@ -1,15 +1,12 @@
 """Version control data plugin definitions"""
-from abc import abstractmethod
 from pathlib import Path
-from typing import TypeVar
-
-from cppython_core.schema import Plugin
+from typing import Protocol, TypeVar, runtime_checkable
 
 
-class SCM(Plugin):
+@runtime_checkable
+class SCM(Protocol):
     """Base class for version control systems"""
 
-    @abstractmethod
     def is_repository(self, path: Path) -> bool:
         """Queries repository status of a path
 
@@ -21,7 +18,6 @@ class SCM(Plugin):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def extract_version(self, path: Path) -> str:
         """Extracts the system's version metadata
 
