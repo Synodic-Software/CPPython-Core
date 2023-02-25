@@ -1,7 +1,6 @@
 """Provider data plugin definitions"""
-from abc import abstractmethod
 from pathlib import Path
-from typing import TypeVar
+from typing import Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
@@ -16,11 +15,11 @@ class ProviderGroupData(PluginGroupData):
     generator: str
 
 
-class Provider(DataPlugin[ProviderGroupData]):
+@runtime_checkable
+class Provider(DataPlugin[ProviderGroupData], Protocol):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
     @staticmethod
-    @abstractmethod
     def supported(directory: Path) -> bool:
         """Queries a given directory for provider related files
 
@@ -33,7 +32,6 @@ class Provider(DataPlugin[ProviderGroupData]):
         raise NotImplementedError()
 
     @classmethod
-    @abstractmethod
     async def download_tooling(cls, path: Path) -> None:
         """Installs the external tooling required by the provider
 
@@ -44,9 +42,6 @@ class Provider(DataPlugin[ProviderGroupData]):
             NotImplementedError: Must be sub-classed
         """
 
-        raise NotImplementedError()
-
-    @abstractmethod
     def sync_data(self, generator_name: PluginName) -> SyncData | None:
         """Requests generator information from the provider. The generator is either defined by a provider specific file
         or the CPPython configuration table
@@ -57,17 +52,12 @@ class Provider(DataPlugin[ProviderGroupData]):
         Returns:
             An instantiated data type
         """
-        raise NotImplementedError()
 
-    @abstractmethod
     def install(self) -> None:
         """Called when dependencies need to be installed from a lock file."""
-        raise NotImplementedError()
 
-    @abstractmethod
     def update(self) -> None:
         """Called when dependencies need to be updated and written to the lock file."""
-        raise NotImplementedError()
 
 
 ProviderT = TypeVar("ProviderT", bound=Provider)

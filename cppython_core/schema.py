@@ -1,18 +1,12 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
-from abc import ABC
 from dataclasses import dataclass
-from functools import cached_property
-from importlib.metadata import EntryPoint
-from logging import Logger, getLogger
 from pathlib import Path
-from typing import Any, Generic, NewType, TypeVar
+from typing import Any, NewType, Protocol, TypeVar
 
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
-
-from cppython_core.utility import canonicalize_name
 
 
 class CPPythonModel(BaseModel):
@@ -178,7 +172,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 
 
-class SyncData(CPPythonModel, ABC):
+class SyncData(CPPythonModel):
     """Data that passes in a plugin sync"""
 
     provider_name: str
@@ -191,75 +185,11 @@ PluginGroup = NewType("PluginGroup", str)
 PluginFullName = NewType("PluginFullName", str)
 
 
-class Plugin(ABC):
-    """Abstract plugin type"""
-
-    def __init__(self, entry: EntryPoint) -> None:
-        self._entry_point = entry
-
-    @property
-    def entry_point(self) -> EntryPoint:
-        """Returns the EntryPoint specification
-
-        Returns:
-            The EntryPoint
-        """
-        return self._entry_point
-
-    @classmethod
-    def full_name(cls) -> PluginFullName:
-        """Concatenates group and name values
-
-        Raises:
-            ValueError: When the class name is incorrect
-
-        Returns:
-            Concatenated name
-        """
-
-        name = canonicalize_name(cls.__name__)
-
-        return PluginFullName(".".join(name))
-
-    @classmethod
-    def name(cls) -> PluginName:
-        """The plugin name
-
-        Returns:
-            The name
-        """
-        name = canonicalize_name(cls.__name__)
-        return PluginName(name.name)
-
-    @classmethod
-    def group(cls) -> PluginGroup:
-        """The cppython plugin group name
-
-        Returns:
-            The group name
-        """
-        name = canonicalize_name(cls.__name__)
-        return PluginGroup(name.group)
-
-    @cached_property
-    def logger(self) -> Logger:
-        """Returns the plugin specific sub-logger
-
-        Returns:
-            The plugin's named logger
-        """
-
-        return getLogger(f"cppython.{self.group()}.{self.name()}")
-
-
-PluginT = TypeVar("PluginT", bound=Plugin)
-
-
-class PluginGroupData(CPPythonModel, ABC, extra=Extra.forbid):
+class PluginGroupData(CPPythonModel, extra=Extra.forbid):
     """Group data"""
 
 
-PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
+PluginGroupDataT_contra = TypeVar("PluginGroupDataT_contra", bound=PluginGroupData, contravariant=True)
 
 
 class CorePluginData(CPPythonModel):
@@ -270,32 +200,26 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
-class DataPlugin(Plugin, Generic[PluginGroupDataT]):
+class DataPlugin(Protocol[PluginGroupDataT_contra]):
     """Abstract plugin type for internal CPPython data"""
 
-    def __init__(self, entry: EntryPoint, group_data: PluginGroupDataT, core_data: CorePluginData) -> None:
-        self._group_data = group_data
-        self._core_data = core_data
+    def configure(self, group_data: PluginGroupDataT_contra, core_data: CorePluginData) -> None:
+        """_summary_
 
-        super().__init__(entry)
+        Args:
+            group_data: _description_
+            core_data: _description_
+        """
 
-    @property
-    def group_data(self) -> PluginGroupDataT:
-        """Returns the PluginGroupData object set at initialization"""
-        return self._group_data
-
-    @property
-    def core_data(self) -> CorePluginData:
-        """Returns the data object set at initialization"""
-        return self._core_data
-
-    def activate(self, data: dict[str, Any]) -> None:
+    def activate(self, configuration_data: dict[str, Any]) -> None:
         """Called when the plugin configuration data is available after initialization
 
         Args:
-            data: Input configuration data the plugin needs to parse
+            configuration_data: _description_
+
+        Raises:
+            NotImplementedError: _description_
         """
-        raise NotImplementedError()
 
 
 DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
@@ -356,3 +280,16 @@ class CoreData(CPPythonModel):
     project_data: ProjectData
     pep621_data: PEP621Data
     cppython_data: CPPythonData
+
+
+class Interface(Protocol):
+    """Defines"""
+
+    def write_pyproject(self) -> None:
+        """Called when CPPython requires the interface to write out pyproject.toml changes"""
+
+    def something(self) -> None:
+        """TODO"""
+
+
+InterfaceT = TypeVar("InterfaceT", bound=Interface)

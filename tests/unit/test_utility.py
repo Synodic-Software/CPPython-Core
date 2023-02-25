@@ -2,7 +2,6 @@
 """
 
 import logging
-from importlib.metadata import EntryPoint
 from logging import StreamHandler
 from pathlib import Path
 from sys import executable
@@ -11,7 +10,7 @@ import pytest
 from pytest import LogCaptureFixture
 
 from cppython_core.exceptions import ProcessError
-from cppython_core.schema import CPPythonModel, Plugin
+from cppython_core.schema import CPPythonModel
 from cppython_core.utility import canonicalize_name, subprocess_call
 
 cppython_logger = logging.getLogger("cppython")
@@ -27,25 +26,7 @@ class TestUtility:
         test_path: Path
         test_int: int
 
-    def test_plugin_log(self, caplog: LogCaptureFixture) -> None:
-        """Ensures that the root logger receives the auto-gathered plugin logger
-
-        Args:
-            caplog: Fixture for capturing logging input
-        """
-
-        class MockPlugin(Plugin):
-            """A dummy plugin to verify logging metadata"""
-
-        entry = EntryPoint(name="mock", value="value", group="cppython.plugin")
-        plugin = MockPlugin(entry)
-        logger = plugin.logger
-
-        with caplog.at_level(logging.INFO):
-            logger.info("test")
-            assert caplog.record_tuples == [("cppython.plugin.mock", logging.INFO, "test")]
-
-    def test_name_normalization(self) -> None:
+    def test_basic_name_normalization(self) -> None:
         """Test that canonicalization works"""
 
         test = canonicalize_name("BasicPlugin")
@@ -53,11 +34,15 @@ class TestUtility:
         assert test.group == "plugin"
         assert test.name == "basic"
 
+    def test_group_acronym_normalization(self) -> None:
+        """Test that canonicalization works"""
         test = canonicalize_name("AcronymYA")
 
         assert test.group == "ya"
         assert test.name == "acronym"
 
+    def test_name_acronym_normalization(self) -> None:
+        """Test that canonicalization works"""
         test = canonicalize_name("YAAcronym")
         assert test.group == "acronym"
         assert test.name == "ya"
