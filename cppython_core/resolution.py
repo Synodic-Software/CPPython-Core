@@ -3,8 +3,8 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
-from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
+from cppython_core.plugin_schema.generator import GeneratorGroupData
+from cppython_core.plugin_schema.provider import ProviderGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -218,43 +218,3 @@ def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> 
         root_directory=project_data.pyproject_file.parent, generator=cppython_data.generator_name
     )
     return configuration
-
-
-def extract_provider_data(cppython_local_configuration: CPPythonLocalConfiguration, plugin: Provider) -> dict[str, Any]:
-    """Extracts a plugin data type from the CPPython table
-
-    Args:
-        cppython_local_configuration: Configuration data
-        plugin: The plugin
-
-    Raises:
-        KeyError: If there is no plugin data with the given name
-
-    Returns:
-        The plugin data
-    """
-
-    data: dict[str, Any] = cppython_local_configuration.provider[resolve_name(type(plugin))]
-
-    return data
-
-
-def extract_generator_data(
-    cppython_local_configuration: CPPythonLocalConfiguration, plugin: Generator
-) -> dict[str, Any]:
-    """Extracts a plugin data type from the CPPython table
-
-    Args:
-        cppython_local_configuration: Configuration data
-        plugin: The plugin
-
-    Raises:
-        KeyError: If there is no plugin data with the given name
-
-    Returns:
-        The plugin data
-    """
-
-    data: dict[str, Any] = cppython_local_configuration.generator[resolve_name(type(plugin))]
-
-    return data

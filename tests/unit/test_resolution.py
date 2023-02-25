@@ -2,13 +2,9 @@
 """
 
 from pathlib import Path
-from typing import Any
-
-from pytest_mock import MockerFixture
 
 from cppython_core.resolution import (
     resolve_cppython,
-    resolve_cppython_plugin,
     resolve_generator,
     resolve_pep621,
     resolve_project_configuration,
@@ -17,7 +13,6 @@ from cppython_core.resolution import (
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
-    DataPlugin,
     PEP621Configuration,
     ProjectConfiguration,
     ProjectData,
@@ -59,33 +54,6 @@ class TestSchema:
 
         assert len(class_variables)
         assert not None in class_variables.values()
-
-    def test_cppython_plugin_resolve(self, tmp_path: Path, mocker: MockerFixture) -> None:
-        """Test the CPPython plugin schema resolve function
-
-        Args:
-            tmp_path: Temporary path with a lifetime of this test function
-            mocker: Mocking fixture
-        """
-
-        # Create a working configuration
-        pyproject = tmp_path / "pyproject.toml"
-        pyproject.write_text("")
-
-        # Data definition
-        local_config = CPPythonLocalConfiguration(
-            **{"install-path": tmp_path, "generator-name": "test_generator", "provider-name": "test_provider"}
-        )
-        global_config = CPPythonGlobalConfiguration()
-
-        project_config = ProjectData(pyproject_file=pyproject)
-
-        resolved = resolve_cppython(local_config, global_config, project_config)
-
-        mock_plugin_type = mocker.create_autospec(DataPlugin[Any])
-
-        resolve_cppython_plugin(resolved, mock_plugin_type)
-        mock_plugin_type.name.assert_called()
 
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""
