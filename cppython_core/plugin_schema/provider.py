@@ -1,5 +1,4 @@
 """Provider data plugin definitions"""
-from pathlib import Path
 from typing import Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
@@ -18,29 +17,6 @@ class ProviderGroupData(PluginGroupData):
 @runtime_checkable
 class Provider(DataPlugin[ProviderGroupData], Protocol):
     """Abstract type to be inherited by CPPython Provider plugins"""
-
-    @staticmethod
-    def supported(directory: Path) -> bool:
-        """Queries a given directory for provider related files
-
-        Args:
-            directory: The directory to investigate
-
-        Returns:
-            Whether the directory has pre-existing provider support
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    async def download_tooling(cls, path: Path) -> None:
-        """Installs the external tooling required by the provider
-
-        Args:
-            path: The directory to download any extra tooling to
-
-        Raises:
-            NotImplementedError: Must be sub-classed
-        """
 
     def sync_data(self, generator_name: PluginName) -> SyncData | None:
         """Requests generator information from the provider. The generator is either defined by a provider specific file

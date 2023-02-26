@@ -185,6 +185,34 @@ PluginGroup = NewType("PluginGroup", str)
 PluginFullName = NewType("PluginFullName", str)
 
 
+class Information(CPPythonModel):
+    """Plugin information beyond project metadata"""
+
+
+class Plugin(Protocol):
+    """CPPython plugin"""
+
+    @staticmethod
+    def supported(directory: Path) -> bool:
+        """Queries a given directory for plugin related files
+
+        Args:
+            directory: The directory to investigate
+
+        Returns:
+            Whether the directory has pre-existing plugin support.
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def information() -> Information:
+        """Returns plugin information"""
+        raise NotImplementedError()
+
+
+PluginT = TypeVar("PluginT", bound=Plugin)
+
+
 class PluginGroupData(CPPythonModel, extra=Extra.forbid):
     """Group data"""
 
@@ -200,7 +228,7 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
-class DataPlugin(Protocol[PluginGroupDataT_contra]):
+class DataPlugin(Plugin, Protocol[PluginGroupDataT_contra]):
     """Abstract plugin type for internal CPPython data"""
 
     def configure(self, group_data: PluginGroupDataT_contra, core_data: CorePluginData) -> None:
@@ -219,6 +247,17 @@ class DataPlugin(Protocol[PluginGroupDataT_contra]):
 
         Raises:
             NotImplementedError: _description_
+        """
+
+    @classmethod
+    async def download_tooling(cls, path: Path) -> None:
+        """Installs the external tooling required by the provider
+
+        Args:
+            path: The directory to download any extra tooling to
+
+        Raises:
+            NotImplementedError: Must be sub-classed
         """
 
 
@@ -288,8 +327,8 @@ class Interface(Protocol):
     def write_pyproject(self) -> None:
         """Called when CPPython requires the interface to write out pyproject.toml changes"""
 
-    def something(self) -> None:
-        """TODO"""
+    def write_configuration(self) -> None:
+        """Called when CPPython requires the interface to write out configuration changes"""
 
 
 InterfaceT = TypeVar("InterfaceT", bound=Interface)
