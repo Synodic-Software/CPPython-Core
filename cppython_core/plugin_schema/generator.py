@@ -1,5 +1,4 @@
 """Generator data plugin definitions"""
-from pathlib import Path
 from typing import Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
@@ -17,18 +16,6 @@ class GeneratorGroupData(PluginGroupData):
 @runtime_checkable
 class Generator(DataPlugin[GeneratorGroupData], Protocol):
     """Abstract type to be inherited by CPPython Generator plugins"""
-
-    @staticmethod
-    def supported(directory: Path) -> bool:
-        """Queries a given directory for generator related files
-
-        Args:
-            directory: The directory to investigate
-
-        Returns:
-            Whether the directory has pre-existing generator support
-        """
-        raise NotImplementedError()
 
     def sync(self, sync_data: SyncData) -> None:
         """Synchronizes generator files and state with the providers input

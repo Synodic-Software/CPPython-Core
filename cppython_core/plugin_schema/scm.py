@@ -2,32 +2,29 @@
 from pathlib import Path
 from typing import Protocol, TypeVar, runtime_checkable
 
+from cppython_core.schema import Plugin
+
 
 @runtime_checkable
-class SCM(Protocol):
+class SCM(Plugin, Protocol):
     """Base class for version control systems"""
 
-    def is_repository(self, path: Path) -> bool:
-        """Queries repository status of a path
-
-        Args:
-            path: The input path to query
-
-        Returns:
-            Whether the given path is a repository root
-        """
-        raise NotImplementedError()
-
-    def extract_version(self, path: Path) -> str:
+    def version(self, path: Path) -> str | None:
         """Extracts the system's version metadata
 
         Args:
-            path: The repository path
+            path: The input directory
 
         Returns:
-            A version
+            A version string
         """
-        raise NotImplementedError()
+
+    def description(self) -> str | None:
+        """Requests extraction of the project description
+
+        Returns:
+            Returns the project description, or none if unavailable
+        """
 
 
 SCMT = TypeVar("SCMT", bound=SCM)
