@@ -20,10 +20,10 @@ class SCM(Plugin, Protocol):
         """
 
     def description(self) -> str | None:
-        """_summary_
+        """Requests extraction of the project description
 
         Returns:
-            _description_
+            Returns the project description, or none if unavailable
         """
 
 

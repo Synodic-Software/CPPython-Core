@@ -232,21 +232,18 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT_contra]):
     """Abstract plugin type for internal CPPython data"""
 
     def configure(self, group_data: PluginGroupDataT_contra, core_data: CorePluginData) -> None:
-        """_summary_
-
-        Args:
-            group_data: _description_
-            core_data: _description_
-        """
-
-    def activate(self, configuration_data: dict[str, Any]) -> None:
         """Called when the plugin configuration data is available after initialization
 
         Args:
-            configuration_data: _description_
+            group_data: CPPython plugin group data
+            core_data: CPPython core configuration data
+        """
 
-        Raises:
-            NotImplementedError: _description_
+    def activate(self, configuration_data: dict[str, Any]) -> None:
+        """Called when the project configuration data is available after initialization
+
+        Args:
+            configuration_data: The local configuration data from the pyproject.toml file
         """
 
     @classmethod
@@ -255,9 +252,6 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT_contra]):
 
         Args:
             path: The directory to download any extra tooling to
-
-        Raises:
-            NotImplementedError: Must be sub-classed
         """
 
 
