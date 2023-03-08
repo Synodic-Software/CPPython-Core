@@ -2,6 +2,7 @@
 """
 
 from pathlib import Path
+from typing import Any
 
 from cppython_core.resolution import (
     resolve_cppython,
@@ -33,10 +34,14 @@ class TestSchema:
         pyproject = tmp_path / "pyproject.toml"
         pyproject.write_text("")
 
+        data: dict[str, Any] = {
+            "install-path": tmp_path,
+            "generator-name": "test_generator",
+            "provider-name": "test_provider",
+        }
+
         # Data definition
-        local_config = CPPythonLocalConfiguration(
-            **{"install-path": tmp_path, "generator-name": "test_generator", "provider-name": "test_provider"}
-        )
+        local_config = CPPythonLocalConfiguration(**data)
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)
@@ -94,9 +99,13 @@ class TestSchema:
         pyproject.write_text("")
 
         # Data definition
-        local_config = CPPythonLocalConfiguration(
-            **{"install-path": tmp_path, "generator-name": "test_generator", "provider-name": "test_provider"}
-        )
+        data: dict[str, Any] = {
+            "install-path": tmp_path,
+            "generator-name": "test_generator",
+            "provider-name": "test_provider",
+        }
+
+        local_config = CPPythonLocalConfiguration(**data)
         global_config = CPPythonGlobalConfiguration()
 
         project_config = ProjectData(pyproject_file=pyproject)
