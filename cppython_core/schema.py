@@ -240,7 +240,9 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
     configuration_data: ModelT
 
     @abstractmethod
-    def __init__(self) -> None:
+    def __init__(
+        self, group_data: PluginGroupDataT, core_data: CorePluginData, configuration_data: dict[str, Any]
+    ) -> None:
         raise NotImplementedError
 
     @classmethod
