@@ -1,6 +1,7 @@
 """Data types for CPPython that encapsulate the requirements between the plugins and the core library
 """
 
+from abc import abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, NewType, Protocol, TypeVar
@@ -195,7 +196,8 @@ class Plugin(Protocol):
 
     @staticmethod
     def supported(directory: Path) -> bool:
-        """Queries a given directory for plugin related files
+        """Queries a given directory for plugin related files.
+        If the plugin possibly can't support a directory, this method should be overridden
 
         Args:
             directory: The directory to investigate
@@ -203,12 +205,13 @@ class Plugin(Protocol):
         Returns:
             Whether the directory has pre-existing plugin support.
         """
-        raise NotImplementedError()
+        return True
 
     @staticmethod
+    @abstractmethod
     def information() -> Information:
         """Returns plugin information"""
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 PluginT = TypeVar("PluginT", bound=Plugin)
@@ -238,7 +241,7 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
 
     @classmethod
     async def download_tooling(cls, path: Path) -> None:
-        """Installs the external tooling required by the provider
+        """Installs the external tooling required by the plugin. Should be overridden if required
 
         Args:
             path: The directory to download any extra tooling to
@@ -306,13 +309,17 @@ class CoreData(CPPythonModel):
 
 
 class Interface(Protocol):
-    """Defines"""
+    """Type for interfaces to allow feedback from CPPython"""
 
+    @abstractmethod
     def write_pyproject(self) -> None:
         """Called when CPPython requires the interface to write out pyproject.toml changes"""
+        raise NotImplementedError
 
+    @abstractmethod
     def write_configuration(self) -> None:
         """Called when CPPython requires the interface to write out configuration changes"""
+        raise NotImplementedError
 
 
 InterfaceT = TypeVar("InterfaceT", bound=Interface)

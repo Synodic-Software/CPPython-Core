@@ -1,4 +1,5 @@
 """Provider data plugin definitions"""
+from abc import abstractmethod
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
@@ -24,7 +25,8 @@ class ProviderGroupData(PluginGroupData):
 class Provider(DataPlugin[ProviderGroupData, ModelT], Protocol[ModelT]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
-    def sync_data(self, generator_name: PluginName) -> SyncData | None:
+    @abstractmethod
+    def sync_data(self, generator_name: PluginName) -> SyncData:
         """Requests generator information from the provider. The generator is either defined by a provider specific file
         or the CPPython configuration table
 
@@ -34,12 +36,17 @@ class Provider(DataPlugin[ProviderGroupData, ModelT], Protocol[ModelT]):
         Returns:
             An instantiated data type
         """
+        raise NotImplementedError
 
+    @abstractmethod
     def install(self) -> None:
         """Called when dependencies need to be installed from a lock file."""
+        raise NotImplementedError
 
+    @abstractmethod
     def update(self) -> None:
         """Called when dependencies need to be updated and written to the lock file."""
+        raise NotImplementedError
 
 
 ProviderT = TypeVar("ProviderT", bound=Provider[Any])

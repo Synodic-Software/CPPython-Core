@@ -1,4 +1,5 @@
 """Version control data plugin definitions"""
+from abc import abstractmethod
 from pathlib import Path
 from typing import Protocol, TypeVar, runtime_checkable
 
@@ -9,7 +10,8 @@ from cppython_core.schema import Plugin
 class SCM(Plugin, Protocol):
     """Base class for version control systems"""
 
-    def version(self, path: Path) -> str | None:
+    @abstractmethod
+    def version(self, path: Path) -> str:
         """Extracts the system's version metadata
 
         Args:
@@ -18,6 +20,7 @@ class SCM(Plugin, Protocol):
         Returns:
             A version string
         """
+        raise NotImplementedError
 
     def description(self) -> str | None:
         """Requests extraction of the project description
