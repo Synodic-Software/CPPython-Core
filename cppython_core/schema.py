@@ -239,6 +239,10 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
     core_data: CorePluginData
     configuration_data: ModelT
 
+    @abstractmethod
+    def __init__(self) -> None:
+        raise NotImplementedError
+
     @classmethod
     async def download_tooling(cls, path: Path) -> None:
         """Installs the external tooling required by the plugin. Should be overridden if required
