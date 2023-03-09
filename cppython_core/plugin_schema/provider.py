@@ -26,7 +26,7 @@ class Provider(DataPlugin[ProviderGroupData, ModelT], Protocol[ModelT]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
     @abstractmethod
-    def sync_data(self, generator_name: PluginName) -> SyncData:
+    def sync_data(self, generator_name: PluginName) -> SyncData | None:
         """Requests generator information from the provider. The generator is either defined by a provider specific file
         or the CPPython configuration table
 
@@ -34,7 +34,7 @@ class Provider(DataPlugin[ProviderGroupData, ModelT], Protocol[ModelT]):
             generator_name: The name of the generator requesting sync information
 
         Returns:
-            An instantiated data type
+            An instantiated data type, or None if the generator is not supported
         """
         raise NotImplementedError
 
