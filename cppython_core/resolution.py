@@ -164,7 +164,7 @@ def resolve_cppython(
     return cppython_data
 
 
-def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPlugin[Any]]) -> CPPythonPluginData:
+def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPlugin[Any, Any]]) -> CPPythonPluginData:
     """Resolve project configuration for plugins
 
     Args:
