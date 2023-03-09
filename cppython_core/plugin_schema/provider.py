@@ -1,10 +1,16 @@
 """Provider data plugin definitions"""
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, PluginName, SyncData
+from cppython_core.schema import (
+    DataPlugin,
+    ModelT,
+    PluginGroupData,
+    PluginName,
+    SyncData,
+)
 
 
 class ProviderGroupData(PluginGroupData):
@@ -15,7 +21,7 @@ class ProviderGroupData(PluginGroupData):
 
 
 @runtime_checkable
-class Provider(DataPlugin[ProviderGroupData], Protocol):
+class Provider(DataPlugin[ProviderGroupData, ModelT], Protocol[ModelT]):
     """Abstract type to be inherited by CPPython Provider plugins"""
 
     def sync_data(self, generator_name: PluginName) -> SyncData | None:
@@ -36,4 +42,4 @@ class Provider(DataPlugin[ProviderGroupData], Protocol):
         """Called when dependencies need to be updated and written to the lock file."""
 
 
-ProviderT = TypeVar("ProviderT", bound=Provider)
+ProviderT = TypeVar("ProviderT", bound=Provider[Any])

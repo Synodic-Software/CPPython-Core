@@ -218,7 +218,7 @@ class PluginGroupData(CPPythonModel, extra=Extra.forbid):
     """Group data"""
 
 
-PluginGroupDataT_contra = TypeVar("PluginGroupDataT_contra", bound=PluginGroupData, contravariant=True)
+PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
 
 
 class CorePluginData(CPPythonModel):
@@ -229,23 +229,12 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
-class DataPlugin(Plugin, Protocol[PluginGroupDataT_contra]):
+class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
     """Abstract plugin type for internal CPPython data"""
 
-    def configure(self, group_data: PluginGroupDataT_contra, core_data: CorePluginData) -> None:
-        """Called when the plugin configuration data is available after initialization
-
-        Args:
-            group_data: CPPython plugin group data
-            core_data: CPPython core configuration data
-        """
-
-    def activate(self, configuration_data: dict[str, Any]) -> None:
-        """Called when the project configuration data is available after initialization
-
-        Args:
-            configuration_data: The local configuration data from the pyproject.toml file
-        """
+    group_data: PluginGroupDataT
+    core_data: CorePluginData
+    configuration_data: ModelT
 
     @classmethod
     async def download_tooling(cls, path: Path) -> None:
@@ -256,7 +245,7 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT_contra]):
         """
 
 
-DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
+DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any, Any])
 
 
 class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
