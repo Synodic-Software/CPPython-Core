@@ -232,12 +232,8 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
-class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
+class DataPlugin(Plugin, Protocol[PluginGroupDataT]):
     """Abstract plugin type for internal CPPython data"""
-
-    group_data: PluginGroupDataT
-    core_data: CorePluginData
-    configuration_data: ModelT
 
     @abstractmethod
     def __init__(
@@ -254,7 +250,7 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
         """
 
 
-DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any, Any])
+DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
 
 
 class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
