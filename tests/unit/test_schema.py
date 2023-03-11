@@ -1,5 +1,4 @@
-"""Test custom schema validation that cannot be verified by the Pydantic validation
-"""
+"""Test custom schema validation that cannot be verified by the Pydantic validation"""
 
 import pytest
 from pydantic import Field

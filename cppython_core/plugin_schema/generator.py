@@ -14,18 +14,32 @@ class GeneratorGroupData(PluginGroupData):
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
-@runtime_checkable
-class Generator(DataPlugin[GeneratorGroupData], Protocol):
-    """Abstract type to be inherited by CPPython Generator plugins"""
+class SyncConsumer(Protocol):
+    """Interface for consuming synchronization data from providers"""
+
+    @staticmethod
+    @abstractmethod
+    def sync_types() -> list[type[SyncData]]:
+        """Broadcasts supported types
+
+        Returns:
+            A list of synchronization types that are supported
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def sync(self, sync_data: SyncData) -> None:
         """Synchronizes generator files and state with the providers input
 
         Args:
-            sync_data: List of information gathered from providers
+            sync_data: The input data to sync with
         """
         raise NotImplementedError
+
+
+@runtime_checkable
+class Generator(DataPlugin[GeneratorGroupData], SyncConsumer, Protocol):
+    """Abstract type to be inherited by CPPython Generator plugins"""
 
 
 GeneratorT = TypeVar("GeneratorT", bound=Generator)

@@ -5,7 +5,7 @@ from typing import Protocol, TypeVar, runtime_checkable
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, PluginName, SyncData
+from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
 
 
 class ProviderGroupData(PluginGroupData):
@@ -15,22 +15,38 @@ class ProviderGroupData(PluginGroupData):
     generator: str
 
 
-@runtime_checkable
-class Provider(DataPlugin[ProviderGroupData], Protocol):
-    """Abstract type to be inherited by CPPython Provider plugins"""
+class SyncProducer(Protocol):
+    """Interface for producing synchronization data with generators"""
 
     @abstractmethod
-    def sync_data(self, generator_name: PluginName) -> SyncData | None:
+    def supported_sync_type(self, sync_type: type[SyncData]) -> bool:
+        """Queries for support for a given synchronization type
+
+        Args:
+            sync_type: The type to query support for
+
+        Returns:
+            Support
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def sync_data(self, sync_type: type[SyncData]) -> SyncData | None:
         """Requests generator information from the provider. The generator is either defined by a provider specific file
         or the CPPython configuration table
 
         Args:
-            generator_name: The name of the generator requesting sync information
+            sync_type: The type requesting to be fulfilled
 
         Returns:
-            An instantiated data type, or None if the generator is not supported
+            An instantiated data type, or None if no instantiation is made
         """
         raise NotImplementedError
+
+
+@runtime_checkable
+class Provider(DataPlugin[ProviderGroupData], SyncProducer, Protocol):
+    """Abstract type to be inherited by CPPython Provider plugins"""
 
     @abstractmethod
     def install(self) -> None:

@@ -173,18 +173,18 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
 
 CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 
+PluginName = NewType("PluginName", str)
+PluginGroup = NewType("PluginGroup", str)
+PluginFullName = NewType("PluginFullName", str)
+
 
 class SyncData(CPPythonModel):
     """Data that passes in a plugin sync"""
 
-    provider_name: str
+    provider_name: PluginName
 
 
 SyncDataT = TypeVar("SyncDataT", bound=SyncData)
-
-PluginName = NewType("PluginName", str)
-PluginGroup = NewType("PluginGroup", str)
-PluginFullName = NewType("PluginFullName", str)
 
 
 class Information(CPPythonModel):
