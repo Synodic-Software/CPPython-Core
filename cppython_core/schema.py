@@ -221,6 +221,7 @@ class PluginGroupData(CPPythonModel, extra=Extra.forbid):
     """Group data"""
 
 
+PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
 PluginGroupDataT_co = TypeVar("PluginGroupDataT_co", bound=PluginGroupData, covariant=True)
 
 
