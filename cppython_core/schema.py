@@ -221,7 +221,7 @@ class PluginGroupData(CPPythonModel, extra=Extra.forbid):
     """Group data"""
 
 
-PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
+PluginGroupDataT_co = TypeVar("PluginGroupDataT_co", bound=PluginGroupData, covariant=True)
 
 
 class CorePluginData(CPPythonModel):
@@ -232,16 +232,12 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
-class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
+class DataPlugin(Plugin, Protocol[PluginGroupDataT_co]):
     """Abstract plugin type for internal CPPython data"""
-
-    group_data: PluginGroupDataT
-    core_data: CorePluginData
-    configuration_data: ModelT
 
     @abstractmethod
     def __init__(
-        self, group_data: PluginGroupDataT, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: PluginGroupDataT_co, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         raise NotImplementedError
 
@@ -254,7 +250,7 @@ class DataPlugin(Plugin, Protocol[PluginGroupDataT, ModelT]):
         """
 
 
-DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any, Any])
+DataPluginT = TypeVar("DataPluginT", bound=DataPlugin[Any])
 
 
 class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
