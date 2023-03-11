@@ -1,11 +1,11 @@
 """Generator data plugin definitions"""
 from abc import abstractmethod
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
+from cppython_core.schema import CorePluginData, DataPlugin, PluginGroupData, SyncData
 
 
 class GeneratorGroupData(PluginGroupData):
@@ -38,8 +38,14 @@ class SyncConsumer(Protocol):
 
 
 @runtime_checkable
-class Generator(DataPlugin[GeneratorGroupData], SyncConsumer, Protocol):
+class Generator(DataPlugin, SyncConsumer, Protocol):
     """Abstract type to be inherited by CPPython Generator plugins"""
+
+    @abstractmethod
+    def __init__(
+        self, group_data: GeneratorGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+    ) -> None:
+        raise NotImplementedError
 
 
 GeneratorT = TypeVar("GeneratorT", bound=Generator)
