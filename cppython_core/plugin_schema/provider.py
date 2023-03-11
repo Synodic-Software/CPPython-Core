@@ -1,11 +1,11 @@
 """Provider data plugin definitions"""
 from abc import abstractmethod
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import DataPlugin, PluginGroupData, SyncData
+from cppython_core.schema import CorePluginData, DataPlugin, PluginGroupData, SyncData
 
 
 class ProviderGroupData(PluginGroupData):
@@ -45,8 +45,14 @@ class SyncProducer(Protocol):
 
 
 @runtime_checkable
-class Provider(DataPlugin[ProviderGroupData], SyncProducer, Protocol):
+class Provider(DataPlugin, SyncProducer, Protocol):
     """Abstract type to be inherited by CPPython Provider plugins"""
+
+    @abstractmethod
+    def __init__(
+        self, group_data: ProviderGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+    ) -> None:
+        raise NotImplementedError
 
     @abstractmethod
     def install(self) -> None:
