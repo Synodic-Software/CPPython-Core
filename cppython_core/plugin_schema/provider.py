@@ -18,8 +18,9 @@ class ProviderGroupData(PluginGroupData):
 class SyncProducer(Protocol):
     """Interface for producing synchronization data with generators"""
 
+    @staticmethod
     @abstractmethod
-    def supported_sync_type(self, sync_type: type[SyncData]) -> bool:
+    def supported_sync_type(sync_type: type[SyncData]) -> bool:
         """Queries for support for a given synchronization type
 
         Args:
