@@ -46,7 +46,8 @@ class TestSchema:
     class Producer(SyncProducer):
         """Dummy producer"""
 
-        def supported_sync_type(self, sync_type: type[SyncData]) -> bool:
+        @staticmethod
+        def supported_sync_type(sync_type: type[SyncData]) -> bool:
             """Fulfils protocol
 
             Args:
