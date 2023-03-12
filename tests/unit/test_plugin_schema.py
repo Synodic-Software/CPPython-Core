@@ -62,7 +62,7 @@ class TestSchema:
             """Fulfils protocol
 
             Args:
-                generator: Fulfils protocol
+                consumer: Fulfils protocol
 
             Returns:
                 Fulfils protocol
