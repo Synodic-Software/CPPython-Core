@@ -204,17 +204,14 @@ def resolve_generator(project_data: ProjectData) -> GeneratorGroupData:
     return configuration
 
 
-def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderGroupData:
+def resolve_provider(project_data: ProjectData) -> ProviderGroupData:
     """Creates an instance from the given project
 
     Args:
         project_data: The input project configuration
-        cppython_data: TODO
 
     Returns:
         The plugin specific configuration
     """
-    configuration = ProviderGroupData(
-        root_directory=project_data.pyproject_file.parent, generator=cppython_data.generator_name
-    )
+    configuration = ProviderGroupData(root_directory=project_data.pyproject_file.parent)
     return configuration
