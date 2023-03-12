@@ -98,19 +98,5 @@ class TestSchema:
         pyproject = tmp_path / "pyproject.toml"
         pyproject.write_text("")
 
-        # Data definition
-        data: dict[str, Any] = {
-            "install-path": tmp_path,
-            "generator-name": "test_generator",
-            "provider-name": "test_provider",
-        }
-
-        local_config = CPPythonLocalConfiguration(**data)
-        global_config = CPPythonGlobalConfiguration()
-
-        project_config = ProjectData(pyproject_file=pyproject)
-
-        resolved = resolve_cppython(local_config, global_config, project_config)
-
         project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
-        assert resolve_provider(project_data, resolved)
+        assert resolve_provider(project_data)

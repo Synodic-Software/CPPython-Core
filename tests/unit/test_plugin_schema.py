@@ -58,18 +58,18 @@ class TestSchema:
             """
             return sync_type == TestSchema.GeneratorSyncDataSuccess
 
-        def sync_data(self, sync_type: type[SyncData]) -> SyncData | None:
+        def sync_data(self, consumer: SyncConsumer) -> SyncData | None:
             """Fulfils protocol
 
             Args:
-                sync_type: Fulfils protocol
+                consumer: Fulfils protocol
 
             Returns:
                 Fulfils protocol
             """
-
-            if sync_type == TestSchema.GeneratorSyncDataSuccess:
-                return TestSchema.GeneratorSyncDataSuccess(provider_name=PluginName("Dummy"), success=True)
+            for sync_type in consumer.sync_types():
+                if sync_type == TestSchema.GeneratorSyncDataSuccess:
+                    return TestSchema.GeneratorSyncDataSuccess(provider_name=PluginName("Dummy"), success=True)
 
             return None
 
@@ -88,8 +88,8 @@ class TestSchema:
         """Verifies the variant behavior of SyncData"""
 
         producer = self.Producer()
-        assert producer.sync_data(self.GeneratorSyncDataSuccess)
-        assert not producer.sync_data(self.GeneratorSyncDataFail)
+        consumer = self.Consumer()
+        assert producer.sync_data(consumer)
 
     def test_sync_consumption(self) -> None:
         """Verifies the variant behavior of SyncData"""
@@ -109,5 +109,5 @@ class TestSchema:
 
         for test in types:
             if producer.supported_sync_type(test):
-                if data := producer.sync_data(test):
+                if data := producer.sync_data(consumer):
                     consumer.sync(data)
