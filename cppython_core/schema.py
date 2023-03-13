@@ -188,7 +188,11 @@ SyncDataT = TypeVar("SyncDataT", bound=SyncData)
 
 
 class Information(CPPythonModel):
-    """Plugin information beyond project metadata"""
+    """Plugin feature support"""
+
+    initialization: bool = Field(
+        default=False, description="Whether the plugin supports initialization from an empty state"
+    )
 
 
 class Plugin(Protocol):
@@ -197,20 +201,20 @@ class Plugin(Protocol):
     @staticmethod
     def supported(directory: Path) -> bool:
         """Queries a given directory for plugin related files.
-        If the plugin possibly can't support a directory, this method should be overridden
+        If no meaningful plugin specific files are stored, the directory is in an unsupported state
 
         Args:
-            directory: The directory to investigate
+            directory: The directory to query
 
         Returns:
             Whether the directory has pre-existing plugin support.
         """
-        return True
+        return False
 
     @staticmethod
     @abstractmethod
     def information() -> Information:
-        """Returns plugin information"""
+        """Returns plugin information that broadcast the plugin's features"""
         raise NotImplementedError
 
 
