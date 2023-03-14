@@ -57,6 +57,9 @@ class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
         )
     )
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
+    debug: bool = Field(
+        default=False, description="Debug mode. Additional processing will happen to expose more debug information"
+    )
 
     @validator("verbosity")
     @classmethod
