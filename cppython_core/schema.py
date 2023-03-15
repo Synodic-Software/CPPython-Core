@@ -299,14 +299,14 @@ class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
 class ToolData(CPPythonModel):
     """Tool entry of pyproject.toml"""
 
-    cppython: CPPythonLocalConfiguration | None = Field(default=None)
+    cppython: CPPythonLocalConfiguration = Field(description="CPPython tool data")
 
 
 class PyProject(CPPythonModel):
     """pyproject.toml schema"""
 
-    project: PEP621Configuration
-    tool: ToolData | None = Field(default=None)
+    project: PEP621Configuration = Field(description="PEP621: https://www.python.org/dev/peps/pep-0621/")
+    tool: ToolData = Field(description="Tool data")
 
 
 class CoreData(CPPythonModel):
