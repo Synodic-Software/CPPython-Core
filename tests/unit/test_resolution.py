@@ -50,26 +50,26 @@ class TestSchema:
         project_config = ProjectData(pyproject_file=pyproject)
 
         class MockProvider(Plugin):
-            """TODO"""
+            """Mock Provider"""
 
             @staticmethod
             def information() -> Information:
-                """_summary_
+                """Protocol satisfaction
 
                 Returns:
-                    _description_
+                    Information
                 """
                 return Information()
 
         class MockGenerator(Plugin):
-            """TODO"""
+            """Mock Generator"""
 
             @staticmethod
             def information() -> Information:
-                """_summary_
+                """Protocol satisfaction
 
                 Returns:
-                    _description_
+                    Information
                 """
                 return Information()
 
