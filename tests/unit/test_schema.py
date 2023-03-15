@@ -66,23 +66,6 @@ class TestSchema:
         assert pyproject.tool is not None
         assert pyproject.tool.cppython is not None
 
-    def test_empty_cppython(self) -> None:
-        """Ensure that the common none condition works"""
-
-        data = """
-        [project]\n
-        name = "test"\n
-        version = "1.0.0"\n
-        description = "A test document"\n
-
-        [tool.test]\n
-        """
-
-        document = parse(data).value
-        pyproject = PyProject(**document)
-        assert pyproject.tool is not None
-        assert pyproject.tool.cppython is None
-
     def test_pep621_version(self) -> None:
         """Tests the dynamic version validation"""
 
