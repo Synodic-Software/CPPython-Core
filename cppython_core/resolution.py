@@ -13,6 +13,7 @@ from cppython_core.schema import (
     DataPlugin,
     PEP621Configuration,
     PEP621Data,
+    PluginBuildData,
     PluginFullName,
     PluginGroup,
     PluginName,
@@ -109,6 +110,7 @@ def resolve_cppython(
     local_configuration: CPPythonLocalConfiguration,
     global_configuration: CPPythonGlobalConfiguration,
     project_data: ProjectData,
+    plugin_build_data: PluginBuildData,
 ) -> CPPythonData:
     """Creates a copy and resolves dynamic attributes
 
@@ -116,6 +118,7 @@ def resolve_cppython(
         local_configuration: Local project configuration
         global_configuration: Shared project configuration
         project_data: Project information to aid in the resolution
+        plugin_build_data: Plugin build data
 
     Raises:
         ConfigError: Raised when the tooling did not satisfy the configuration request
@@ -147,19 +150,23 @@ def resolve_cppython(
     modified_tool_path.mkdir(parents=True, exist_ok=True)
     modified_build_path.mkdir(parents=True, exist_ok=True)
 
-    if local_configuration.provider_name is None:
-        raise ConfigError("CPPython did not fill the 'provider_name' value")
 
-    if local_configuration.generator_name is None:
-        raise ConfigError("CPPython did not fill the 'generator_name' value")
+    modified_provider_name = local_configuration.provider_name
+    modified_generator_name = local_configuration.generator_name
+
+    if modified_provider_name is None:
+        modified_provider_name = resolve_name(plugin_build_data.provider_type)
+
+    if modified_generator_name is None:
+        modified_generator_name = resolve_name(plugin_build_data.generator_type)
 
     cppython_data = CPPythonData(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
         build_path=modified_build_path,
         current_check=global_configuration.current_check,
-        provider_name=local_configuration.provider_name,
-        generator_name=local_configuration.generator_name,
+        provider_name=modified_provider_name,
+        generator_name=modified_generator_name,
     )
     return cppython_data
 

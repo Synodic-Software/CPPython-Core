@@ -14,7 +14,10 @@ from cppython_core.resolution import (
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
+    Information,
     PEP621Configuration,
+    Plugin,
+    PluginBuildData,
     ProjectConfiguration,
     ProjectData,
 )
@@ -46,8 +49,34 @@ class TestSchema:
 
         project_config = ProjectData(pyproject_file=pyproject)
 
+        class MockProvider(Plugin):
+            """TODO"""
+
+            @staticmethod
+            def information() -> Information:
+                """_summary_
+
+                Returns:
+                    _description_
+                """
+                return Information()
+
+        class MockGenerator(Plugin):
+            """TODO"""
+
+            @staticmethod
+            def information() -> Information:
+                """_summary_
+
+                Returns:
+                    _description_
+                """
+                return Information()
+
+        plugin_build_data = PluginBuildData(generator_type=MockGenerator, provider_type=MockProvider)
+
         # Function to test
-        resolved = resolve_cppython(local_config, global_config, project_config)
+        resolved = resolve_cppython(local_config, global_config, project_config, plugin_build_data)
 
         # Test that paths are created successfully
         assert resolved.build_path.exists()
