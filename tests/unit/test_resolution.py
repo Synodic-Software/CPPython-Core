@@ -4,26 +4,13 @@
 from pathlib import Path
 from typing import Any
 
-from pytest_mock import MockerFixture
-
-from cppython_core.plugin_schema.generator import Generator
-from cppython_core.plugin_schema.provider import Provider
 from cppython_core.resolution import (
-    PluginBuildData,
-    resolve_cppython,
     resolve_generator,
     resolve_pep621,
     resolve_project_configuration,
     resolve_provider,
 )
-from cppython_core.schema import (
-    CPPythonGlobalConfiguration,
-    CPPythonLocalConfiguration,
-    Information,
-    PEP621Configuration,
-    ProjectConfiguration,
-    ProjectData,
-)
+from cppython_core.schema import PEP621Configuration, ProjectConfiguration, ProjectData
 
 
 class TestSchema:
