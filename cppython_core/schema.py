@@ -4,7 +4,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, NewType, Protocol, TypeVar, runtime_checkable
+from typing import Any, NewType, Protocol, TypeVar
 
 from pydantic import BaseModel, Extra, Field, validator
 from pydantic.types import DirectoryPath, FilePath
@@ -198,7 +198,6 @@ class Information(CPPythonModel):
     )
 
 
-@runtime_checkable
 class Plugin(Protocol):
     """CPPython plugin"""
 
@@ -308,13 +307,6 @@ class PyProject(CPPythonModel):
 
     project: PEP621Configuration = Field(description="PEP621: https://www.python.org/dev/peps/pep-0621/")
     tool: ToolData = Field(description="Tool data")
-
-
-class PluginBuildData(CPPythonModel):
-    """Data needed to construct CoreData"""
-
-    generator_type: type[Plugin]
-    provider_type: type[Plugin]
 
 
 class CoreData(CPPythonModel):

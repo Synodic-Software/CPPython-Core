@@ -3,17 +3,17 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import GeneratorGroupData
-from cppython_core.plugin_schema.provider import ProviderGroupData
+from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
+    CPPythonModel,
     CPPythonPluginData,
     DataPlugin,
     PEP621Configuration,
     PEP621Data,
-    PluginBuildData,
     PluginFullName,
     PluginGroup,
     PluginName,
@@ -106,6 +106,13 @@ def resolve_pep621(
     return pep621_data
 
 
+class PluginBuildData(CPPythonModel):
+    """Data needed to construct CoreData"""
+
+    generator_type: type[Generator]
+    provider_type: type[Provider]
+
+
 def resolve_cppython(
     local_configuration: CPPythonLocalConfiguration,
     global_configuration: CPPythonGlobalConfiguration,
@@ -149,7 +156,6 @@ def resolve_cppython(
     modified_install_path.mkdir(parents=True, exist_ok=True)
     modified_tool_path.mkdir(parents=True, exist_ok=True)
     modified_build_path.mkdir(parents=True, exist_ok=True)
-
 
     modified_provider_name = local_configuration.provider_name
     modified_generator_name = local_configuration.generator_name

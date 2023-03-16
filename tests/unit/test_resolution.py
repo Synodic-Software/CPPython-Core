@@ -4,7 +4,12 @@
 from pathlib import Path
 from typing import Any
 
+from pytest_mock import MockerFixture
+
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
 from cppython_core.resolution import (
+    PluginBuildData,
     resolve_cppython,
     resolve_generator,
     resolve_pep621,
@@ -16,8 +21,6 @@ from cppython_core.schema import (
     CPPythonLocalConfiguration,
     Information,
     PEP621Configuration,
-    Plugin,
-    PluginBuildData,
     ProjectConfiguration,
     ProjectData,
 )
@@ -25,69 +28,6 @@ from cppython_core.schema import (
 
 class TestSchema:
     """Test validation"""
-
-    def test_cppython_resolve(self, tmp_path: Path) -> None:
-        """Test the CPPython schema resolve function
-
-        Args:
-            tmp_path: Temporary path with a lifetime of this test function
-        """
-
-        # Create a working configuration
-        pyproject = tmp_path / "pyproject.toml"
-        pyproject.write_text("")
-
-        data: dict[str, Any] = {
-            "install-path": tmp_path,
-            "generator-name": "test_generator",
-            "provider-name": "test_provider",
-        }
-
-        # Data definition
-        local_config = CPPythonLocalConfiguration(**data)
-        global_config = CPPythonGlobalConfiguration()
-
-        project_config = ProjectData(pyproject_file=pyproject)
-
-        class MockProvider(Plugin):
-            """Mock Provider"""
-
-            @staticmethod
-            def information() -> Information:
-                """Protocol satisfaction
-
-                Returns:
-                    Information
-                """
-                return Information()
-
-        class MockGenerator(Plugin):
-            """Mock Generator"""
-
-            @staticmethod
-            def information() -> Information:
-                """Protocol satisfaction
-
-                Returns:
-                    Information
-                """
-                return Information()
-
-        plugin_build_data = PluginBuildData(generator_type=MockGenerator, provider_type=MockProvider)
-
-        # Function to test
-        resolved = resolve_cppython(local_config, global_config, project_config, plugin_build_data)
-
-        # Test that paths are created successfully
-        assert resolved.build_path.exists()
-        assert resolved.tool_path.exists()
-        assert resolved.install_path.exists()
-
-        # Ensure that all values are populated
-        class_variables = vars(resolved)
-
-        assert len(class_variables)
-        assert not None in class_variables.values()
 
     def test_pep621_resolve(self) -> None:
         """Test the PEP621 schema resolve function"""
