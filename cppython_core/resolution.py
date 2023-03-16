@@ -3,12 +3,13 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import GeneratorGroupData
-from cppython_core.plugin_schema.provider import ProviderGroupData
+from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
+    CPPythonModel,
     CPPythonPluginData,
     DataPlugin,
     PEP621Configuration,
@@ -105,10 +106,18 @@ def resolve_pep621(
     return pep621_data
 
 
+class PluginBuildData(CPPythonModel):
+    """Data needed to construct CoreData"""
+
+    generator_type: type[Generator]
+    provider_type: type[Provider]
+
+
 def resolve_cppython(
     local_configuration: CPPythonLocalConfiguration,
     global_configuration: CPPythonGlobalConfiguration,
     project_data: ProjectData,
+    plugin_build_data: PluginBuildData,
 ) -> CPPythonData:
     """Creates a copy and resolves dynamic attributes
 
@@ -116,6 +125,7 @@ def resolve_cppython(
         local_configuration: Local project configuration
         global_configuration: Shared project configuration
         project_data: Project information to aid in the resolution
+        plugin_build_data: Plugin build data
 
     Raises:
         ConfigError: Raised when the tooling did not satisfy the configuration request
@@ -147,19 +157,22 @@ def resolve_cppython(
     modified_tool_path.mkdir(parents=True, exist_ok=True)
     modified_build_path.mkdir(parents=True, exist_ok=True)
 
-    if local_configuration.provider_name is None:
-        raise ConfigError("CPPython did not fill the 'provider_name' value")
+    modified_provider_name = local_configuration.provider_name
+    modified_generator_name = local_configuration.generator_name
 
-    if local_configuration.generator_name is None:
-        raise ConfigError("CPPython did not fill the 'generator_name' value")
+    if modified_provider_name is None:
+        modified_provider_name = resolve_name(plugin_build_data.provider_type)
+
+    if modified_generator_name is None:
+        modified_generator_name = resolve_name(plugin_build_data.generator_type)
 
     cppython_data = CPPythonData(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
         build_path=modified_build_path,
         current_check=global_configuration.current_check,
-        provider_name=local_configuration.provider_name,
-        generator_name=local_configuration.generator_name,
+        provider_name=modified_provider_name,
+        generator_name=modified_generator_name,
     )
     return cppython_data
 
