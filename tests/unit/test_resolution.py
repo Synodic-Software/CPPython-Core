@@ -2,7 +2,6 @@
 """
 
 from pathlib import Path
-from typing import Any
 
 from cppython_core.resolution import (
     resolve_generator,
