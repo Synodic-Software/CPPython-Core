@@ -26,26 +26,32 @@ class TestUtility:
         test_path: Path
         test_int: int
 
-    def test_basic_name_normalization(self) -> None:
+    def test_name_group(self) -> None:
         """Test that canonicalization works"""
 
-        test = canonicalize_name("BasicPlugin")
+        test = canonicalize_name("NameGroup")
 
-        assert test.group == "plugin"
-        assert test.name == "basic"
+        assert test.group == "group"
+        assert test.name == "name"
 
-    def test_group_acronym_normalization(self) -> None:
+    def test_group_only_caps(self) -> None:
         """Test that canonicalization works"""
-        test = canonicalize_name("AcronymYA")
+        test = canonicalize_name("NameGROUP")
 
-        assert test.group == "ya"
-        assert test.name == "acronym"
+        assert test.group == "group"
+        assert test.name == "name"
 
-    def test_name_acronym_normalization(self) -> None:
+    def test_name_only_caps(self) -> None:
         """Test that canonicalization works"""
-        test = canonicalize_name("YAAcronym")
-        assert test.group == "acronym"
-        assert test.name == "ya"
+        test = canonicalize_name("NAMEGroup")
+        assert test.group == "group"
+        assert test.name == "name"
+
+    def test_name_multi_caps(self) -> None:
+        """Test that caps works"""
+        test = canonicalize_name("NAmeGroup")
+        assert test.group == "group"
+        assert test.name == "name"
 
 
 class TestSubprocess:

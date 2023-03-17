@@ -82,7 +82,7 @@ def write_json(path: Path, data: Any) -> None:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-_canonicalize_regex = re.compile(r"[A-Z](?:[A-Z]*(?![a-z])|[a-z]*)")
+_canonicalize_regex = re.compile(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))")
 
 
 class NormalizedName(NamedTuple):
@@ -102,6 +102,7 @@ def canonicalize_name(name: str) -> NormalizedName:
         The normalized name
     """
 
-    values = _canonicalize_regex.findall(name)
-
-    return NormalizedName(values[0].lower(), values[1].lower())
+    sub = re.sub(_canonicalize_regex, r" \1", name)
+    values = sub.split(" ")
+    result = "".join(values[:-1])
+    return NormalizedName(result.lower(), values[-1].lower())
