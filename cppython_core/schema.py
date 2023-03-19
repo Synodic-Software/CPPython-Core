@@ -196,7 +196,6 @@ class SupportedFeatures(CPPythonModel):
     initialization: bool = Field(
         default=False, description="Whether the plugin supports initialization from an empty state"
     )
-    supported: bool = Field(default=True, description="Whether the plugin supports initialization from an empty state")
 
 
 class Information(CPPythonModel):
