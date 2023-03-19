@@ -14,7 +14,7 @@ from cppython_core.schema import (
 )
 
 
-class GeneratorGroupData(DataPluginGroupData):
+class GeneratorPluginGroupData(DataPluginGroupData):
     """Base class for the configuration data that is set by the project for the generator"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
@@ -53,7 +53,7 @@ class Generator(DataPlugin, SyncConsumer, Protocol):
 
     @abstractmethod
     def __init__(
-        self, group_data: GeneratorGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: GeneratorPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         raise NotImplementedError
 

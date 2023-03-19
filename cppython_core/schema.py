@@ -205,6 +205,8 @@ class Information(CPPythonModel):
 class PluginGroupData(CPPythonModel, extra=Extra.forbid):
     """Plugin group data"""
 
+    root_directory: DirectoryPath = Field(description="The directory of the project")
+
 
 class Plugin(Protocol):
     """CPPython plugin"""
