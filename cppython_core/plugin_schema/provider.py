@@ -2,7 +2,6 @@
 from abc import abstractmethod
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
-from pydantic import Field
 from pydantic.types import DirectoryPath
 
 from cppython_core.plugin_schema.generator import SyncConsumer
@@ -15,10 +14,8 @@ from cppython_core.schema import (
 )
 
 
-class ProviderGroupData(DataPluginGroupData):
+class ProviderPluginGroupData(DataPluginGroupData):
     """Base class for the configuration data that is set by the project for the provider"""
-
-    root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
 class SupportedProviderFeatures(SupportedDataFeatures):
@@ -61,7 +58,7 @@ class Provider(DataPlugin, SyncProducer, Protocol):
 
     @abstractmethod
     def __init__(
-        self, group_data: ProviderGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: ProviderPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         raise NotImplementedError
 

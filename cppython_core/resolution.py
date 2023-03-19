@@ -3,8 +3,9 @@
 from typing import Any, cast
 
 from cppython_core.exceptions import ConfigError
-from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
-from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
+from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
+from cppython_core.plugin_schema.scm import SCMPluginGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -204,7 +205,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
     return cast(CPPythonPluginData, plugin_data)
 
 
-def resolve_generator(project_data: ProjectData) -> GeneratorGroupData:
+def resolve_generator(project_data: ProjectData) -> GeneratorPluginGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -213,11 +214,11 @@ def resolve_generator(project_data: ProjectData) -> GeneratorGroupData:
     Returns:
         The plugin specific configuration
     """
-    configuration = GeneratorGroupData(root_directory=project_data.pyproject_file.parent)
+    configuration = GeneratorPluginGroupData(root_directory=project_data.pyproject_file.parent)
     return configuration
 
 
-def resolve_provider(project_data: ProjectData) -> ProviderGroupData:
+def resolve_provider(project_data: ProjectData) -> ProviderPluginGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -226,5 +227,19 @@ def resolve_provider(project_data: ProjectData) -> ProviderGroupData:
     Returns:
         The plugin specific configuration
     """
-    configuration = ProviderGroupData(root_directory=project_data.pyproject_file.parent)
+    configuration = ProviderPluginGroupData(root_directory=project_data.pyproject_file.parent)
+    return configuration
+
+
+def resolve_scm(project_data: ProjectData) -> SCMPluginGroupData:
+    """Creates an instance from the given project
+
+    Args:
+        project_data: The input project configuration
+
+    Returns:
+        The plugin specific configuration
+    """
+
+    configuration = SCMPluginGroupData(root_directory=project_data.pyproject_file.parent)
     return configuration
