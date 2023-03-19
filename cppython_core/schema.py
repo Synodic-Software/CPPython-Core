@@ -202,8 +202,16 @@ class Information(CPPythonModel):
     """Plugin information that complements the packaged project metadata"""
 
 
+class PluginGroupData(CPPythonModel, extra=Extra.forbid):
+    """Plugin group data"""
+
+
 class Plugin(Protocol):
     """CPPython plugin"""
+
+    @abstractmethod
+    def __init__(self, group_data: PluginGroupData) -> None:
+        raise NotImplementedError
 
     @staticmethod
     @abstractmethod
@@ -232,11 +240,8 @@ class Plugin(Protocol):
 PluginT = TypeVar("PluginT", bound=Plugin)
 
 
-class PluginGroupData(CPPythonModel, extra=Extra.forbid):
-    """Group data"""
-
-
-PluginGroupDataT = TypeVar("PluginGroupDataT", bound=PluginGroupData)
+class DataPluginGroupData(PluginGroupData):
+    """Data plugin group data"""
 
 
 class CorePluginData(CPPythonModel):
@@ -256,7 +261,7 @@ class DataPlugin(Plugin, Protocol):
 
     @abstractmethod
     def __init__(
-        self, group_data: PluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: DataPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         raise NotImplementedError
 
