@@ -5,13 +5,23 @@ from typing import Any, Protocol, TypeVar, runtime_checkable
 from pydantic import Field
 from pydantic.types import DirectoryPath
 
-from cppython_core.schema import CorePluginData, DataPlugin, PluginGroupData, SyncData
+from cppython_core.schema import (
+    CorePluginData,
+    DataPlugin,
+    PluginGroupData,
+    SupportedDataFeatures,
+    SyncData,
+)
 
 
 class GeneratorGroupData(PluginGroupData):
     """Base class for the configuration data that is set by the project for the generator"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
+
+
+class SupportedGeneratorFeatures(SupportedDataFeatures):
+    """Generator plugin feature support"""
 
 
 class SyncConsumer(Protocol):
@@ -45,6 +55,19 @@ class Generator(DataPlugin, SyncConsumer, Protocol):
     def __init__(
         self, group_data: GeneratorGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def features(directory: DirectoryPath) -> SupportedGeneratorFeatures:
+        """Broadcasts the shared features of the generator plugin to CPPython
+
+        Args:
+            directory: The root directory where features are evaluated
+
+        Returns:
+            The supported features
+        """
         raise NotImplementedError
 
 

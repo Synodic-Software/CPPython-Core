@@ -6,13 +6,23 @@ from pydantic import Field
 from pydantic.types import DirectoryPath
 
 from cppython_core.plugin_schema.generator import SyncConsumer
-from cppython_core.schema import CorePluginData, DataPlugin, PluginGroupData, SyncData
+from cppython_core.schema import (
+    CorePluginData,
+    DataPlugin,
+    PluginGroupData,
+    SupportedDataFeatures,
+    SyncData,
+)
 
 
 class ProviderGroupData(PluginGroupData):
     """Base class for the configuration data that is set by the project for the provider"""
 
     root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
+
+
+class SupportedProviderFeatures(SupportedDataFeatures):
+    """Provider plugin feature support"""
 
 
 class SyncProducer(Protocol):
@@ -53,6 +63,19 @@ class Provider(DataPlugin, SyncProducer, Protocol):
     def __init__(
         self, group_data: ProviderGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def features(directory: DirectoryPath) -> SupportedProviderFeatures:
+        """Broadcasts the shared features of the Provider plugin to CPPython
+
+        Args:
+            directory: The root directory where features are evaluated
+
+        Returns:
+            The supported features
+        """
         raise NotImplementedError
 
     @abstractmethod
