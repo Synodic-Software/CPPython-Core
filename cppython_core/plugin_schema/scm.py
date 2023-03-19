@@ -4,7 +4,11 @@ from typing import Protocol, TypeVar, runtime_checkable
 
 from pydantic import DirectoryPath
 
-from cppython_core.schema import Plugin, SupportedFeatures
+from cppython_core.schema import Plugin, PluginGroupData, SupportedFeatures
+
+
+class SCMPluginGroupData(PluginGroupData):
+    """SCM plugin input data"""
 
 
 class SupportedSCMFeatures(SupportedFeatures):
@@ -14,6 +18,10 @@ class SupportedSCMFeatures(SupportedFeatures):
 @runtime_checkable
 class SCM(Plugin, Protocol):
     """Base class for version control systems"""
+
+    @abstractmethod
+    def __init__(self, group_data: SCMPluginGroupData) -> None:
+        raise NotImplementedError
 
     @staticmethod
     @abstractmethod
