@@ -190,34 +190,43 @@ class SyncData(CPPythonModel):
 SyncDataT = TypeVar("SyncDataT", bound=SyncData)
 
 
-class Information(CPPythonModel):
+class SupportedFeatures(CPPythonModel):
     """Plugin feature support"""
 
     initialization: bool = Field(
         default=False, description="Whether the plugin supports initialization from an empty state"
     )
+    supported: bool = Field(default=True, description="Whether the plugin supports initialization from an empty state")
+
+
+class Information(CPPythonModel):
+    """Plugin information that complements the packaged project metadata"""
 
 
 class Plugin(Protocol):
     """CPPython plugin"""
 
     @staticmethod
-    def supported(directory: Path) -> bool:
-        """Queries a given directory for plugin related files.
-        If no meaningful plugin specific files are stored, the directory is in an unsupported state
+    @abstractmethod
+    def features(directory: DirectoryPath) -> SupportedFeatures:
+        """Broadcasts the shared features of the plugin to CPPython
 
         Args:
-            directory: The directory to query
+            directory: The root directory where features are evaluated
 
         Returns:
-            Whether the directory has pre-existing plugin support.
+            The supported features
         """
-        return False
+        raise NotImplementedError
 
     @staticmethod
     @abstractmethod
     def information() -> Information:
-        """Returns plugin information that broadcast the plugin's features"""
+        """Retrieves plugin information that complements the packaged project metadata
+
+        Returns:
+            The plugin's information
+        """
         raise NotImplementedError
 
 
@@ -239,6 +248,10 @@ class CorePluginData(CPPythonModel):
     cppython_data: CPPythonPluginData
 
 
+class SupportedDataFeatures(SupportedFeatures):
+    """Data plugin feature support"""
+
+
 class DataPlugin(Plugin, Protocol):
     """Abstract plugin type for internal CPPython data"""
 
@@ -248,12 +261,25 @@ class DataPlugin(Plugin, Protocol):
     ) -> None:
         raise NotImplementedError
 
+    @staticmethod
+    @abstractmethod
+    def features(directory: DirectoryPath) -> SupportedDataFeatures:
+        """Broadcasts the shared features of the data plugin to CPPython
+
+        Args:
+            directory: The root directory where features are evaluated
+
+        Returns:
+            The supported features
+        """
+        raise NotImplementedError
+
     @classmethod
-    async def download_tooling(cls, path: Path) -> None:
+    async def download_tooling(cls, directory: DirectoryPath) -> None:
         """Installs the external tooling required by the plugin. Should be overridden if required
 
         Args:
-            path: The directory to download any extra tooling to
+            directory: The directory to download any extra tooling to
         """
 
 

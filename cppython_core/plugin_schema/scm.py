@@ -1,21 +1,39 @@
 """Version control data plugin definitions"""
 from abc import abstractmethod
-from pathlib import Path
 from typing import Protocol, TypeVar, runtime_checkable
 
-from cppython_core.schema import Plugin
+from pydantic import DirectoryPath
+
+from cppython_core.schema import Plugin, SupportedFeatures
+
+
+class SupportedSCMFeatures(SupportedFeatures):
+    """SCM plugin feature support"""
 
 
 @runtime_checkable
 class SCM(Plugin, Protocol):
     """Base class for version control systems"""
 
+    @staticmethod
     @abstractmethod
-    def version(self, path: Path) -> str:
+    def features(directory: DirectoryPath) -> SupportedSCMFeatures:
+        """Broadcasts the shared features of the SCM plugin to CPPython
+
+        Args:
+            directory: The root directory where features are evaluated
+
+        Returns:
+            The supported features
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def version(self, directory: DirectoryPath) -> str:
         """Extracts the system's version metadata
 
         Args:
-            path: The input directory
+            directory: The input directory
 
         Returns:
             A version string
