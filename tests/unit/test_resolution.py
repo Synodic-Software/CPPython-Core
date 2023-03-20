@@ -20,7 +20,7 @@ class TestSchema:
 
         data = PEP621Configuration(name="pep621-resolve-test", dynamic=["version"])
         config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
-        resolved = resolve_pep621(data, config)
+        resolved = resolve_pep621(data, config, None)
 
         class_variables = vars(resolved)
 

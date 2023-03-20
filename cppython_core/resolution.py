@@ -2,10 +2,9 @@
 
 from typing import Any, cast
 
-from cppython_core.exceptions import ConfigError
 from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
-from cppython_core.plugin_schema.scm import SCMPluginGroupData
+from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.schema import (
     CPPythonData,
     CPPythonGlobalConfiguration,
@@ -72,13 +71,14 @@ def resolve_project_configuration(project_configuration: ProjectConfiguration) -
 
 
 def resolve_pep621(
-    pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration
+    pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration, scm: SCM | None
 ) -> PEP621Data:
     """Creates a resolved type
 
     Args:
         pep621_configuration: Input PEP621 configuration
         project_configuration: The input configuration used to aid the resolve
+        scm: SCM
 
     Raises:
         ConfigError: Raised when the tooling did not satisfy the configuration request
@@ -92,14 +92,16 @@ def resolve_pep621(
     if "version" in pep621_configuration.dynamic:
         if project_configuration.version is not None:
             modified_version = project_configuration.version
+        elif scm is not None:
+            modified_version = scm.version(project_configuration.pyproject_file.parent)
         else:
-            raise ConfigError("'version' is dynamic but the interface did not provide a version value")
+            raise ValueError("Version can't be resolved. No SCM")
 
     elif pep621_configuration.version is not None:
         modified_version = pep621_configuration.version
 
     else:
-        raise ValueError("Version can't be resolved. This is an internal schema error")
+        raise ValueError("Version can't be resolved. Schema error")
 
     pep621_data = PEP621Data(
         name=pep621_configuration.name, version=modified_version, description=pep621_configuration.description
