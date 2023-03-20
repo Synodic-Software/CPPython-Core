@@ -2,7 +2,7 @@
 from abc import abstractmethod
 from typing import Protocol, TypeVar, runtime_checkable
 
-from pydantic import DirectoryPath
+from pydantic import DirectoryPath, Field
 
 from cppython_core.schema import Plugin, PluginGroupData, SupportedFeatures
 
@@ -13,6 +13,8 @@ class SCMPluginGroupData(PluginGroupData):
 
 class SupportedSCMFeatures(SupportedFeatures):
     """SCM plugin feature support"""
+
+    repository: bool = Field(description="True if the directory is a repository for the SCM. False, otherwise")
 
 
 @runtime_checkable
