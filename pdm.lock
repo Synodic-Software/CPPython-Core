@@ -3,7 +3,7 @@
 
 [[package]]
 name = "astroid"
-version = "2.15.4"
+version = "2.15.5"
 requires_python = ">=3.7.2"
 summary = "An abstract syntax tree for Python with inference support."
 dependencies = [
@@ -115,7 +115,7 @@ summary = "Utility library for gitignore style pattern matching of file paths."
 
 [[package]]
 name = "platformdirs"
-version = "3.5.0"
+version = "3.5.1"
 requires_python = ">=3.7"
 summary = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 
@@ -205,9 +205,9 @@ groups = ["default", "lint", "test"]
 content_hash = "sha256:86117c9eaebc071de5e696fd595c0bb713f4739590ce9f50f2f1c8c6dc27f934"
 
 [metadata.files]
-"astroid 2.15.4" = [
-    {url = "https://files.pythonhosted.org/packages/36/50/c2bde258f4b8021ee9075932ace925245a1ad9a816a0cab269f04f480c3b/astroid-2.15.4.tar.gz", hash = "sha256:c81e1c7fbac615037744d067a9bb5f9aeb655edf59b63ee8b59585475d6f80d8"},
-    {url = "https://files.pythonhosted.org/packages/6d/79/5684480fc8be4b9e3ec55d78376d82e88b6658a2328a7fded88738aa1286/astroid-2.15.4-py3-none-any.whl", hash = "sha256:a1b8543ef9d36ea777194bc9b17f5f8678d2c56ee6a45b2c2f17eec96f242347"},
+"astroid 2.15.5" = [
+    {url = "https://files.pythonhosted.org/packages/6f/51/868921f570a1ad2ddefd04594e1f95aacd6208c85f6b0ab75401acf65cfb/astroid-2.15.5-py3-none-any.whl", hash = "sha256:078e5212f9885fa85fbb0cf0101978a336190aadea6e13305409d099f71b2324"},
+    {url = "https://files.pythonhosted.org/packages/e9/8d/338debdfc65383c2e1a0eaf336810ced0e8bc58a3f64d8f957cfb7b19e84/astroid-2.15.5.tar.gz", hash = "sha256:1039262575027b441137ab4a62a793a9b43defb42c32d5670f38686207cd780f"},
 ]
 "black 23.3.0" = [
     {url = "https://files.pythonhosted.org/packages/06/1e/273d610249f0335afb1ddb03664a03223f4826e3d1a95170a0142cb19fb4/black-23.3.0-cp39-cp39-win_amd64.whl", hash = "sha256:6b39abdfb402002b8a7d030ccc85cf5afff64ee90fa4c5aebc531e3ad0175ddb"},
@@ -391,9 +391,9 @@ content_hash = "sha256:86117c9eaebc071de5e696fd595c0bb713f4739590ce9f50f2f1c8c6d
     {url = "https://files.pythonhosted.org/packages/95/60/d93628975242cc515ab2b8f5b2fc831d8be2eff32f5a1be4776d49305d13/pathspec-0.11.1.tar.gz", hash = "sha256:2798de800fa92780e33acca925945e9a19a133b715067cf165b8866c15a31687"},
     {url = "https://files.pythonhosted.org/packages/be/c8/551a803a6ebb174ec1c124e68b449b98a0961f0b737def601e3c1fbb4cfd/pathspec-0.11.1-py3-none-any.whl", hash = "sha256:d8af70af76652554bd134c22b3e8a1cc46ed7d91edcdd721ef1a0c51a84a5293"},
 ]
-"platformdirs 3.5.0" = [
-    {url = "https://files.pythonhosted.org/packages/91/17/3836ffe140abb245726d0e21c5b9b984e2569e7027c20d12e969ec69bd8a/platformdirs-3.5.0.tar.gz", hash = "sha256:7954a68d0ba23558d753f73437c55f89027cf8f5108c19844d4b82e5af396335"},
-    {url = "https://files.pythonhosted.org/packages/ce/cf/279b73aae00f7ba9d5d7664156ef323ebbf16fb556285bb223ecc45031aa/platformdirs-3.5.0-py3-none-any.whl", hash = "sha256:47692bc24c1958e8b0f13dd727307cff1db103fca36399f457da8e05f222fdc4"},
+"platformdirs 3.5.1" = [
+    {url = "https://files.pythonhosted.org/packages/89/7e/c6ff9ddcf93b9b36c90d88111c4db354afab7f9a58c7ac3257fa717f1268/platformdirs-3.5.1-py3-none-any.whl", hash = "sha256:e2378146f1964972c03c085bb5662ae80b2b8c06226c54b2ff4aa9483e8a13a5"},
+    {url = "https://files.pythonhosted.org/packages/9c/0e/ae9ef1049d4b5697e79250c4b2e72796e4152228e67733389868229c92bb/platformdirs-3.5.1.tar.gz", hash = "sha256:412dae91f52a6f84830f39a8078cecd0e866cb72294a5c66808e74d5e88d251f"},
 ]
 "pluggy 1.0.0" = [
     {url = "https://files.pythonhosted.org/packages/9e/01/f38e2ff29715251cf25532b9082a1589ab7e4f571ced434f98d0139336dc/pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
