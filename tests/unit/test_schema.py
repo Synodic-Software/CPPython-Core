@@ -9,7 +9,6 @@ from cppython_core.schema import (
     CPPythonLocalConfiguration,
     CPPythonModel,
     PEP621Configuration,
-    PyProject,
 )
 
 
@@ -48,23 +47,6 @@ class TestSchema:
     def test_cppython_global(self) -> None:
         """Ensures that the CPPython global config data can be defaulted"""
         CPPythonGlobalConfiguration()
-
-    def test_cppython_table(self) -> None:
-        """Ensures that the nesting yaml table behavior can be read properly"""
-
-        data = """
-        [project]\n
-        name = "test"\n
-        version = "1.0.0"\n
-        description = "A test document"\n
-
-        [tool.cppython]\n
-        """
-
-        document = parse(data).value
-        pyproject = PyProject(**document)
-        assert pyproject.tool is not None
-        assert pyproject.tool.cppython is not None
 
     def test_pep621_version(self) -> None:
         """Tests the dynamic version validation"""
