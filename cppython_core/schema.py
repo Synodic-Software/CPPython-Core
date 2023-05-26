@@ -13,16 +13,10 @@ from pydantic.types import DirectoryPath, FilePath
 class CPPythonModel(BaseModel):
     """The base model to use for all CPPython models"""
 
-    @dataclass
-    class Config:
-        """Pydantic built-in configuration"""
+    # Data aliases should only exist for Configuration types, which will be read from files.
+    #    Constructors will never take aliases by field name
 
-        # Data aliases should only exist for Configuration types, which will be read from files.
-        #    Constructors will never take aliases by field name
-        allow_population_by_field_name = False
-
-        # Mutation will happen via data resolution
-        allow_mutation = False
+    model_config = {"populate_by_name": False}
 
 
 class CPPythonConfigurationModel(BaseModel):

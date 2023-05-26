@@ -14,7 +14,7 @@ dynamic = ["version"]
 requires-python = ">=3.11"
 
 dependencies = [
-    "pydantic>=1.10.4",
+  "pydantic>=2.0a4",
 ]
 
 [project.license-files]
