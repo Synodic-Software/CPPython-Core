@@ -37,7 +37,7 @@ class TestSchema:
         aliased-variable = true
         """
 
-        result = self.Model.parse_obj(parse(data).value)
+        result = self.Model.model_validate(parse(data).value)
         assert result.aliased_variable is True
 
     def test_cppython_local(self) -> None:

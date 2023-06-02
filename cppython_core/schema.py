@@ -2,45 +2,30 @@
 """
 
 from abc import abstractmethod
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, NewType, Protocol, TypeVar
 
-from pydantic import BaseModel, Extra, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import DirectoryPath, FilePath
 
 
 class CPPythonModel(BaseModel):
     """The base model to use for all CPPython models"""
 
-    # Data aliases should only exist for Configuration types, which will be read from files.
-    #    Constructors will never take aliases by field name
-
     model_config = {"populate_by_name": False}
-
-
-class CPPythonConfigurationModel(BaseModel):
-    """The model to use for all CPPython configuration models"""
-
-    @dataclass
-    class Config:
-        """Pydantic built-in configuration"""
-
-        # Data aliases should only exist for Configuration types. Constructors will never take aliases by field name
-        allow_population_by_field_name = False
 
 
 ModelT = TypeVar("ModelT", bound=CPPythonModel)
 
 
-class ProjectData(CPPythonModel, extra=Extra.forbid):
+class ProjectData(CPPythonModel, extra="forbid"):
     """Resolved data of 'ProjectConfiguration'"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
     verbosity: int = Field(default=0, description="The verbosity level as an integer [0,2]")
 
 
-class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
+class ProjectConfiguration(CPPythonModel, extra="forbid"):
     """Project-wide configuration"""
 
     pyproject_file: FilePath = Field(description="The path where the pyproject.toml exists")
@@ -55,7 +40,7 @@ class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
         default=False, description="Debug mode. Additional processing will happen to expose more debug information"
     )
 
-    @validator("verbosity")
+    @field_validator("verbosity")
     @classmethod
     def min_max(cls, value: int) -> int:
         """Validator that clamps the input value
@@ -68,7 +53,7 @@ class ProjectConfiguration(CPPythonConfigurationModel, extra=Extra.forbid):
         """
         return min(max(value, 0), 2)
 
-    @validator("pyproject_file")
+    @field_validator("pyproject_file")
     @classmethod
     def pyproject_name(cls, value: FilePath) -> FilePath:
         """Validator that verifies the name of the file
@@ -108,37 +93,40 @@ class PEP621Configuration(CPPythonModel):
     version: str | None = Field(default=None, description="https://peps.python.org/pep-0621/#version")
     description: str = Field(default="", description="https://peps.python.org/pep-0621/#description")
 
-    @validator("version", always=True)
+    @model_validator(mode="after")  # type: ignore
     @classmethod
-    def dynamic_version(cls, value: str | None, values: dict[str, Any]) -> str | None:
-        """Validates that version is present or that the name is present in the dynamic field
+    def dynamic_data(cls, model: "PEP621Configuration") -> "PEP621Configuration":
+        """Validates that dynamic data is represented correctly
 
         Args:
-            value: The input version
-            values: All values of the Model prior to running this validation
+            model: The input model data
 
         Raises:
             ValueError: If dynamic versioning is incorrect
 
         Returns:
-            The validated input version
+            The data
         """
 
-        if "version" not in values["dynamic"]:
-            if value is None:
-                raise ValueError("'version' is not a dynamic field. It must be defined")
-        else:
-            if value is not None:
-                raise ValueError("'version' is a dynamic field. It must not be defined")
+        for field in model.model_fields.keys():
+            if field == "dynamic":
+                continue
+            value = getattr(model, field)
+            if field not in model.dynamic:
+                if value is None:
+                    raise ValueError(f"'{field}' is not a dynamic field. It must be defined")
+            else:
+                if value is not None:
+                    raise ValueError(f"'{field}' is a dynamic field. It must not be defined")
 
-        return value
+        return model
 
 
 def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
 
-class CPPythonData(CPPythonModel, extra=Extra.forbid):
+class CPPythonData(CPPythonModel, extra="forbid"):
     """Resolved CPPython data with local and global configuration"""
 
     install_path: DirectoryPath
@@ -148,7 +136,7 @@ class CPPythonData(CPPythonModel, extra=Extra.forbid):
     provider_name: str
     generator_name: str
 
-    @validator("install_path", "tool_path", "build_path")
+    @field_validator("install_path", "tool_path", "build_path")
     @classmethod
     def validate_absolute_path(cls, value: DirectoryPath) -> DirectoryPath:
         """Enforce the input is an absolute path
@@ -196,7 +184,7 @@ class Information(CPPythonModel):
     """Plugin information that complements the packaged project metadata"""
 
 
-class PluginGroupData(CPPythonModel, extra=Extra.forbid):
+class PluginGroupData(CPPythonModel, extra="forbid"):
     """Plugin group data"""
 
     root_directory: DirectoryPath = Field(description="The directory of the project")
@@ -286,7 +274,7 @@ class DataPlugin(Plugin, Protocol):
 DataPluginT = TypeVar("DataPluginT", bound=DataPlugin)
 
 
-class CPPythonGlobalConfiguration(CPPythonModel, extra=Extra.forbid):
+class CPPythonGlobalConfiguration(CPPythonModel, extra="forbid"):
     """Global data extracted by the tool"""
 
     current_check: bool = Field(default=True, alias="current-check", description="Checks for a new CPPython version")
@@ -296,7 +284,7 @@ ProviderData = NewType("ProviderData", dict[str, Any])
 GeneratorData = NewType("GeneratorData", dict[str, Any])
 
 
-class CPPythonLocalConfiguration(CPPythonModel, extra=Extra.forbid):
+class CPPythonLocalConfiguration(CPPythonModel, extra="forbid"):
     """Data required by the tool"""
 
     install_path: Path = Field(
