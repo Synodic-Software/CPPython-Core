@@ -78,9 +78,6 @@ load-plugins = [
   "pylint.extensions.bad_builtin",
 ]
 
-[tool.pylint.messages_control]
-extension-pkg-whitelist = "pydantic"
-
 [tool.pylint.format]
 max-line-length = "120"
 
