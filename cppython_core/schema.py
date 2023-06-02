@@ -27,7 +27,7 @@ class CPPythonConfigurationModel(BaseModel):
         """Pydantic built-in configuration"""
 
         # Data aliases should only exist for Configuration types. Constructors will never take aliases by field name
-        allow_population_by_field_name = False
+        populate_by_name = False
 
 
 ModelT = TypeVar("ModelT", bound=CPPythonModel)
