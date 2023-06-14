@@ -26,6 +26,22 @@ class TestUtility:
         test_path: Path
         test_int: int
 
+    def test_none(self) -> None:
+        """Verifies that no exception is thrown with an empty string"""
+
+        test = canonicalize_name("")
+
+        assert test.group == ""
+        assert test.name == ""
+
+    def test_only_group(self) -> None:
+        """Verifies that no exception is thrown when only a group is specified"""
+
+        test = canonicalize_name("Group")
+
+        assert test.group == "group"
+        assert test.name == ""
+
     def test_name_group(self) -> None:
         """Test that canonicalization works"""
 
