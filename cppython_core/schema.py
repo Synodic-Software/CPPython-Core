@@ -122,6 +122,11 @@ class PEP621Configuration(CPPythonModel):
         return model
 
 
+PluginName = NewType("PluginName", str)
+PluginGroup = NewType("PluginGroup", str)
+PluginFullName = NewType("PluginFullName", str)
+
+
 def _default_install_location() -> Path:
     return Path.home() / ".cppython"
 
@@ -133,8 +138,9 @@ class CPPythonData(CPPythonModel, extra="forbid"):
     tool_path: DirectoryPath
     build_path: DirectoryPath
     current_check: bool
-    provider_name: str
-    generator_name: str
+    provider_name: PluginName
+    generator_name: PluginName
+    scm_name: PluginName
 
     @field_validator("install_path", "tool_path", "build_path")
     @classmethod
@@ -157,10 +163,6 @@ class CPPythonData(CPPythonModel, extra="forbid"):
 
 
 CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
-
-PluginName = NewType("PluginName", str)
-PluginGroup = NewType("PluginGroup", str)
-PluginFullName = NewType("PluginFullName", str)
 
 
 class SyncData(CPPythonModel):
@@ -188,6 +190,12 @@ class PluginGroupData(CPPythonModel, extra="forbid"):
     """Plugin group data"""
 
     root_directory: DirectoryPath = Field(description="The directory of the project")
+    tool_directory: DirectoryPath = Field(
+        description=(
+            "Points to the project plugin directory within the tool directory. This directory is for project specific"
+            " cached data."
+        )
+    )
 
 
 class Plugin(Protocol):
@@ -299,13 +307,13 @@ class CPPythonLocalConfiguration(CPPythonModel, extra="forbid"):
     provider: ProviderData = Field(
         default=ProviderData({}), description="Provider plugin data associated with 'provider_name"
     )
-    provider_name: str | None = Field(
+    provider_name: PluginName | None = Field(
         default=None, alias="provider-name", description="If empty, the provider will be automatically deduced."
     )
     generator: GeneratorData = Field(
         default=GeneratorData({}), description="Generator plugin data associated with 'generator_name'"
     )
-    generator_name: str | None = Field(
+    generator_name: PluginName | None = Field(
         default=None, alias="generator-name", description="If empty, the generator will be automatically deduced."
     )
 
@@ -327,7 +335,6 @@ class CoreData(CPPythonModel):
     """Core resolved data that will be resolved"""
 
     project_data: ProjectData
-    pep621_data: PEP621Data
     cppython_data: CPPythonData
 
 

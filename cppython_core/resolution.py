@@ -1,11 +1,15 @@
 """Data conversion routines"""
 
+from pathlib import Path
 from typing import Any, cast
+
+from pydantic import DirectoryPath
 
 from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
 from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.schema import (
+    CorePluginData,
     CPPythonData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
@@ -114,6 +118,7 @@ class PluginBuildData(CPPythonModel):
 
     generator_type: type[Generator]
     provider_type: type[Provider]
+    scm_type: type[Provider]
 
 
 def resolve_cppython(
@@ -169,6 +174,8 @@ def resolve_cppython(
     if modified_generator_name is None:
         modified_generator_name = resolve_name(plugin_build_data.generator_type)
 
+    modified_scm_name = resolve_name(plugin_build_data.scm_type)
+
     cppython_data = CPPythonData(
         install_path=modified_install_path,
         tool_path=modified_tool_path,
@@ -176,6 +183,7 @@ def resolve_cppython(
         current_check=global_configuration.current_check,
         provider_name=modified_provider_name,
         generator_name=modified_generator_name,
+        scm_name=modified_scm_name,
     )
     return cppython_data
 
@@ -202,46 +210,72 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
         current_check=cppython_data.current_check,
         provider_name=cppython_data.provider_name,
         generator_name=cppython_data.generator_name,
+        scm_name=cppython_data.scm_name,
     )
 
     return cast(CPPythonPluginData, plugin_data)
 
 
-def resolve_generator(project_data: ProjectData) -> GeneratorPluginGroupData:
+def _write_tool_directory(core_data: CorePluginData, directory: Path) -> DirectoryPath:
+    """Creates directories following a certain format
+
+    Args:
+        core_data: The core data
+        plugin_path: The relative plugin path to use
+
+    Returns:
+        The written path
+    """
+
+    plugin_directory = core_data.cppython_data.tool_path / "cppython" / directory
+    plugin_directory.mkdir(parents=True, exist_ok=True)
+
+    return plugin_directory
+
+
+def resolve_generator(core_data: CorePluginData) -> GeneratorPluginGroupData:
     """Creates an instance from the given project
 
     Args:
-        project_data: The input project configuration
+        core_data: The input project configuration
 
     Returns:
         The plugin specific configuration
     """
-    configuration = GeneratorPluginGroupData(root_directory=project_data.pyproject_file.parent)
+
+    root_directory = core_data.project_data.pyproject_file.parent
+    tool_directory = _write_tool_directory(core_data, Path("generators") / core_data.cppython_data.generator_name)
+    configuration = GeneratorPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration
 
 
-def resolve_provider(project_data: ProjectData) -> ProviderPluginGroupData:
+def resolve_provider(core_data: CorePluginData) -> ProviderPluginGroupData:
     """Creates an instance from the given project
 
     Args:
-        project_data: The input project configuration
+        core_data: The input project configuration
 
     Returns:
         The plugin specific configuration
     """
-    configuration = ProviderPluginGroupData(root_directory=project_data.pyproject_file.parent)
+
+    root_directory = core_data.project_data.pyproject_file.parent
+    tool_directory = _write_tool_directory(core_data, Path("providers") / core_data.cppython_data.provider_name)
+    configuration = ProviderPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration
 
 
-def resolve_scm(project_data: ProjectData) -> SCMPluginGroupData:
+def resolve_scm(core_data: CorePluginData) -> SCMPluginGroupData:
     """Creates an instance from the given project
 
     Args:
-        project_data: The input project configuration
+        core_data: The input project configuration
 
     Returns:
         The plugin specific configuration
     """
 
-    configuration = SCMPluginGroupData(root_directory=project_data.pyproject_file.parent)
+    root_directory = core_data.project_data.pyproject_file.parent
+    tool_directory = _write_tool_directory(core_data, Path("managers") / core_data.cppython_data.scm_name)
+    configuration = SCMPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration

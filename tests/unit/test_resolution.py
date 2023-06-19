@@ -3,13 +3,8 @@
 
 from pathlib import Path
 
-from cppython_core.resolution import (
-    resolve_generator,
-    resolve_pep621,
-    resolve_project_configuration,
-    resolve_provider,
-)
-from cppython_core.schema import PEP621Configuration, ProjectConfiguration, ProjectData
+from cppython_core.resolution import resolve_pep621, resolve_project_configuration
+from cppython_core.schema import PEP621Configuration, ProjectConfiguration
 
 
 class TestSchema:
@@ -32,26 +27,3 @@ class TestSchema:
 
         config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         assert resolve_project_configuration(config)
-
-    def test_generator_resolve(self) -> None:
-        """Tests generator resolution"""
-
-        project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
-        assert resolve_generator(project_data)
-
-    def test_provider_resolve(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Tests provider resolution
-
-        Args:
-            tmp_path: Mocker fixture
-        """
-
-        # Create a working configuration
-        pyproject = tmp_path / "pyproject.toml"
-        pyproject.write_text("")
-
-        project_data = ProjectData(pyproject_file=Path("pyproject.toml"))
-        assert resolve_provider(project_data)

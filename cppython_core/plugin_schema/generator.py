@@ -2,7 +2,6 @@
 from abc import abstractmethod
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
-from pydantic import Field
 from pydantic.types import DirectoryPath
 
 from cppython_core.schema import (
@@ -16,8 +15,6 @@ from cppython_core.schema import (
 
 class GeneratorPluginGroupData(DataPluginGroupData):
     """Base class for the configuration data that is set by the project for the generator"""
-
-    root_directory: DirectoryPath = Field(description="The directory where the pyproject.toml lives")
 
 
 class SupportedGeneratorFeatures(SupportedDataFeatures):
