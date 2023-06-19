@@ -118,7 +118,7 @@ class PluginBuildData(CPPythonModel):
 
     generator_type: type[Generator]
     provider_type: type[Provider]
-    scm_type: type[Provider]
+    scm_type: type[SCM]
 
 
 def resolve_cppython(
