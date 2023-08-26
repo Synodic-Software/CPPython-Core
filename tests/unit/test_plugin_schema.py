@@ -1,8 +1,10 @@
 """Test plugin schemas"""
 
+from synodic_utilities.utility import PluginName
+
 from cppython_core.plugin_schema.generator import SyncConsumer
 from cppython_core.plugin_schema.provider import SyncProducer
-from cppython_core.schema import PluginName, SyncData
+from cppython_core.schema import SyncData
 
 
 class TestSchema:
