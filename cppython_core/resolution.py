@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from pydantic import DirectoryPath
+from synodic_utilities.utility import canonicalize_name
 
 from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
@@ -24,7 +25,6 @@ from cppython_core.schema import (
     ProjectConfiguration,
     ProjectData,
 )
-from cppython_core.utility import canonicalize_name
 
 
 def resolve_full_name(input_type: type[Any]) -> PluginFullName:

@@ -2,7 +2,7 @@
 description = "Data definitions for CPPython"
 name = "cppython-core"
 
-license = "MIT"
+license = {text = "MIT"}
 
 authors = [
   {name = "Synodic Software", email = "contact@synodic.software"},
@@ -14,7 +14,8 @@ dynamic = ["version"]
 requires-python = ">=3.11"
 
 dependencies = [
-  "pydantic>=2.0b1",
+  "pydantic>=2.0",
+  "synodic-utilities>=0.1.1.dev3",
 ]
 
 [project.license-files]
@@ -24,18 +25,21 @@ paths = ["LICENSE.md"]
 homepage = "https://github.com/Synodic-Software/CPPython-Core"
 repository = "https://github.com/Synodic-Software/CPPython-Core"
 
-[tool.pdm]
-version = {use_scm = true}
+[tool.pdm.options]
+update = ["--update-all"]
+
+[tool.pdm.version]
+source = "scm"
 
 [tool.pdm.dev-dependencies]
 lint = [
   "black>=23.1.0",
   "isort>=5.10.1",
-  "mypy>=1.0.0",
+  "mypy>=1.4.0",
   "pylint>=2.16.1",
 ]
 test = [
-  "pytest>=7.1.2",
+  "pytest>=7.4.0",
   "pytest-cov>=4.0.0",
   "tomlkit>=0.11.4",
   "pytest-mock>=3.10.0",
@@ -92,5 +96,5 @@ default-docstring-type = "google"
 skip_empty = true
 
 [build-system]
-build-backend = "pdm.pep517.api"
-requires = ["pdm-pep517"]
+build-backend = "pdm.backend"
+requires = ["pdm.backend"]

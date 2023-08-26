@@ -2,45 +2,10 @@
 """
 
 import json
-import logging
-import re
-import subprocess
-from logging import Logger
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import Any
 
 from pydantic import BaseModel
-
-from cppython_core.exceptions import ProcessError
-
-
-def subprocess_call(
-    arguments: list[str | Path], logger: Logger, log_level: int = logging.WARNING, suppress: bool = False, **kwargs: Any
-) -> None:
-    """Executes a subprocess call with logger and utility attachments. Captures STDOUT and STDERR
-
-    Args:
-        arguments: Arguments to pass to Popen
-        logger: The logger to log the process pipes to
-        log_level: The level to log to. Defaults to logging.WARNING.
-        suppress: Mutes logging output. Defaults to False.
-        kwargs: Keyword arguments to pass to subprocess.Popen
-
-    Raises:
-        ProcessError: If the underlying process fails
-    """
-
-    with subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs) as process:
-        if process.stdout is None:
-            return
-
-        with process.stdout as pipe:
-            for line in iter(pipe.readline, ""):
-                if not suppress:
-                    logger.log(log_level, line.rstrip())
-
-    if process.returncode != 0:
-        raise ProcessError("Subprocess task failed")
 
 
 def read_json(path: Path) -> Any:
@@ -80,29 +45,3 @@ def write_json(path: Path, data: Any) -> None:
 
     with open(path, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
-
-
-_canonicalize_regex = re.compile(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))")
-
-
-class NormalizedName(NamedTuple):
-    """Normalized name"""
-
-    name: str
-    group: str
-
-
-def canonicalize_name(name: str) -> NormalizedName:
-    """Performs normalization on an input string
-
-    Args:
-        name: The string to parse
-
-    Returns:
-        The normalized name
-    """
-
-    sub = re.sub(_canonicalize_regex, r" \1", name)
-    values = sub.split(" ")
-    result = "".join(values[:-1])
-    return NormalizedName(result.lower(), values[-1].lower())
