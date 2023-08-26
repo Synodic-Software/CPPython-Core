@@ -7,6 +7,7 @@ from typing import Any, NewType, Protocol, TypeVar
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import DirectoryPath, FilePath
+from synodic_utilities.utility import PluginName
 
 
 class CPPythonModel(BaseModel):
@@ -120,11 +121,6 @@ class PEP621Configuration(CPPythonModel):
                     raise ValueError(f"'{field}' is a dynamic field. It must not be defined")
 
         return model
-
-
-PluginName = NewType("PluginName", str)
-PluginGroup = NewType("PluginGroup", str)
-PluginFullName = NewType("PluginFullName", str)
 
 
 def _default_install_location() -> Path:
