@@ -2,7 +2,7 @@
 description = "Data definitions for CPPython"
 name = "cppython-core"
 
-license = "MIT"
+license = {text = "MIT"}
 
 authors = [
   {name = "Synodic Software", email = "contact@synodic.software"},
@@ -15,6 +15,7 @@ requires-python = ">=3.11"
 
 dependencies = [
   "pydantic>=2.0",
+  "synodic-utilities>=0.1.1.dev3",
 ]
 
 [project.license-files]
@@ -24,8 +25,11 @@ paths = ["LICENSE.md"]
 homepage = "https://github.com/Synodic-Software/CPPython-Core"
 repository = "https://github.com/Synodic-Software/CPPython-Core"
 
-[tool.pdm]
-version = {use_scm = true}
+[tool.pdm.options]
+update = ["--update-all"]
+
+[tool.pdm.version]
+source = "scm"
 
 [tool.pdm.dev-dependencies]
 lint = [
@@ -94,4 +98,3 @@ skip_empty = true
 [build-system]
 build-backend = "pdm.backend"
 requires = ["pdm.backend"]
-
