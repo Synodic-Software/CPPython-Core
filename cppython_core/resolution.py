@@ -1,10 +1,10 @@
 """Data conversion routines"""
 
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 from pydantic import DirectoryPath
-from synodic_utilities.utility import canonicalize_name
+from synodic_utilities.utility import canonicalize_type
 
 from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
@@ -19,47 +19,9 @@ from cppython_core.schema import (
     DataPlugin,
     PEP621Configuration,
     PEP621Data,
-    PluginFullName,
-    PluginGroup,
-    PluginName,
     ProjectConfiguration,
     ProjectData,
 )
-
-
-def resolve_full_name(input_type: type[Any]) -> PluginFullName:
-    """Concatenates group and name values
-    Args:
-        input_type: The input type to resolve
-    Raises:
-        ValueError: When the class name is incorrect
-    Returns:
-        Concatenated name
-    """
-    name = canonicalize_name(input_type.__name__)
-    return PluginFullName(".".join(name))
-
-
-def resolve_name(input_type: type[Any]) -> PluginName:
-    """The plugin name
-    Args:
-        input_type: The input type to resolve
-    Returns:
-        The name
-    """
-    name = canonicalize_name(input_type.__name__)
-    return PluginName(name.name)
-
-
-def resolve_group(input_type: type[Any]) -> PluginGroup:
-    """The cppython plugin group name
-    Args:
-        input_type: The input type to resolve
-    Returns:
-        The group name
-    """
-    name = canonicalize_name(input_type.__name__)
-    return PluginGroup(name.group)
 
 
 def resolve_project_configuration(project_configuration: ProjectConfiguration) -> ProjectData:
@@ -169,12 +131,12 @@ def resolve_cppython(
     modified_generator_name = local_configuration.generator_name
 
     if modified_provider_name is None:
-        modified_provider_name = resolve_name(plugin_build_data.provider_type)
+        modified_provider_name = canonicalize_type(plugin_build_data.provider_type).name
 
     if modified_generator_name is None:
-        modified_generator_name = resolve_name(plugin_build_data.generator_type)
+        modified_generator_name = canonicalize_type(plugin_build_data.generator_type).name
 
-    modified_scm_name = resolve_name(plugin_build_data.scm_type)
+    modified_scm_name = canonicalize_type(plugin_build_data.scm_type).name
 
     cppython_data = CPPythonData(
         install_path=modified_install_path,
@@ -200,7 +162,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataP
     """
 
     # Add plugin specific paths to the base path
-    modified_install_path = cppython_data.install_path / resolve_name(plugin_type)
+    modified_install_path = cppython_data.install_path / canonicalize_type(plugin_type).name
     modified_install_path.mkdir(parents=True, exist_ok=True)
 
     plugin_data = CPPythonData(

@@ -263,12 +263,12 @@ files = [
 
 [[package]]
 name = "pluggy"
-version = "1.2.0"
-requires_python = ">=3.7"
+version = "1.3.0"
+requires_python = ">=3.8"
 summary = "plugin and hook calling mechanisms for python"
 files = [
-    {file = "pluggy-1.2.0-py3-none-any.whl", hash = "sha256:c2fd55a7d7a3863cba1a013e4e2414658b1d07b6bc57b3919e0c63c9abb99849"},
-    {file = "pluggy-1.2.0.tar.gz", hash = "sha256:d12f0c4b579b15f5e054301bb226ee85eeeba08ffec228092f8defbaa3a4c4b3"},
+    {file = "pluggy-1.3.0-py3-none-any.whl", hash = "sha256:d89c696a773f8bd377d18e5ecda92b7a3793cbe66c87060a6fb58c7b6e1061f7"},
+    {file = "pluggy-1.3.0.tar.gz", hash = "sha256:cf61ae8f126ac6f7c451172cf30e3e43d3ca77615509771b3a984a0730651e12"},
 ]
 
 [[package]]
@@ -419,12 +419,12 @@ files = [
 
 [[package]]
 name = "synodic-utilities"
-version = "0.1.1.dev4"
+version = "0.1.1.dev5"
 requires_python = ">=3.11"
 summary = "Synodic python utility library"
 files = [
-    {file = "synodic_utilities-0.1.1.dev4-py3-none-any.whl", hash = "sha256:a3d4c5fe9e90fe144d31795324d9ce69b98fe9cb13075ea9509d36cc4c094891"},
-    {file = "synodic_utilities-0.1.1.dev4.tar.gz", hash = "sha256:795effaedc597d95045534a8f508e8e96034ff35335e5fa99610d7b32174240c"},
+    {file = "synodic_utilities-0.1.1.dev5-py3-none-any.whl", hash = "sha256:a2980005c8d7686d5a443a1efdfa6015eabbd502604872b59ce5580f212e51ec"},
+    {file = "synodic_utilities-0.1.1.dev5.tar.gz", hash = "sha256:03237654687b6e5ce21a82c52a424a68ba9e3c04ba8337a7ee0aa0ac51111637"},
 ]
 
 [[package]]
