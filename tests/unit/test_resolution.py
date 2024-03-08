@@ -1,5 +1,4 @@
-"""Test data resolution
-"""
+"""Test data resolution"""
 
 from pathlib import Path
 

@@ -1,4 +1,5 @@
 """Generator data plugin definitions"""
+
 from abc import abstractmethod
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
