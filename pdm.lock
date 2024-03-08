@@ -5,7 +5,7 @@
 groups = ["default", "test", "lint"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:5148286cc81e367534896034f6a18edf172e8aa82ec0060db15ac14bd632a680"
+content_hash = "sha256:27188f33919c0d61f9c52911a563845dddaabf023aa9b2c1b5a5728f5258863d"
 
 [[package]]
 name = "annotated-types"
