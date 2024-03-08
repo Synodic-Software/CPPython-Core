@@ -1,8 +1,9 @@
 """Test custom schema validation that cannot be verified by the Pydantic validation"""
 
+from tomllib import loads
+
 import pytest
 from pydantic import Field
-from tomlkit import parse
 
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
@@ -32,12 +33,13 @@ class TestSchema:
     def test_model_construction_from_data(self) -> None:
         """Verifies that the base model type has the expected construction behaviors"""
 
-        data = """
+        toml_str = """
         aliased_variable = false\n
         aliased-variable = true
         """
 
-        result = self.Model.model_validate(parse(data).value)
+        data = loads(toml_str)
+        result = self.Model.model_validate(data)
         assert result.aliased_variable is True
 
     def test_cppython_local(self) -> None:
