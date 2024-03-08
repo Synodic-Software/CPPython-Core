@@ -1,4 +1,5 @@
 """Version control data plugin definitions"""
+
 from abc import abstractmethod
 from typing import Protocol, TypeVar, runtime_checkable
 

@@ -1,5 +1,4 @@
-"""Data types for CPPython that encapsulate the requirements between the plugins and the core library
-"""
+"""Data types for CPPython that encapsulate the requirements between the plugins and the core library"""
 
 from abc import abstractmethod
 from pathlib import Path

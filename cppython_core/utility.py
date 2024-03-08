@@ -1,5 +1,4 @@
-"""Core Utilities
-"""
+"""Core Utilities"""
 
 import json
 from pathlib import Path

@@ -1,5 +1,4 @@
-"""Custom exceptions used by CPPython
-"""
+"""Custom exceptions used by CPPython"""
 
 
 class ConfigError(Exception):
