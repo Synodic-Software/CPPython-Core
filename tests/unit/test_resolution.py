@@ -5,7 +5,7 @@ from pathlib import Path
 from synodic_utilities.utility import TypeName
 
 from cppython_core.resolution import (
-    PluginBuildData,
+    PluginCPPythonData,
     resolve_cppython,
     resolve_pep621,
     resolve_project_configuration,
@@ -48,7 +48,7 @@ class TestSchema:
         config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         project_data = resolve_project_configuration(config)
 
-        plugin_build_data = PluginBuildData(
+        plugin_build_data = PluginCPPythonData(
             generator_name=TypeName("generator"), provider_name=TypeName("provider"), scm_name=TypeName("scm")
         )
 

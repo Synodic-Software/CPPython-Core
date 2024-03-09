@@ -6,8 +6,8 @@ from typing import cast
 from pydantic import DirectoryPath
 from synodic_utilities.utility import TypeName
 
-from cppython_core.plugin_schema.generator import GeneratorPluginGroupData
-from cppython_core.plugin_schema.provider import ProviderPluginGroupData
+from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
 from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.schema import (
     CorePluginData,
@@ -78,6 +78,14 @@ def resolve_pep621(
 class PluginBuildData(CPPythonModel):
     """Data needed to construct CoreData"""
 
+    generator_type: type[Generator]
+    provider_type: type[Provider]
+    scm_type: type[SCM]
+
+
+class PluginCPPythonData(CPPythonModel):
+    """Plugin data needed to construct CPPythonData"""
+
     generator_name: TypeName
     provider_name: TypeName
     scm_name: TypeName
@@ -87,7 +95,7 @@ def resolve_cppython(
     local_configuration: CPPythonLocalConfiguration,
     global_configuration: CPPythonGlobalConfiguration,
     project_data: ProjectData,
-    plugin_build_data: PluginBuildData,
+    plugin_build_data: PluginCPPythonData,
 ) -> CPPythonData:
     """Creates a copy and resolves dynamic attributes
 
