@@ -2,8 +2,20 @@
 
 from pathlib import Path
 
-from cppython_core.resolution import resolve_pep621, resolve_project_configuration
-from cppython_core.schema import PEP621Configuration, ProjectConfiguration
+from synodic_utilities.utility import TypeName
+
+from cppython_core.resolution import (
+    PluginBuildData,
+    resolve_cppython,
+    resolve_pep621,
+    resolve_project_configuration,
+)
+from cppython_core.schema import (
+    CPPythonGlobalConfiguration,
+    CPPythonLocalConfiguration,
+    PEP621Configuration,
+    ProjectConfiguration,
+)
 
 
 class TestSchema:
@@ -26,3 +38,20 @@ class TestSchema:
 
         config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
         assert resolve_project_configuration(config)
+
+    def test_cppython_resolve(self) -> None:
+        """Tests cppython configuration resolution"""
+
+        cppython_local_configuration = CPPythonLocalConfiguration()
+        cppython_global_configuration = CPPythonGlobalConfiguration()
+
+        config = ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0")
+        project_data = resolve_project_configuration(config)
+
+        plugin_build_data = PluginBuildData(
+            generator_name=TypeName("generator"), provider_name=TypeName("provider"), scm_name=TypeName("scm")
+        )
+
+        assert resolve_cppython(
+            cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
+        )

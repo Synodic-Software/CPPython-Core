@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import cast
 
 from pydantic import DirectoryPath
-from synodic_utilities.utility import canonicalize_type
+from synodic_utilities.utility import TypeName
 
-from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
-from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
+from cppython_core.plugin_schema.generator import GeneratorPluginGroupData
+from cppython_core.plugin_schema.provider import ProviderPluginGroupData
 from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.schema import (
     CorePluginData,
@@ -78,9 +78,9 @@ def resolve_pep621(
 class PluginBuildData(CPPythonModel):
     """Data needed to construct CoreData"""
 
-    generator_type: type[Generator]
-    provider_type: type[Provider]
-    scm_type: type[SCM]
+    generator_name: TypeName
+    provider_name: TypeName
+    scm_name: TypeName
 
 
 def resolve_cppython(
@@ -131,12 +131,12 @@ def resolve_cppython(
     modified_generator_name = local_configuration.generator_name
 
     if modified_provider_name is None:
-        modified_provider_name = canonicalize_type(plugin_build_data.provider_type).name
+        modified_provider_name = plugin_build_data.provider_name
 
     if modified_generator_name is None:
-        modified_generator_name = canonicalize_type(plugin_build_data.generator_type).name
+        modified_generator_name = plugin_build_data.generator_name
 
-    modified_scm_name = canonicalize_type(plugin_build_data.scm_type).name
+    modified_scm_name = plugin_build_data.scm_name
 
     cppython_data = CPPythonData(
         install_path=modified_install_path,
@@ -162,7 +162,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[Plugi
     """
 
     # Add plugin specific paths to the base path
-    modified_install_path = cppython_data.install_path / canonicalize_type(plugin_type).name
+    modified_install_path = cppython_data.install_path / plugin_type.name()
     modified_install_path.mkdir(parents=True, exist_ok=True)
 
     plugin_data = CPPythonData(
