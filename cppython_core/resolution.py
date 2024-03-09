@@ -16,9 +16,9 @@ from cppython_core.schema import (
     CPPythonLocalConfiguration,
     CPPythonModel,
     CPPythonPluginData,
-    DataPlugin,
     PEP621Configuration,
     PEP621Data,
+    Plugin,
     ProjectConfiguration,
     ProjectData,
 )
@@ -150,7 +150,7 @@ def resolve_cppython(
     return cppython_data
 
 
-def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[DataPlugin]) -> CPPythonPluginData:
+def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[Plugin]) -> CPPythonPluginData:
     """Resolve project configuration for plugins
 
     Args:
