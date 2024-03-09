@@ -2,7 +2,7 @@
 
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, NewType, Protocol, TypeVar
+from typing import Any, NewType, Protocol
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import DirectoryPath, FilePath
@@ -13,10 +13,6 @@ class CPPythonModel(BaseModel):
     """The base model to use for all CPPython models"""
 
     model_config = {"populate_by_name": False}
-
-
-ModelT = TypeVar("ModelT", bound=CPPythonModel)
-
 
 class ProjectData(CPPythonModel, extra="forbid"):
     """Resolved data of 'ProjectConfiguration'"""
@@ -165,10 +161,6 @@ class SyncData(CPPythonModel):
 
     provider_name: PluginName
 
-
-SyncDataT = TypeVar("SyncDataT", bound=SyncData)
-
-
 class SupportedFeatures(CPPythonModel):
     """Plugin feature support"""
 
@@ -223,10 +215,6 @@ class Plugin(Protocol):
         """
         raise NotImplementedError
 
-
-PluginT = TypeVar("PluginT", bound=Plugin)
-
-
 class DataPluginGroupData(PluginGroupData):
     """Data plugin group data"""
 
@@ -272,10 +260,6 @@ class DataPlugin(Plugin, Protocol):
         Args:
             directory: The directory to download any extra tooling to
         """
-
-
-DataPluginT = TypeVar("DataPluginT", bound=DataPlugin)
-
 
 class CPPythonGlobalConfiguration(CPPythonModel, extra="forbid"):
     """Global data extracted by the tool"""
@@ -345,6 +329,3 @@ class Interface(Protocol):
     def write_configuration(self) -> None:
         """Called when CPPython requires the interface to write out configuration changes"""
         raise NotImplementedError
-
-
-InterfaceT = TypeVar("InterfaceT", bound=Interface)

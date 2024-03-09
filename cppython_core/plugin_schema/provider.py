@@ -1,7 +1,7 @@
 """Provider data plugin definitions"""
 
 from abc import abstractmethod
-from typing import Any, Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from pydantic.types import DirectoryPath
 
@@ -85,6 +85,3 @@ class Provider(DataPlugin, SyncProducer, Protocol):
     def update(self) -> None:
         """Called when dependencies need to be updated and written to the lock file."""
         raise NotImplementedError
-
-
-ProviderT = TypeVar("ProviderT", bound=Provider)

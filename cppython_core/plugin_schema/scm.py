@@ -1,7 +1,7 @@
 """Version control data plugin definitions"""
 
 from abc import abstractmethod
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from pydantic import DirectoryPath, Field
 
@@ -57,6 +57,3 @@ class SCM(Plugin, Protocol):
         Returns:
             Returns the project description, or none if unavailable
         """
-
-
-SCMT = TypeVar("SCMT", bound=SCM)
