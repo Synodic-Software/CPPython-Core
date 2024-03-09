@@ -1,7 +1,7 @@
 """Generator data plugin definitions"""
 
 from abc import abstractmethod
-from typing import Any, Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from pydantic.types import DirectoryPath
 
@@ -67,6 +67,3 @@ class Generator(DataPlugin, SyncConsumer, Protocol):
             The supported features
         """
         raise NotImplementedError
-
-
-GeneratorT = TypeVar("GeneratorT", bound=Generator)
