@@ -6,13 +6,15 @@ from typing import Any, NewType, Protocol
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic.types import DirectoryPath, FilePath
-from synodic_utilities.utility import PluginName
+from synodic_utilities.plugin import Plugin as SynodicPlugin
+from synodic_utilities.utility import TypeName
 
 
 class CPPythonModel(BaseModel):
     """The base model to use for all CPPython models"""
 
     model_config = {"populate_by_name": False}
+
 
 class ProjectData(CPPythonModel, extra="forbid"):
     """Resolved data of 'ProjectConfiguration'"""
@@ -129,9 +131,9 @@ class CPPythonData(CPPythonModel, extra="forbid"):
     tool_path: DirectoryPath
     build_path: DirectoryPath
     current_check: bool
-    provider_name: PluginName
-    generator_name: PluginName
-    scm_name: PluginName
+    provider_name: TypeName
+    generator_name: TypeName
+    scm_name: TypeName
 
     @field_validator("install_path", "tool_path", "build_path")
     @classmethod
@@ -159,7 +161,8 @@ CPPythonPluginData = NewType("CPPythonPluginData", CPPythonData)
 class SyncData(CPPythonModel):
     """Data that passes in a plugin sync"""
 
-    provider_name: PluginName
+    provider_name: TypeName
+
 
 class SupportedFeatures(CPPythonModel):
     """Plugin feature support"""
@@ -185,7 +188,7 @@ class PluginGroupData(CPPythonModel, extra="forbid"):
     )
 
 
-class Plugin(Protocol):
+class Plugin(SynodicPlugin, Protocol):
     """CPPython plugin"""
 
     @abstractmethod
@@ -214,6 +217,7 @@ class Plugin(Protocol):
             The plugin's information
         """
         raise NotImplementedError
+
 
 class DataPluginGroupData(PluginGroupData):
     """Data plugin group data"""
@@ -261,6 +265,7 @@ class DataPlugin(Plugin, Protocol):
             directory: The directory to download any extra tooling to
         """
 
+
 class CPPythonGlobalConfiguration(CPPythonModel, extra="forbid"):
     """Global data extracted by the tool"""
 
@@ -286,13 +291,13 @@ class CPPythonLocalConfiguration(CPPythonModel, extra="forbid"):
     provider: ProviderData = Field(
         default=ProviderData({}), description="Provider plugin data associated with 'provider_name"
     )
-    provider_name: PluginName | None = Field(
+    provider_name: TypeName | None = Field(
         default=None, alias="provider-name", description="If empty, the provider will be automatically deduced."
     )
     generator: GeneratorData = Field(
         default=GeneratorData({}), description="Generator plugin data associated with 'generator_name'"
     )
-    generator_name: PluginName | None = Field(
+    generator_name: TypeName | None = Field(
         default=None, alias="generator-name", description="If empty, the generator will be automatically deduced."
     )
 
