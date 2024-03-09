@@ -1,6 +1,6 @@
 """Test plugin schemas"""
 
-from synodic_utilities.utility import PluginName
+from synodic_utilities.utility import TypeName
 
 from cppython_core.plugin_schema.generator import SyncConsumer
 from cppython_core.plugin_schema.provider import SyncProducer
@@ -71,7 +71,7 @@ class TestSchema:
             """
             for sync_type in consumer.sync_types():
                 if sync_type == TestSchema.GeneratorSyncDataSuccess:
-                    return TestSchema.GeneratorSyncDataSuccess(provider_name=PluginName("Dummy"), success=True)
+                    return TestSchema.GeneratorSyncDataSuccess(provider_name=TypeName("Dummy"), success=True)
 
             return None
 
@@ -98,7 +98,7 @@ class TestSchema:
 
         consumer = self.Consumer()
 
-        data = self.GeneratorSyncDataSuccess(provider_name=PluginName("Dummy"), success=True)
+        data = self.GeneratorSyncDataSuccess(provider_name=TypeName("Dummy"), success=True)
         consumer.sync(data)
 
     def test_sync_flow(self) -> None:
