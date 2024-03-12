@@ -1,11 +1,12 @@
 """Data conversion routines"""
 
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
-from pydantic import DirectoryPath
+from pydantic import BaseModel, DirectoryPath, ValidationError
 from synodic_utilities.utility import TypeName
 
+from cppython_core.exceptions import ConfigError, ConfigException
 from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
 from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
@@ -249,3 +250,27 @@ def resolve_scm(core_data: CorePluginData) -> SCMPluginGroupData:
     tool_directory = _write_tool_directory(core_data, Path("managers") / core_data.cppython_data.scm_name)
     configuration = SCMPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration
+
+
+def resolve_model[T: BaseModel](model: type[T], data: dict[str, Any]) -> T:
+    """Clean up Pydantic ValidationError messages and add custom messages if needed
+
+    Args:
+        data: The input data
+        messages: A mapping of field names to custom messages
+
+    Raises:
+        ConfigError: Raised when the input does not satisfy the given schema
+
+    Returns:
+        The sanitized and human readable error messages
+    """
+
+    try:
+        # BaseModel is setup to ignore extra fields
+        return model(**data)
+    except ValidationError as e:
+        new_errors: list[ConfigError] = []
+        for error in e.errors():
+            new_errors.append(ConfigError(message=error["msg"]))
+        raise ConfigException("The input project failed", new_errors) from e
