@@ -7,9 +7,13 @@ from pydantic import Field
 from synodic_utilities.utility import TypeName
 
 from cppython_core.exceptions import ConfigException
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
+from cppython_core.plugin_schema.scm import SCM
 from cppython_core.resolution import (
     PluginCPPythonData,
     resolve_cppython,
+    resolve_cppython_plugin,
     resolve_generator,
     resolve_model,
     resolve_pep621,
@@ -102,7 +106,11 @@ class TestResolve:
             cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
         )
 
-        assert resolve_generator(project_data, cppython_data)
+        MockGenerator = type("MockGenerator", (Generator,), {})
+
+        cppython_plugin_data = resolve_cppython_plugin(cppython_data, MockGenerator)
+
+        assert resolve_generator(project_data, cppython_plugin_data)
 
     def test_provider_resolve(self) -> None:
         """Test provider resolution"""
@@ -122,7 +130,11 @@ class TestResolve:
             cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
         )
 
-        assert resolve_provider(project_data, cppython_data)
+        MockProvider = type("MockProvider", (Provider,), {})
+
+        cppython_plugin_data = resolve_cppython_plugin(cppython_data, MockProvider)
+
+        assert resolve_provider(project_data, cppython_plugin_data)
 
     def test_scm_resolve(self) -> None:
         """Test scm resolution"""
@@ -142,4 +154,8 @@ class TestResolve:
             cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
         )
 
-        assert resolve_scm(project_data, cppython_data)
+        MockSCM = type("MockSCM", (SCM,), {})
+
+        cppython_plugin_data = resolve_cppython_plugin(cppython_data, MockSCM)
+
+        assert resolve_scm(project_data, cppython_plugin_data)
