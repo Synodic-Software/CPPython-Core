@@ -22,6 +22,7 @@ from cppython_core.resolution import (
     resolve_scm,
 )
 from cppython_core.schema import (
+    CoreData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
     CPPythonModel,
@@ -65,9 +66,11 @@ class TestResolve:
             generator_name=TypeName("generator"), provider_name=TypeName("provider"), scm_name=TypeName("scm")
         )
 
-        assert resolve_cppython(
+        cppython_data = resolve_cppython(
             cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
         )
+
+        assert CoreData(project_data=project_data, cppython_data=cppython_data)
 
     def test_model_resolve(self) -> None:
         """Test model resolution"""
