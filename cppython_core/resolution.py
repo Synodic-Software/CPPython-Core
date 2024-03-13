@@ -203,7 +203,7 @@ def _write_tool_directory(cppython_data: CPPythonData, directory: Path) -> Direc
     return plugin_directory
 
 
-def resolve_generator(project_data: ProjectData, cppython_data: CPPythonData) -> GeneratorPluginGroupData:
+def resolve_generator(project_data: ProjectData, cppython_data: CPPythonPluginData) -> GeneratorPluginGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -220,7 +220,7 @@ def resolve_generator(project_data: ProjectData, cppython_data: CPPythonData) ->
     return configuration
 
 
-def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderPluginGroupData:
+def resolve_provider(project_data: ProjectData, cppython_data: CPPythonPluginData) -> ProviderPluginGroupData:
     """Creates an instance from the given project
 
     Args:
@@ -237,7 +237,7 @@ def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> 
     return configuration
 
 
-def resolve_scm(project_data: ProjectData, cppython_data: CPPythonData) -> SCMPluginGroupData:
+def resolve_scm(project_data: ProjectData, cppython_data: CPPythonPluginData) -> SCMPluginGroupData:
     """Creates an instance from the given project
 
     Args:
