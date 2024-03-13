@@ -11,7 +11,6 @@ from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGrou
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
 from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.schema import (
-    CorePluginData,
     CPPythonData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
