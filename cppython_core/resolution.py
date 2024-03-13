@@ -11,7 +11,6 @@ from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGrou
 from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
 from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.schema import (
-    CorePluginData,
     CPPythonData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
@@ -187,7 +186,7 @@ def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[Plugi
     return cast(CPPythonPluginData, plugin_data)
 
 
-def _write_tool_directory(core_data: CorePluginData, directory: Path) -> DirectoryPath:
+def _write_tool_directory(cppython_data: CPPythonData, directory: Path) -> DirectoryPath:
     """Creates directories following a certain format
 
     Args:
@@ -198,72 +197,75 @@ def _write_tool_directory(core_data: CorePluginData, directory: Path) -> Directo
         The written path
     """
 
-    plugin_directory = core_data.cppython_data.tool_path / "cppython" / directory
+    plugin_directory = cppython_data.tool_path / "cppython" / directory
     plugin_directory.mkdir(parents=True, exist_ok=True)
 
     return plugin_directory
 
 
-def resolve_generator(core_data: CorePluginData) -> GeneratorPluginGroupData:
+def resolve_generator(project_data: ProjectData, cppython_data: CPPythonData) -> GeneratorPluginGroupData:
     """Creates an instance from the given project
 
     Args:
-        core_data: The input project configuration
+        project_data: The input project data
+        cppython_data: The input cppython data
 
     Returns:
         The plugin specific configuration
     """
 
-    root_directory = core_data.project_data.pyproject_file.parent
-    tool_directory = _write_tool_directory(core_data, Path("generators") / core_data.cppython_data.generator_name)
+    root_directory = project_data.pyproject_file.parent
+    tool_directory = _write_tool_directory(cppython_data, Path("generators") / cppython_data.generator_name)
     configuration = GeneratorPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration
 
 
-def resolve_provider(core_data: CorePluginData) -> ProviderPluginGroupData:
+def resolve_provider(project_data: ProjectData, cppython_data: CPPythonData) -> ProviderPluginGroupData:
     """Creates an instance from the given project
 
     Args:
-        core_data: The input project configuration
+        project_data: The input project data
+        cppython_data: The input cppython data
 
     Returns:
         The plugin specific configuration
     """
 
-    root_directory = core_data.project_data.pyproject_file.parent
-    tool_directory = _write_tool_directory(core_data, Path("providers") / core_data.cppython_data.provider_name)
+    root_directory = project_data.pyproject_file.parent
+    tool_directory = _write_tool_directory(cppython_data, Path("providers") / cppython_data.provider_name)
     configuration = ProviderPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration
 
 
-def resolve_scm(core_data: CorePluginData) -> SCMPluginGroupData:
+def resolve_scm(project_data: ProjectData, cppython_data: CPPythonData) -> SCMPluginGroupData:
     """Creates an instance from the given project
 
     Args:
-        core_data: The input project configuration
+        project_data: The input project data
+        cppython_data: The input cppython data
 
     Returns:
         The plugin specific configuration
     """
 
-    root_directory = core_data.project_data.pyproject_file.parent
-    tool_directory = _write_tool_directory(core_data, Path("managers") / core_data.cppython_data.scm_name)
+    root_directory = project_data.pyproject_file.parent
+    tool_directory = _write_tool_directory(cppython_data, Path("managers") / cppython_data.scm_name)
     configuration = SCMPluginGroupData(root_directory=root_directory, tool_directory=tool_directory)
     return configuration
 
 
 def resolve_model[T: BaseModel](model: type[T], data: dict[str, Any]) -> T:
-    """Clean up Pydantic ValidationError messages and add custom messages if needed
+    """Wraps the model validation and conversion
 
     Args:
-        data: The input data
-        messages: A mapping of field names to custom messages
+        model: The model to create
+        data: The input data to create the model from
 
     Raises:
-        ConfigError: Raised when the input does not satisfy the given schema
+        ConfigException: Raised when the input does not satisfy the given schema
 
     Returns:
-        The sanitized and human readable error messages
+        The instance of the model
     """
 
     try:
