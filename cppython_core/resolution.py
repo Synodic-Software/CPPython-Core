@@ -159,28 +159,6 @@ def resolve_cppython(
     return cppython_data
 
 
-def resolve_core_data(
-    project_data: ProjectData,
-    local_configuration: CPPythonLocalConfiguration,
-    global_configuration: CPPythonGlobalConfiguration,
-    plugin_cppython_date: PluginCPPythonData,
-) -> CoreData:
-    """Parses and returns resolved data from all configuration sources
-
-    Args:
-        project_data: Project data
-        local_configuration: Local project configuration
-        global_configuration: Shared project configuration
-        plugin_cppython_date: CPPython data needed to construct CoreData for plugins
-
-    Returns:
-        The resolved core object
-    """
-    cppython_data = resolve_cppython(local_configuration, global_configuration, project_data, plugin_cppython_date)
-
-    return CoreData(project_data=project_data, cppython_data=cppython_data)
-
-
 def resolve_cppython_plugin(cppython_data: CPPythonData, plugin_type: type[Plugin]) -> CPPythonPluginData:
     """Resolve project configuration for plugins
 

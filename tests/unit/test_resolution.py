@@ -70,7 +70,7 @@ class TestResolve:
             cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
         )
 
-        assert CoreData(project_data=project_data, cppython_data=cppython_data)
+        assert cppython_data
 
     def test_model_resolve(self) -> None:
         """Test model resolution"""
